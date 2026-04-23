@@ -1,0 +1,5 @@
+public enum TipoEvento {
+    ORÇAMENTO_PRONTO,
+    SERVIÇO_FINALIZADO,
+    PRONTO_PARA_RETIRADA;
+}
