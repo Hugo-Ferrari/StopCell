@@ -6,28 +6,34 @@ public class TransacaoPix extends Transicao {
     public TransacaoPix() {
     }
 
+
     public TransacaoPix(Long id, Double valor, LocalDateTime data, String chaveDestino) {
         super(id, valor, data);
         this.chaveDestino = chaveDestino;
     }
 
+
     public String getChaveDestino() {
         return chaveDestino;
     }
+
 
     public void setChaveDestino(String chaveDestino) {
         this.chaveDestino = chaveDestino;
     }
 
+
     public String getQrCode() {
         return qrCode;
     }
+
 
     public void setQrCode(String qrCode) {
         this.qrCode = qrCode;
     }
 
     @Override
+    // Valida os dados obrigatórios do PIX e registra a data atual se ela ainda não estiver preenchida.
     void registrar() {
         if (valor == null || valor <= 0) {
             throw new IllegalArgumentException("Valor da transacao PIX deve ser maior que zero.");
@@ -41,11 +47,13 @@ public class TransacaoPix extends Transicao {
     }
 
     @Override
+    // Cancela a transação limpando a data de registro.
     void cancelar() {
         this.data = null;
     }
 
     @Override
+
     public String toString() {
         return "Pix{" +
                 super.toString() +

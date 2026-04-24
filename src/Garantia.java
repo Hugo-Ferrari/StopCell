@@ -49,6 +49,7 @@ public class Garantia {
         this.dataValidade = dataValidade;
     }
 
+    // Calcula quantos dias faltam ate a validade, retornando zero quando ela nao existir.
     public int diasRestantes() {
         if (dataValidade == null) {
             return 0;
@@ -57,6 +58,7 @@ public class Garantia {
     }
 
     @Override
+    // Monta uma representacao textual da garantia.
     public String toString() {
         return "Garantia{" +
                 "id=" + id +

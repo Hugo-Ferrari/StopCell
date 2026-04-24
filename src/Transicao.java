@@ -8,41 +8,51 @@ public abstract class Transicao {
     public Transicao() {
     }
 
+
     public Transicao(Long id, Double valor, LocalDateTime data) {
         this.id = id;
         this.valor = valor;
         this.data = data;
     }
 
+
     public Long getId() {
         return id;
     }
+
 
     public void setId(Long id) {
         this.id = id;
     }
 
+
     public Double getValor() {
         return valor;
     }
+
 
     public void setValor(Double valor) {
         this.valor = valor;
     }
 
+
     public LocalDateTime getData() {
         return data;
     }
+
 
     public void setData(LocalDateTime data) {
         this.data = data;
     }
 
+    // Obriga as subclasses a implementarem a rotina de registro da transação.
     abstract void registrar();
 
+    // Obriga as subclasses a implementarem a rotina de cancelamento da transação.
     abstract void cancelar();
 
     @Override
+
     public String toString() {
         return "Transicao{" +
                 "id=" + id +

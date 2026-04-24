@@ -7,6 +7,7 @@ public class TransacaoCartao extends Transicao {
     public TransacaoCartao() {
     }
 
+
     public TransacaoCartao(Long id, Double valor, LocalDateTime data, String bandeira, String ultimos4Digitos, int numeroParcelas) {
         super(id, valor, data);
         this.bandeira = bandeira;
@@ -14,31 +15,38 @@ public class TransacaoCartao extends Transicao {
         this.numeroParcelas = numeroParcelas;
     }
 
+
     public String getBandeira() {
         return bandeira;
     }
+
 
     public void setBandeira(String bandeira) {
         this.bandeira = bandeira;
     }
 
+
     public String getUltimos4Digitos() {
         return ultimos4Digitos;
     }
+
 
     public void setUltimos4Digitos(String ultimos4Digitos) {
         this.ultimos4Digitos = ultimos4Digitos;
     }
 
+
     public int getNumeroParcelas() {
         return numeroParcelas;
     }
+
 
     public void setNumeroParcelas(int numeroParcelas) {
         this.numeroParcelas = numeroParcelas;
     }
 
     @Override
+    // Valida os dados obrigatórios do pagamento em cartão e preenche valores padrão quando necessário.
     void registrar() {
         if (valor == null || valor <= 0) {
             throw new IllegalArgumentException("Valor da transacao no cartao deve ser maior que zero.");
@@ -58,11 +66,13 @@ public class TransacaoCartao extends Transicao {
     }
 
     @Override
+    // Cancela a transação limpando a data registrada.
     void cancelar() {
         this.data = null;
     }
 
     @Override
+
     public String toString() {
         return "Cartao{" +
                 super.toString() +

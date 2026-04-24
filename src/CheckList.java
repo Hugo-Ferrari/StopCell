@@ -40,6 +40,7 @@ public class CheckList {
         this.itens = itens;
     }
 
+    // Garante que o checklist tenha data de registro e uma colecao de itens pronta para uso.
     public void registrar() {
         if (this.dataResgistro == null) {
             this.dataResgistro = LocalDateTime.now();
@@ -49,6 +50,7 @@ public class CheckList {
         }
     }
 
+    // Finaliza o checklist apenas quando todos os itens ja estiverem marcados.
     public void finalizar() {
         if (!isCompleto()) {
             throw new IllegalStateException("Nao e possivel finalizar um checklist incompleto.");
@@ -58,11 +60,13 @@ public class CheckList {
         }
     }
 
+    // Verifica se existe pelo menos um item e se todos foram marcados.
     public boolean isCompleto() {
         return itens != null && !itens.isEmpty() && itens.stream().allMatch(ItemCheckList::isMarcado);
     }
 
     @Override
+    // Monta uma representacao textual do checklist com seus dados principais.
     public String toString() {
         return "CheckList{" +
                 "id=" + id +

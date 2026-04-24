@@ -67,24 +67,29 @@ public class Cliente {
         this.datatCadastro = datatCadastro;
     }
 
+    // Preenche a data de cadastro caso ela ainda nao tenha sido informada.
     public void castrar() {
         if (this.datatCadastro == null) {
             this.datatCadastro = LocalDateTime.now();
         }
     }
 
+    // Registra uma mensagem indicando que os dados do cliente foram alterados.
     public void editar() {
         registrarAlteracao("dados do cliente atualizados");
     }
 
+    // Registra uma mensagem indicando exclusao logica do cliente.
     public void excluir() {
         registrarAlteracao("cliente excluido");
     }
 
+    // Exibe no console a descricao da alteracao recebida.
     public void registrarAlteracao(String alteracao) {
         System.out.println("A alteracao " + alteracao + " foi registrada");
     }
 
+    // Busca pelo telefone informado e retorna o nome quando houver correspondencia.
     public String buscarPorTelefone(String telefone) {
         if (this.telefone != null && this.telefone.equals(telefone)) {
             return this.nomeCompleto;
@@ -92,6 +97,7 @@ public class Cliente {
         return null;
     }
 
+    // Recebe uma notificacao e imprime sua mensagem quando ela existir.
     public void receberNotificacao(Notificacao notificacao) {
         if (notificacao != null) {
             System.out.println("Notificacao recebida: " + notificacao.getMensagem());
@@ -99,6 +105,7 @@ public class Cliente {
     }
 
     @Override
+    // Monta uma representacao textual do cliente para inspecao.
     public String toString() {
         return "Cliente{" +
                 "id=" + id +
