@@ -1,0 +1,293 @@
+// ============================================================
+// schema.prisma — stopCell (NestJS + Prisma + PostgreSQL)
+// Multi-tenant: cada empresa isola seus próprios dados
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// LOOKUP TABLES (agora por empresa)
+// ─────────────────────────────────────────────
+
+model Categoria {
+  idCategoria Int    @id @default(autoincrement()) @map("id_categoria")
+  cnpjEmpresa String @map("cnpj_empresa") @db.VarChar(14)
+  nmCategoria String? @map("nm_categoria") @db.VarChar(100)
+
+  empresa   Empresa    @relation(fields: [cnpjEmpresa], references: [cnpj])
+  aparelhos Aparelho[]
+
+  @@map("categoria")
+}
+
+model Marca {
+  idMarca     Int    @id @default(autoincrement()) @map("id_marca")
+  cnpjEmpresa String @map("cnpj_empresa") @db.VarChar(14)
+  nmMarca     String? @map("nm_marca") @db.VarChar(100)
+
+  empresa   Empresa    @relation(fields: [cnpjEmpresa], references: [cnpj])
+  aparelhos Aparelho[]
+
+  @@map("marca")
+}
+
+model Checklist {
+  idChecklist Int    @id @default(autoincrement()) @map("id_checklist")
+  cnpjEmpresa String @map("cnpj_empresa") @db.VarChar(14)
+  descricao   String? @db.VarChar(100)
+
+  empresa      Empresa       @relation(fields: [cnpjEmpresa], references: [cnpj])
+  osChecklists OsChecklist[]
+
+  @@map("checklist")
+}
+
+// ─────────────────────────────────────────────
+// PESSOAS / EMPRESA
+// ─────────────────────────────────────────────
+
+model Cliente {
+  cpf         String  @id @db.VarChar(11)
+  cnpjEmpresa String  @map("cnpj_empresa") @db.VarChar(14)
+  nmCompleto  String? @map("nm_completo") @db.VarChar(100)
+  telefone    String? @db.VarChar(20)
+  email       String? @db.VarChar(100)
+  endereco    String? @db.VarChar(150)
+
+  empresa         Empresa          @relation(fields: [cnpjEmpresa], references: [cnpj])
+  aparelhos       Aparelho[]
+  ordensServico   OrdemServico[]
+  logNotificacoes LogNotificacao[]
+
+  @@map("cliente")
+}
+
+model Empresa {
+  cnpj         String  @id @db.VarChar(14)
+  nomeFantasia String? @map("nome_fantasia") @db.VarChar(100)
+  razaoSocial  String? @map("razao_social") @db.VarChar(100)
+  telefone     String? @db.VarChar(20)
+  endereco     String? @db.VarChar(150)
+
+  usuarios      Usuario[]
+  ordensServico OrdemServico[]
+  clientes      Cliente[]
+  aparelhos     Aparelho[]
+  servicos      Servico[]
+  pecas         Peca[]
+  categorias    Categoria[]
+  marcas        Marca[]
+  checklists    Checklist[]
+
+  @@map("empresa")
+}
+
+model Usuario {
+  idUsuario    Int     @id @default(autoincrement()) @map("id_usuario")
+  cnpjEmpresa  String? @map("cnpj_empresa") @db.VarChar(14)
+  nome         String? @db.VarChar(100)
+  login        String? @db.VarChar(50)
+  emailUsuario String? @map("email_usuario") @db.VarChar(100) @unique
+  senha        String? @db.VarChar(255)
+  nivelAcesso  String? @map("nivel_acesso") @db.VarChar(20)
+
+  empresa       Empresa?       @relation(fields: [cnpjEmpresa], references: [cnpj])
+  ordensServico OrdemServico[]
+
+  @@map("usuario")
+}
+
+// ─────────────────────────────────────────────
+// APARELHO
+// ─────────────────────────────────────────────
+
+model Aparelho {
+  imei          String  @id @db.VarChar(50)
+  cnpjEmpresa   String  @map("cnpj_empresa") @db.VarChar(14)
+  idCategoria   Int     @map("id_categoria")
+  idMarca       Int     @map("id_marca")
+  cpfCliente    String  @map("cpf_cliente") @db.VarChar(11)
+  modelo        String? @db.VarChar(100)
+  cor           String? @db.VarChar(50)
+  senhaAparelho String? @map("senha_aparelho") @db.VarChar(255)
+  tipoSenha     String? @map("tipo_senha") @db.VarChar(50)
+
+  empresa       Empresa        @relation(fields: [cnpjEmpresa], references: [cnpj])
+  categoria     Categoria      @relation(fields: [idCategoria], references: [idCategoria])
+  marca         Marca          @relation(fields: [idMarca], references: [idMarca])
+  cliente       Cliente        @relation(fields: [cpfCliente], references: [cpf])
+  ordensServico OrdemServico[]
+
+  @@map("aparelho")
+}
+
+// ─────────────────────────────────────────────
+// PEÇA / SERVIÇO (agora por empresa)
+// ─────────────────────────────────────────────
+
+model Peca {
+  idPeca      Int      @id @default(autoincrement()) @map("id_peca")
+  cnpjEmpresa String   @map("cnpj_empresa") @db.VarChar(14)
+  descricao   String?  @db.VarChar(150)
+  valor       Decimal? @db.Decimal(10, 2)
+  quantidade  Int?
+
+  empresa Empresa   @relation(fields: [cnpjEmpresa], references: [cnpj])
+  itensOs ItensOs[]
+
+  @@map("peca")
+}
+
+model Servico {
+  idServico   Int      @id @default(autoincrement()) @map("id_servico")
+  cnpjEmpresa String   @map("cnpj_empresa") @db.VarChar(14)
+  descricao   String?  @db.VarChar(150)
+  valor       Decimal? @db.Decimal(10, 2)
+
+  empresa Empresa   @relation(fields: [cnpjEmpresa], references: [cnpj])
+  itensOs ItensOs[]
+
+  @@map("servico")
+}
+
+// ─────────────────────────────────────────────
+// ORDEM DE SERVIÇO
+// ─────────────────────────────────────────────
+
+model OrdemServico {
+  numOs         Int       @id @default(autoincrement()) @map("num_os")
+  numOsAnterior Int?      @map("num_os_anterior")
+  cpfCliente    String    @map("cpf_cliente") @db.VarChar(11)
+  imeiAparelho  String    @map("imei_aparelho") @db.VarChar(50)
+  cnpjEmpresa   String    @map("cnpj_empresa") @db.VarChar(14)
+  idUsuario     Int       @map("id_usuario")
+  dtEntrada     DateTime? @map("dt_entrada")
+  dtSaida       DateTime? @map("dt_saida")
+  status        String?   @db.VarChar(50)
+  vlTotal       Decimal?  @map("vl_total") @db.Decimal(10, 2)
+  diagnostico   String?
+
+  // Auto-referência: OS pai (retrabalho)
+  ordemServicoPai OrdemServico?  @relation("OsRetrabalho", fields: [numOsAnterior], references: [numOs])
+  ordensFilhas    OrdemServico[] @relation("OsRetrabalho")
+
+  cliente  Cliente  @relation(fields: [cpfCliente], references: [cpf])
+  aparelho Aparelho @relation(fields: [imeiAparelho], references: [imei])
+  empresa  Empresa  @relation(fields: [cnpjEmpresa], references: [cnpj])
+  usuario  Usuario  @relation(fields: [idUsuario], references: [idUsuario])
+
+  itensOs         ItensOs[]
+  diagnosticos    Diagnostico[]
+  logNotificacoes LogNotificacao[]
+  pagamentos      Pagamento[]
+  osChecklists    OsChecklist[]
+
+  @@map("ordem_servico")
+}
+
+// ─────────────────────────────────────────────
+// ITENS DA OS
+// ─────────────────────────────────────────────
+
+model ItensOs {
+  idItemOs      Int      @id @default(autoincrement()) @map("id_item_os")
+  numOs         Int      @map("num_os")
+  idServico     Int?     @map("id_servico")
+  idPeca        Int?     @map("id_peca")
+  quantidade    Int?
+  valorUnitario Decimal? @map("valor_unitario") @db.Decimal(10, 2)
+
+  ordemServico OrdemServico @relation(fields: [numOs], references: [numOs])
+  servico      Servico?     @relation(fields: [idServico], references: [idServico])
+  peca         Peca?        @relation(fields: [idPeca], references: [idPeca])
+
+  @@map("itens_os")
+}
+
+// ─────────────────────────────────────────────
+// DIAGNÓSTICO
+// ─────────────────────────────────────────────
+
+model Diagnostico {
+  idDiagnostico Int       @id @default(autoincrement()) @map("id_diagnostico")
+  numOs         Int       @map("num_os")
+  relatoTecnico String?   @map("relato_tecnico")
+  dataHora      DateTime? @map("data_hora")
+
+  ordemServico OrdemServico @relation(fields: [numOs], references: [numOs])
+
+  @@map("diagnostico")
+}
+
+// ─────────────────────────────────────────────
+// CHECKLIST DA OS (chave composta)
+// ─────────────────────────────────────────────
+
+model OsChecklist {
+  numOs       Int     @map("num_os")
+  idChecklist Int     @map("id_checklist")
+  status      String? @db.VarChar(20)
+
+  ordemServico OrdemServico @relation(fields: [numOs], references: [numOs])
+  checklist    Checklist    @relation(fields: [idChecklist], references: [idChecklist])
+
+  @@id([numOs, idChecklist])
+  @@map("os_checklist")
+}
+
+// ─────────────────────────────────────────────
+// LOG DE NOTIFICAÇÃO
+// ─────────────────────────────────────────────
+
+model LogNotificacao {
+  idLogNotificacao Int       @id @default(autoincrement()) @map("id_log_notificacao")
+  numOs            Int       @map("num_os")
+  cpfCliente       String    @map("cpf_cliente") @db.VarChar(11)
+  tipoEvento       String?   @map("tipo_evento") @db.VarChar(50)
+  dtHoraEnvio      DateTime? @map("dt_hora_envio")
+  mensagemTexto    String?   @map("mensagem_texto")
+  statusEnvio      String?   @map("status_envio") @db.VarChar(50)
+
+  ordemServico OrdemServico @relation(fields: [numOs], references: [numOs])
+  cliente      Cliente      @relation(fields: [cpfCliente], references: [cpf])
+
+  @@map("log_notificacao")
+}
+
+// ─────────────────────────────────────────────
+// PAGAMENTO
+// ─────────────────────────────────────────────
+
+enum FormaPagamento {
+  PIX
+  CARTAO
+}
+
+model Pagamento {
+  idPagamento    Int            @id @default(autoincrement()) @map("idPagamento")
+  numOs          Int            @map("Ordem_Servico_Num_Os")
+  valorPago      Decimal?       @map("Valor_pago") @db.Decimal(10, 2)
+  dtPagamento    DateTime?      @map("Dt_pagamento")
+  formaPagamento FormaPagamento @map("Forma_pagamento")
+
+  // Campos de PagamentoPix
+  chavePix String? @map("chave_pix") @db.VarChar(100)
+  txid     String? @db.VarChar(100)
+  qrCode   String? @map("qr_code") @db.VarChar(500)
+
+  // Campos de PagamentoCartao
+  numParcelas    Int?    @map("num_parcelas")
+  bandeira       String? @db.VarChar(50)
+  tipoCartao     String? @map("tipo_cartao") @db.VarChar(20)
+  ultimosDigitos String? @map("ultimos_digitos") @db.VarChar(4)
+
+  ordemServico OrdemServico @relation(fields: [numOs], references: [numOs])
+
+  @@map("Pagamento")
+}
