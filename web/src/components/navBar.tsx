@@ -35,10 +35,10 @@ function NavBar() {
                         {aberta && (
                             <div className="flex flex-col">
                                 <span className="text-sm font-semibold text-white">
-                                    Ordem de Serviço
+                                    {item.text}
                                 </span>
                                 <span className="text-xs text-zinc-400">
-                                    Cadastre e acompanhe serviços
+                                    {item.subtext}
                                 </span>
                             </div>
                             
