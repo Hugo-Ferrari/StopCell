@@ -6,12 +6,13 @@ function NavBar() {
     const [aberta, setAberta] = useState(false)
 
     const menuItens = [
-        { icon: <ClipboardList size={20} />, text: "Ordem de Serviço", path: "/" },
-        { icon: <RotateCcw size={20} />, text: "Histórico", path: "/historico" },
-        { icon: <Wallet size={20} />, text: "Financeiro", path: "/financeiro" },
-        { icon: <Settings size={20} />, text: "Configurações", path: "/configuracoes" }
-
+        { icon: <ClipboardList size={20} />, text: "Ordem de Serviço", subtext: "Cadastre e acompanhe serviços", path: "/" },
+        { icon: <RotateCcw size={20} />, text: "Histórico", subtext: "Visualize serviços anteriores", path: "/historico" },
+        { icon: <Wallet size={20} />, text: "Fornecedores", subtext: "Cadastre e gerencie fornecedores", path: "/fornecedores"},
+        { icon: <Wallet size={20} />, text: "Financeiro", subtext: "Controle receitas e despesas", path: "/financeiro" },
+        { icon: <Settings size={20} />, text: "Configurações", subtext: "Personalize o sistema", path: "/configuracoes" }
     ]
+
     return (
         <aside className={` h-screen
       bg-zinc-900
@@ -32,9 +33,14 @@ function NavBar() {
                     >
                         {item.icon}
                         {aberta && (
-                            <span>
-                                {item.text}
-                            </span>
+                            <div className="flex flex-col">
+                                <span className="text-sm font-semibold text-white">
+                                    Ordem de Serviço
+                                </span>
+                                <span className="text-xs text-zinc-400">
+                                    Cadastre e acompanhe serviços
+                                </span>
+                            </div>
                         )}
                     </Link>
                 ))}
