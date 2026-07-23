@@ -2,6 +2,9 @@ import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { User, Lock, Loader2, Sun, Moon } from 'lucide-react'
 import { login, salvarToken } from '@/services/auth.service'
+import Marca from '../components/marca'
+
+<Marca size={176} />
 
 function Login() {
     const navigate = useNavigate()
