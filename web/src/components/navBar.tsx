@@ -20,7 +20,7 @@ function NavBar() {
       duration-300
       ${aberta ? "w-60" : "w-15"}
     `}>
-            <button onClick={() => setAberta(!aberta)}className={`p-4 ${aberta? "rotate-0" : "rotate-180"}`}>
+            <button onClick={() => setAberta(!aberta)}className={`p-4 ${aberta? "rotate-0 w-full flex justify-end" : "rotate-180 justify-center"}`}>
                 {aberta? <X/> : <Menu />}
             </button>
             <nav>
