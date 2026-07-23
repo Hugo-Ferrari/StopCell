@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ClipboardList, Menu, RotateCcw, Settings, TableOfContents, TextAlignJustifyIcon, Wallet, X } from "lucide-react"
+import { ClipboardList, Menu, RotateCcw, Settings, Wallet, X } from "lucide-react"
 
 function NavBar() {
     const [aberta, setAberta] = useState(false)
@@ -35,6 +35,7 @@ function NavBar() {
                             <span>
                                 {item.text}
                             </span>
+                            
                         )}
                     </Link>
                 ))}
