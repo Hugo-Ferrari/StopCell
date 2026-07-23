@@ -4,8 +4,6 @@ import { User, Lock, Loader2, Sun, Moon } from 'lucide-react'
 import { login, salvarToken } from '@/services/auth.service'
 import Marca from '../components/marca'
 
-<Marca size={176} />
-
 function Login() {
     const navigate = useNavigate()
 
@@ -20,10 +18,10 @@ function Login() {
         e.preventDefault()
         setErro('')
         setCarregando(true)
-        
+
         try {
-            const data  = await login(emailUsuario, senha);
-            salvarToken(data.token,lembrar);
+            const data = await login(emailUsuario, senha);
+            salvarToken(data.token, lembrar);
             navigate('/ordemServico')
 
         } catch (err: any) {
@@ -66,25 +64,7 @@ function Login() {
 
                 {/* marca */}
                 <div className="flex flex-col items-center text-center">
-                    <div className="relative flex h-44 w-44 items-center justify-center">
-                        <svg
-                            viewBox="0 0 100 115"
-                            className="absolute inset-0 h-full w-full text-orange-500"
-                            fill="none"
-                        >
-                            <path
-                                d="M50 2 L96 28.5 L96 81.5 L50 108 L4 81.5 L4 28.5 Z"
-                                stroke="currentColor"
-                                strokeWidth="2.5"
-                            />
-                        </svg>
-                        <span className="relative text-2xl font-extrabold uppercase leading-tight tracking-wide">
-                            <span className="block text-white">
-                                ST<span className="text-orange-500">O</span>P
-                            </span>
-                            <span className="block text-orange-500">CELL</span>
-                        </span>
-                    </div>
+                    <Marca size={176} />
                     <p className="mt-4 text-sm font-bold uppercase tracking-[0.2em] text-white">
                         Sistema interno
                     </p>
