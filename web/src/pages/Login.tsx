@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { User, Lock, Loader2, Sun, Moon } from 'lucide-react'
-import { api } from '../api/api'
+import { login, salvarToken } from '@/services/auth.service'
 import Marca from '../components/marca'
 
 <Marca size={176} />
@@ -22,8 +22,8 @@ function Login() {
         setCarregando(true)
 
         try {
-            const { data } = await api.post('/auth/login', { emailUsuario, senha })
-            localStorage.setItem('token', data.token)
+            const { data } = await login(emailUsuario, senha);
+            salvarToken(data.token);
             navigate('/ordemServico')
         } catch (err: any) {
             if (err?.response?.status === 401) {
