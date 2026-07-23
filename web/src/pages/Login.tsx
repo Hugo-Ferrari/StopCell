@@ -17,11 +17,12 @@ function Login() {
         e.preventDefault()
         setErro('')
         setCarregando(true)
-
+        
         try {
-            const { data } = await login(emailUsuario, senha);
-            salvarToken(data.token);
+            const data  = await login(emailUsuario, senha);
+            salvarToken(data.token,lembrar);
             navigate('/ordemServico')
+
         } catch (err: any) {
             if (err?.response?.status === 401) {
                 setErro('Usuário ou senha inválidos.')
