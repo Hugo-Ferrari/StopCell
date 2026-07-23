@@ -1,3 +1,4 @@
+
 import React from 'react'
 import { Link } from 'react-router-dom'
 
@@ -6,6 +7,7 @@ function RecuperarSenha() {
         <div>
             <div>
                 {/**faltando um icone de seta.. */}
+                
                 <Link to={"/"}>
                 <p>Voltar para o login</p>
                 </Link>

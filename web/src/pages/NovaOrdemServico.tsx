@@ -1,8 +1,11 @@
 import React from 'react'
+import NavBar from '../components/navBar'
 
 function NovaOrdemServico() {
   return (
-    <div>NovaOrdemServico</div>
+    <div>
+        <NavBar/>
+    </div>
   )
 }
 
