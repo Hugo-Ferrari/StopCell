@@ -1,8 +1,11 @@
+import NavBar from '@/components/navBar'
 import React from 'react'
 
 function OrdemServico() {
   return (
-    <div>OrdemServico</div>
+    <div>
+      <NavBar/>
+    </div>
   )
 }
 
