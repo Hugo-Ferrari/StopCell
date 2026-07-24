@@ -10,7 +10,7 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
     console.log('Iniciando seed...');
 
-    // 1. Empresa
+    
     const empresa = await prisma.empresa.create({
         data: {
             cnpj: '38181114000158',
@@ -22,7 +22,7 @@ async function main() {
     });
     console.log('Empresa criada:', empresa.cnpj);
 
-    // 2. Usuario (dono da empresa)
+    
     const usuario = await prisma.usuario.create({
         data: {
             cnpjEmpresa: empresa.cnpj,
@@ -35,7 +35,7 @@ async function main() {
     });
     console.log('Usuario criado:', usuario.idUsuario);
 
-    // 3. Cliente (agora pertence a uma empresa)
+    
     const cliente = await prisma.cliente.create({
         data: {
             cpf: '34070631801',
@@ -48,7 +48,7 @@ async function main() {
     });
     console.log('Cliente criado:', cliente.cpf);
 
-    // 4. Categoria (agora pertence a uma empresa)
+    
     const categoria = await prisma.categoria.create({
         data: {
             cnpjEmpresa: empresa.cnpj,
@@ -57,7 +57,7 @@ async function main() {
     });
     console.log('Categoria criada:', categoria.idCategoria);
 
-    // 5. Marca (agora pertence a uma empresa)
+    
     const marca = await prisma.marca.create({
         data: {
             cnpjEmpresa: empresa.cnpj,
@@ -66,7 +66,7 @@ async function main() {
     });
     console.log('Marca criada:', marca.idMarca);
 
-    // 6. Aparelho (agora pertence a uma empresa)
+    
     const aparelho = await prisma.aparelho.create({
         data: {
             imei: '357367097817417',
@@ -82,7 +82,7 @@ async function main() {
     });
     console.log('Aparelho criado:', aparelho.imei);
 
-    // 7. Servico (agora pertence a uma empresa)
+    
     const servico = await prisma.servico.create({
         data: {
             cnpjEmpresa: empresa.cnpj,
@@ -92,7 +92,7 @@ async function main() {
     });
     console.log('Servico criado:', servico.idServico);
 
-    // 8. Ordem de Servico
+   
     const ordemServico = await prisma.ordemServico.create({
         data: {
             cpfCliente: cliente.cpf,
@@ -106,7 +106,7 @@ async function main() {
     });
     console.log('Ordem de Servico criada:', ordemServico.numOs);
 
-    // 9. Diagnostico
+    
     const diagnostico = await prisma.diagnostico.create({
         data: {
             numOs: ordemServico.numOs,
@@ -116,7 +116,7 @@ async function main() {
     });
     console.log('Diagnostico criado:', diagnostico.idDiagnostico);
 
-    // 10. Item da OS (vincula o servico a essa ordem)
+   
     const itemOs = await prisma.itensOs.create({
         data: {
             numOs: ordemServico.numOs,

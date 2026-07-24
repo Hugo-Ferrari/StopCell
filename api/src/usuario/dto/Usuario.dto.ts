@@ -1,6 +1,19 @@
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+
 export class UsuarioCadastroDto {
-    nome: string = ""
-    login: string =""
-    emailUsuario: string= ""
-    senha: string =""
+
+  @IsString()
+  @IsNotEmpty()
+  nome: string = "";
+
+  @IsString()
+  @IsNotEmpty()
+  login: string = "";
+
+  @IsEmail()
+  emailUsuario: string = "";
+
+  @IsString()
+  @IsNotEmpty()
+  senha: string = "";
 }
