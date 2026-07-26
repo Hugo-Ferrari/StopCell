@@ -1,10 +1,12 @@
+import CaixaOs from '@/components/caixaOs'
 import NavBar from '@/components/navBar'
 import React from 'react'
 
 function OrdemServico() {
   return (
-    <div>
+    <div className=' flex'>
       <NavBar/>
+      <CaixaOs/>
     </div>
   )
 }

@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ClipboardList, Menu, RotateCcw, Settings, Van, Wallet, X } from "lucide-react"
-import Logo from './marca'
 
 function NavBar() {
     const [aberta, setAberta] = useState(false)
