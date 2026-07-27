@@ -6,21 +6,15 @@ function NavBar() {
     const [aberta, setAberta] = useState(false)
 
     const menuItens = [
-        { icon: <ClipboardList size={20} className="group-hover:text-orange-500" />, text: "Ordem de Serviço", subtext: "Cadastre e acompanhe serviços", path: "/ordemServico", },
-        { icon: <RotateCcw size={20} className="group-hover:text-orange-500" />, text: "Histórico", subtext: "Visualize serviços anteriores", path: "/historico" },
-        { icon: <Van size={20} className="group-hover:text-orange-500" />, text: "Fornecedores", subtext: "Cadastre e gerencie fornecedores", path: "/fornecedores" },
-        { icon: <Wallet size={20} className="group-hover:text-orange-500" />, text: "Financeiro", subtext: "Controle receitas e despesas", path: "/financeiro" },
-        { icon: <Settings size={20} className="group-hover:text-orange-500" />, text: "Configurações", subtext: "Personalize o sistema", path: "/configuracoes" }
+        { icon: <ClipboardList size={20}  />, text: "Ordem de Serviço", subtext: "Cadastre e acompanhe serviços", path: "/ordemServico", },
+        { icon: <RotateCcw size={20}  />, text: "Histórico", subtext: "Visualize serviços anteriores", path: "/historico" },
+        { icon: <Van size={20}  />, text: "Fornecedores", subtext: "Cadastre e gerencie fornecedores", path: "/fornecedores" },
+        { icon: <Wallet size={20}  />, text: "Financeiro", subtext: "Controle receitas e despesas", path: "/financeiro" },
+        { icon: <Settings size={20}  />, text: "Configurações", subtext: "Personalize o sistema", path: "/configuracoes" }
     ]
 
     return (
-        <aside className={` h-screen
-      bg-zinc-900
-      text-white
-      transition-all
-      duration-300
-      ${aberta ? "w-60" : "w-15"}
-      `}>
+        <aside className={` fixed top-0 left-0 h-15  text-white transition-all duration-300 z-50 mt-3 ${aberta ? "w-60 h-screen bg-black" : "w-15"}`}>
             
                 <button onClick={() => setAberta(!aberta)} className={`p-4 ${aberta ? "rotate-0 w-full flex justify-end " : "rotate-180 justify-center"}`}>
                     {aberta ? <X /> : <Menu />}
@@ -33,9 +27,11 @@ function NavBar() {
                         to={item.path}
                         className=" group flex items-center gap-4 p-4 "
                     >
-                        {item.icon}
+                        
                         {aberta && (
+                            
                             <div className="flex flex-col">
+                                {item.icon}
                                 <span className="text-sm font-semibold text-white group-hover:text-orange-500">
                                     {item.text}
                                 </span>
