@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Param, Post, Put, Req, Get } from '@nestjs/common';
 import { AparelhoService } from './aparelho.service';
 import { AparelhoDto } from './dto/aparelho.dto';
 
@@ -9,6 +9,10 @@ export class AparelhoController {
     @Post()
     cadatrar(@Body() dto: AparelhoDto, @Req() req: any) {
         return this.service.cadastro(dto, req.userCnpjEmpresa as string);
+    }
+    @Get()
+    listar(@Req() req: any){
+        return this.service.listar(req.userCnpjEmpresa as string)
     }
 
     @Put(':id')

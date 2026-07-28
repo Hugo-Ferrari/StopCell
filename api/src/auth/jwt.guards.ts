@@ -29,14 +29,21 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwt.verifyAsync(token, {
-        secret: process.env.JWT_SECRET,
-      });
-      request.user = payload;
-      request.userCnpjEmpresa = payload?.cnpjEmpresa ?? null;
-      return true;
-    } catch {
-      throw new UnauthorizedException('Token inválido');
-    }
+  const payload = await this.jwt.verifyAsync(token, {
+    secret: process.env.JWT_SECRET,
+  });
+
+
+  request.user = payload;
+  request.userCnpjEmpresa = payload?.cnpjEmpresa ?? null;
+
+  return true;
+
+} catch(error) {
+
+  console.log("ERRO JWT:", error);
+
+  throw new UnauthorizedException('Token inválido');
+}
   }
 }

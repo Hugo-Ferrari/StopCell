@@ -22,4 +22,7 @@ export class AparelhoRepository {
     findById(id: string, cnpjEmpresa: string) {
         return this.prisma.aparelho.count({ where: { imei: id, cnpjEmpresa } });
     }
+    listar(cnpjEmpresa: string){
+        return this.prisma.aparelho.findMany({where:{cnpjEmpresa}})
+    }
 }

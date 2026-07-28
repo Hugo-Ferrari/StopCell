@@ -8,7 +8,7 @@ function MainLayout() {
         <div className="">
             <Header/>
 
-            <main className="flex-1 ml-15">
+            <main className="flex-1 p-5">
                 <Outlet />
             </main>
         </div>

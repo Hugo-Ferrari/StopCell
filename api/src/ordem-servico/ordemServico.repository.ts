@@ -19,6 +19,16 @@ export class OrdemServicoRepository {
             data: { status },
         });
     }
+    listar(cnpjEmpresa:string){
+        return this.prisma.ordemServico.findMany({where:{cnpjEmpresa},
+        include:{
+            cliente:true,
+            aparelho:true,
+        },
+    orderBy:{
+        dtEntrada:"desc"
+    }})
+    }
     buscarParaPdf(numOs: number, cnpjEmpresa: string) {
         return this.prisma.ordemServico.findFirst({
             where: { numOs, cnpjEmpresa },

@@ -1,12 +1,12 @@
 type Props = {
-  status: "FINALIZADO" | "DIAGNOSTICO" | "EM_REPARO" | "AGUARDANDO_PECA";
+  status: "ABERTA" | "DIAGNOSTICO" | "EM_REPARO" | "FINALIZADO";
   quantidade: number;
 };
 
 function CaixaStatusOs({ status, quantidade }: Props) {
   const statusConfig = {
-    FINALIZADO: {
-      texto: "FINALIZADO",
+    ABERTA: {
+      texto: "ABERTA",
       cor: "bg-green-500",
       
       
@@ -23,8 +23,8 @@ function CaixaStatusOs({ status, quantidade }: Props) {
       
       
     },
-    AGUARDANDO_PECA: {
-      texto: "AGUARD. PEÇA",
+    FINALIZADO: {
+      texto: "FINALIZADO",
       cor: "bg-red-500",
       
       

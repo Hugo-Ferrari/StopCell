@@ -5,7 +5,7 @@ import { OrdemServicoDto } from './dto/ordemServico.dto';
 
 @Controller('ordemServico')
 export class OrdemServicoController {
-    constructor(private readonly service: OrdemServicoService) {}
+    constructor(private readonly service: OrdemServicoService) { }
 
     @Post()
     abrir(@Body() dto: OrdemServicoDto, @Req() req: any) {
@@ -22,7 +22,10 @@ export class OrdemServicoController {
 
         return resposta;
     }
-
+    @Get()
+    listar(@Req() req: any) {
+        return this.service.listar(req.userCnpjEmpresa);
+    }
     @Get(':numOs/pdf')
     async gerarPdf(@Param('numOs') numOs: string, @Res() res: Response, @Req() req: any) {
         const pdfBuffer = await this.service.gerarPdf(+numOs, req.userCnpjEmpresa as string);

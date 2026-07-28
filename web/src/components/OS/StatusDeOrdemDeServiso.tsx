@@ -1,11 +1,11 @@
 type Props = {
-  status: "FINALIZADO" | "DIAGNOSTICO" | "EM_REPARO" | "AGUARDANDO_PECA";
+  status: "ABERTA" | "DIAGNOSTICO" | "EM_REPARO" | "FINALIZADO";
 };
 
 function StatusDeFinalizacaoDeServico({ status }: Props) {
   const statusConfig = {
-    FINALIZADO: {
-      texto: "Finalizado",
+    ABERTA: {
+      texto: "Aberta",
       classes: "bg-green-100 text-green-700",
     },
     DIAGNOSTICO: {
@@ -16,8 +16,8 @@ function StatusDeFinalizacaoDeServico({ status }: Props) {
       texto: "Em reparo",
       classes: "bg-blue-100 text-blue-700",
     },
-    AGUARDANDO_PECA: {
-      texto: "Aguardando peça",
+    FINALIZADO: {
+      texto: "Finalizado",
       classes: "bg-red-100 text-red-700",
     },
   };

@@ -14,7 +14,7 @@ function NavBar() {
     ]
 
     return (
-        <aside className={` fixed top-0 left-0 h-15  text-white transition-all duration-300 z-50 mt-3 ${aberta ? "w-60 h-screen bg-black" : "w-15"}`}>
+        <aside className={` overflow-hidden fixed top-0 left-0 h-15  text-white transition-all duration-300 z-50 mt-3 ${aberta ? "w-60 h-screen bg-black" : "w-15"}`}>
             
                 <button onClick={() => setAberta(!aberta)} className={`p-4 ${aberta ? "rotate-0 w-full flex justify-end " : "rotate-180 justify-center"}`}>
                     {aberta ? <X /> : <Menu />}

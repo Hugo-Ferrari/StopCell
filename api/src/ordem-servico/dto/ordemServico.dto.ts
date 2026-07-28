@@ -1,21 +1,18 @@
 import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class OrdemServicoDto {
+
     @IsInt()
     @IsOptional()
     numOsAnterior?: number | null;
 
     @IsString()
     @IsNotEmpty()
-    cpfCliente: string= ''
+    cpfCliente: string=''
 
     @IsString()
     @IsNotEmpty()
     imeiAparelho: string =''
-
-    @IsString()
-    @IsNotEmpty()
-    cnpjEmpresa: string =''
 
     @IsInt()
     @IsNotEmpty()

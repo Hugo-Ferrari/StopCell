@@ -11,7 +11,7 @@ export class OrdemServicoService {
     constructor(
         private readonly repository: OrdemServicoRepository,
         private readonly prisma: PrismaService,
-    ) {}
+    ) { }
 
     async abrir(dto: OrdemServicoDto, cnpjEmpresa: string) {
         const aparelho = await this.prisma.aparelho.findFirst({
@@ -53,7 +53,9 @@ export class OrdemServicoService {
 
         return this.repository.atualizarStatus(numOs, status, cnpjEmpresa);
     }
-
+    async listar(cnpjEmpresa: string) {
+        return await this.repository.listar(cnpjEmpresa);
+    }
     async gerarPdf(numOs: number, cnpjEmpresa: string): Promise<Buffer> {
         const os = await this.repository.buscarParaPdf(numOs, cnpjEmpresa);
 
