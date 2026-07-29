@@ -1,4 +1,3 @@
-
 import { useLocation } from "react-router-dom";
 import NavBar from "./navBar";
 
@@ -17,24 +16,24 @@ function Header() {
   const titulo = titulos[location.pathname] || "Stop Cell";
 
   return (
-    <header className="flex items-center  p-5  border-b bg-black ">
-        
+    <header className="flex items-center border-b border-border bg-background/95 p-5 backdrop-blur-sm">
 
-      <NavBar/>
-        
+      <NavBar />
 
       <div className="ml-10">
         <span className="relative text-2xl font-extrabold uppercase leading-tight tracking-wide">
-            <div className="text-sm">
-
-                <span className=" text-white">
-                    ST<span className="text-orange-500">O</span>P
-                </span>
-                <span className=" text-orange-500">CELL</span>
-            </div>
+          <div className="text-sm">
+            <span className="text-foreground">
+              ST<span className="text-primary">O</span>P
             </span>
 
-        <h1 className="text-xl font-bold text-white">
+            <span className="text-primary">
+              CELL
+            </span>
+          </div>
+        </span>
+
+        <h1 className="text-xl font-bold text-foreground">
           {titulo}
         </h1>
       </div>

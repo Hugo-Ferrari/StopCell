@@ -6,12 +6,12 @@ interface LogoProps {
 function Logo({ size = 176, className = '' }: LogoProps) {
     return (
         <div
-            className={`relative flex items-center justify-center ${className}`}
+            className={`relative flex items-center justify-center transition-colors ${className}`}
             style={{ width: size, height: size }}
         >
             <svg
                 viewBox="0 0 100 115"
-                className="absolute inset-0 h-full w-full text-orange-500"
+                className="absolute inset-0 h-full w-full text-primary"
                 fill="none"
             >
                 <path
@@ -20,14 +20,18 @@ function Logo({ size = 176, className = '' }: LogoProps) {
                     strokeWidth="2.5"
                 />
             </svg>
+
             <span className="relative text-2xl font-extrabold uppercase leading-tight tracking-wide">
-                <span className="block text-white">
-                    ST<span className="text-orange-500">O</span>P
+                <span className="block text-foreground">
+                    ST<span className="text-primary">O</span>P
                 </span>
-                <span className="block text-orange-500">CELL</span>
+
+                <span className="block text-primary">
+                    CELL
+                </span>
             </span>
         </div>
     )
 }
 
-export default Logo
+export default Logo;

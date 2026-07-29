@@ -7,27 +7,19 @@ function CaixaStatusOs({ status, quantidade }: Props) {
   const statusConfig = {
     ABERTA: {
       texto: "ABERTA",
-      cor: "bg-green-500",
-      
-      
+      cor: "bg-[var(--status-aberta)]",
     },
     DIAGNOSTICO: {
       texto: "EM DIAGN.",
-      cor: "bg-yellow-400",
-      
-     
+      cor: "bg-[var(--status-diagnostico)]",
     },
     EM_REPARO: {
       texto: "EM REPARO",
-      cor: "bg-blue-500",
-      
-      
+      cor: "bg-[var(--status-reparo)]",
     },
     FINALIZADO: {
       texto: "FINALIZADO",
-      cor: "bg-red-500",
-      
-      
+      cor: "bg-primary",
     },
   };
 
@@ -35,16 +27,30 @@ function CaixaStatusOs({ status, quantidade }: Props) {
 
   return (
     <button
-      className={`w-42  rounded-2xl border-1 p-4 text-left transition-all  `}>
+      className="
+        w-42
+        rounded-2xl
+        border
+        border-border
+        bg-card
+        p-4
+        text-left
+        transition-all
+        duration-200
+        hover:border-primary/40
+        hover:bg-accent
+        hover:shadow-lg
+      "
+    >
       <div className="flex items-center gap-2">
-        <div className={`w-3 h-3 rounded-full ${config.cor}`} />
+        <div className={`h-3 w-3 rounded-full ${config.cor}`} />
 
-        <span className={`text-sm font-semibold text-gray-500 `}>
+        <span className="text-sm font-semibold text-muted-foreground">
           {config.texto}
         </span>
       </div>
 
-      <h1 className="mt-3 text-4xl font-bold text-black">
+      <h1 className="mt-3 text-4xl font-bold text-foreground">
         {quantidade}
       </h1>
     </button>
