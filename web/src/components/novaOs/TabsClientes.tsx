@@ -8,23 +8,42 @@ function TabsClientes() {
 
     return (
         <div className="w-full">
-            <div className="flex gap-2 border-b p-3">
+
+            <div className="flex gap-2 border-b border-border p-3">
                 <button
                     onClick={() => setAbaAtiva("existente")}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-4 rounded-lg transition-colors ${abaAtiva === "existente"? "bg-orange-500 text-white": "bg-zinc-200 hover:bg-zinc-300"}`}>
-                    <User size={25} />
-                    <span>Cliente Existente</span>
+                    className={` flex-1 flex items-center justify-center gap-2 px-4 py-4 rounded-lg transition-all duration-200 border
+                        ${
+                            abaAtiva === "existente"
+                                ? "bg-primary text-primary-foreground border-primary shadow-md"
+                                : "bg-card text-muted-foreground border-border hover:bg-accent hover:text-foreground"
+                        }
+                    `}
+                >
+                    <User size={22} />
+                    <span className="font-medium">
+                        Cliente Existente
+                    </span>
                 </button>
 
                 <button
                     onClick={() => setAbaAtiva("novo")}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-4 rounded-lg transition-colors ${abaAtiva === "novo"? "bg-orange-500 text-white": "bg-zinc-200 hover:bg-zinc-300"}`}>
-                    <UserRoundPlus size={25} />
-                    <span>Cadastrar novo cliente</span>
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-4 rounded-lg transition-all duration-200 border
+                        ${
+                            abaAtiva === "novo"
+                                ? "bg-primary text-primary-foreground border-primary shadow-md"
+                                : "bg-card text-muted-foreground border-border hover:bg-accent hover:text-foreground"
+                        }
+                    `}
+                >
+                    <UserRoundPlus size={22} />
+                    <span className="font-medium">
+                        Cadastrar novo cliente
+                    </span>
                 </button>
             </div>
 
-            <div>
+            <div className="mt-4">
                 {abaAtiva === "existente" && <ClienteExistente />}
                 {abaAtiva === "novo" && <NovoCliente />}
             </div>

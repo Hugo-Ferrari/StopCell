@@ -7,6 +7,7 @@ function NovaOrdemServico() {
     <div className='flex'>
 
         <TabsClientes/>
+        
     </div>
   )
 }

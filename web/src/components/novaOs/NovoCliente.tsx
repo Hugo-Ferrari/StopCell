@@ -1,63 +1,83 @@
-
-
 function NovoCliente() {
   return (
-    <div className="bg-white border border-gray-200  p-4 sm:p-6">
+    <div className=" border border-border bg-card p-4 sm:p-6">
       <div className="space-y-4">
 
-        <div className="">
-          <label className="block  font-medium text-gray-700 mb-2 ">
+        <div>
+          <label className="mb-2 block font-medium text-foreground">
             Cliente
           </label>
 
-          <input type="text" placeholder="Digite o nome completo" className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500" />
+          <input
+            type="text"
+            placeholder="Digite o nome completo"
+            className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+          />
         </div>
 
         <div>
-          <label className="block  font-medium text-gray-700 mb-2">
+          <label className="mb-2 block font-medium text-foreground">
             CPF
           </label>
 
-          <input type="text" placeholder="000.000.000-00" className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
+          <input
+            type="text"
+            placeholder="000.000.000-00"
+            className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
           />
         </div>
+
         <div>
-          <label className="block  font-medium text-gray-700 mb-2">
+          <label className="mb-2 block font-medium text-foreground">
             WhatsApp
           </label>
 
-          <input type="text" placeholder="(00) 00000-0000" className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
+          <input
+            type="text"
+            placeholder="(00) 00000-0000"
+            className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
           />
         </div>
 
         <div>
-        <div>
-          <label className="block  font-medium text-gray-700 mb-2">
-            Modelo Do Aparelho
-          </label>
+          <div>
+            <label className="mb-2 block font-medium text-foreground">
+              Modelo do Aparelho
+            </label>
 
-          <input type="text" placeholder="Ex: Iphone 13, Samsung A54..." className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
-          />
-        </div>
-          <label className="block  font-medium text-gray-700 mb-2">
+            <input
+              type="text"
+              placeholder="Ex: iPhone 13, Samsung A54..."
+              className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+            />
+          </div>
+
+          <label className="mt-4 mb-2 block font-medium text-foreground">
             Relato do Problema
           </label>
 
-          <textarea rows={5} placeholder="Descreva o problema do aparelho relatado pelo cliente..." className="w-full rounded-lg border border-gray-300 px-4 py-3 resize-none outline-none focus:ring-2 focus:ring-orange-500" />
+          <textarea
+            rows={5}
+            placeholder="Descreva o problema do aparelho relatado pelo cliente..."
+            className="w-full resize-none rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+          />
         </div>
 
-        <button className="w-full bg-orange-500 hover:bg-orange-600  text-white font-semibold py-3 rounded-lg transition">
-          Gerar Os Digital
+        <button
+          className="w-full rounded-lg bg-primary py-3 font-semibold text-primary-foreground transition-colors hover:opacity-90"
+        >
+          Gerar OS Digital
         </button>
-        <button className="w-full bg-gray-400 hover:  text-white font-semibold py-3 rounded-lg transition">
+
+        <button
+          className="w-full rounded-lg border border-border bg-card py-3 font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        >
           Cancelar
         </button>
 
       </div>
     </div>
-
   );
-
 }
 
-export default NovoCliente
+export default NovoCliente;

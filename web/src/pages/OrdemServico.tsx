@@ -1,9 +1,10 @@
 import CaixaOs from "@/components/OS/caixaOs";
 import CaixaStatusOs from "@/components/OS/CaixaStatusOs";
 import { listarOs } from "@/services/ordemServico.service";
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 interface OrdemServicoInterface {
   numOs: number;
@@ -52,17 +53,10 @@ function OrdemServico() {
           placeholder="Buscar O.S, Cliente ou aparelho"
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
-          className="
-            flex-1
-            bg-transparent
-            text-foreground
-            placeholder:text-muted-foreground
-            outline-none
-          "
-        />
+          className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none" />
       </div>
 
-  
+
       <div className="grid grid-cols-2 gap-4">
 
         <CaixaStatusOs
@@ -87,7 +81,7 @@ function OrdemServico() {
 
       </div>
 
-      
+
       <div className="mt-2 flex flex-col gap-4">
 
         {ordens.map((os) => (
@@ -101,7 +95,14 @@ function OrdemServico() {
           />
         ))}
 
+
       </div>
+      <Link
+        to="/nova-ordem-servico"
+        className="flex h-14 w-14 items-center justify-center rounded-3xl bg-primary text-primary-foreground transition-all ml-auto -mt-15 z-50 "
+      >
+        <Plus size={28} />
+      </Link>
     </div>
   );
 }
