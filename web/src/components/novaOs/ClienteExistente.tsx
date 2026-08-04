@@ -147,7 +147,7 @@ function ClienteExistente() {
                 </option>
 
                 {cliente?.aparelhos?.map((aparelho) => (
-                  <option key={aparelho.id} value={aparelho.id}>
+                  <option key={aparelho.imei} value={aparelho.imei}>
                     {aparelho.modelo}
                   </option>
                 ))}
