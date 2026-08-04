@@ -4,13 +4,12 @@ import RecuperarSenha from "../pages/RecuperarSenha";
 import OrdemServico from "../pages/OrdemServico";
 import Financeiro from "../pages/Financeiro";
 import NovaOrdemServico from "../pages/NovaOrdemServico";
+import DetalhesOrdemServico from "../pages/DetalhesOrdemServico";
 import MainLayout from "@/layouts/MainLayout";
 
 export function AppRoutes(){
     return (
         <Routes>
-
-           
             <Route path="/" element={<Login />} />
             <Route path="/recuperarSenha" element={<RecuperarSenha />} />
 
@@ -23,6 +22,9 @@ export function AppRoutes(){
 
                 <Route
                     path="/nova-ordem-servico"element={<NovaOrdemServico />}/>
+
+                <Route
+                    path="/ordemServico/:numOs" element={<DetalhesOrdemServico />} />
             </Route>
 
         </Routes>

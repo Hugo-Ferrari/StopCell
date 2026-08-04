@@ -1,4 +1,5 @@
 import { Smartphone } from "lucide-react";
+import { Link } from "react-router-dom";
 import StatusDeFinalizacaoDeServico from "./StatusDeOrdemDeServiso";
 
 type Props = {
@@ -17,7 +18,10 @@ function CaixaOs({
   data,
 }: Props) {
   return (
-    <div className="w-full rounded-xl border border-border bg-card p-5 transition-all duration-200 hover:shadow-lg hover:border-primary/40">
+    <Link
+      to={`/ordemServico/${numeroOs}`}
+      className="block w-full rounded-xl border border-border bg-card p-5 transition-all duration-200 hover:shadow-lg hover:border-primary/40"
+    >
 
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold text-muted-foreground">
@@ -47,7 +51,7 @@ function CaixaOs({
         </div>
       </div>
 
-    </div>
+    </Link>
   );
 }
 

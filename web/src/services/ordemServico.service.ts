@@ -19,3 +19,8 @@ export async function listarOs() {
     return response.data
     
 }
+
+export async function buscarOrdemServicoPorNumero(numOs: number) {
+    const response = await api.get(`/ordemServico/${numOs}`);
+    return response.data;
+}

@@ -9,7 +9,7 @@ function TabsClientes() {
     return (
         <div className="w-full">
 
-            <div className="flex gap-2 border-b border-border p-3">
+            <div className="flex gap-2border-border gap-2">
                 <button
                     onClick={() => setAbaAtiva("existente")}
                     className={` flex-1 flex items-center justify-center gap-2 px-4 py-4 rounded-lg transition-all duration-200 border

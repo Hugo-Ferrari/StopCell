@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ClipboardList,
@@ -48,8 +48,8 @@ function NavBar() {
 
   return (
     <aside
-      className={`fixed top-0 left-0 z-50 mt-3 overflow-hidden  text-foreground  transition-all duration-300 ${
-        aberta ? "h-screen bg-card  w-60" : "h-15 w-15"
+      className={`fixed top-0 left-0 z-50 py-3 overflow-hidden  text-foreground  transition-all duration-300 
+        ${aberta ? "h-screen bg-card  w-60" : "h-15 w-15"
       }`}
     >
       <button

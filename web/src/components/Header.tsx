@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { matchPath, useLocation } from "react-router-dom";
 import NavBar from "./navBar";
 
 function Header() {
@@ -13,11 +13,13 @@ function Header() {
     "/configuracoes": "Configurações",
   };
 
-  const titulo = titulos[location.pathname] || "Stop Cell";
+  const titulo =
+    matchPath({ path: "/ordemServico/:numOs", end: true }, location.pathname)
+      ? "Diagnóstico e Orçamento"
+      : titulos[location.pathname] || "Stop Cell";
 
   return (
     <header className="flex items-center border-b border-border bg-background/95 p-5 backdrop-blur-sm">
-
       <NavBar />
 
       <div className="ml-10">

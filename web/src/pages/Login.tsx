@@ -39,7 +39,7 @@ function Login() {
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center bg-gradient-to-b from-background via-background to-card px-4">
 
-      {/* brilho atrás da logo */}
+      
       <div className="absolute top-0 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
 
       {/* toggle de tema */}
@@ -159,8 +159,7 @@ function Login() {
           {erro && (
             <div
               role="alert"
-              className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-            >
+              className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {erro}
             </div>
           )}

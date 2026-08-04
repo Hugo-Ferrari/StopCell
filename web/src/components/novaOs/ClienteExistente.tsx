@@ -1,74 +1,235 @@
+import { buscarClientePorCpf, type criarClienteDto } from "@/services/cliente.service";
 import { Search } from "lucide-react";
-
+import { useState } from "react";
 function ClienteExistente() {
+  const [cpfBusca, setCpfBusca] = useState("");
+
+  const [cliente, setCliente] = useState<criarClienteDto | null>(null);
+
+  async function buscarCliente() {
+    try {
+      const dados = await buscarClientePorCpf(cpfBusca)
+      setCliente(dados)
+    }
+    catch {
+      alert(`cliente nao encontrado`)
+    }
+
+  }
+
   return (
-    <div className="bg-background p-4 sm:p-6">
+    <div className=" sm:p-6">
       <div className="space-y-4">
-
+        {/** colocar icone aqui  */}
+        <h2 className="text-lg sm:text-xl font-bold text-foreground border-b-1">
+          Cliente
+        </h2>
         <div className="bg-card  border border-border p-6">
-          <h2 className="text-lg sm:text-xl font-bold text-foreground">
-            Cliente
-          </h2>
 
-          <p className="mt-1 mb-4 text-sm text-muted-foreground">
+          {/** criar campo no backend para filtar os clientes de acorco com o numero de telefone ou cpf */}
+
+          <p className="mt-1 mb-4  text-muted-foreground">
             Selecione um cliente para criar a Ordem de Serviço.
           </p>
 
-          <div className="flex items-center rounded-lg border border-border bg-background px-3 py-3 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary">
+          <div className="flex items-center rounded-lg border border-border bg-background  px-3 py-3 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary">
             <Search
               size={18}
               className="text-muted-foreground"
             />
 
             <input
+              value={cpfBusca}
+              onChange={(e) => setCpfBusca(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  buscarCliente()
+                }
+              }}
               type="text"
-              placeholder="Nome, CPF ou telefone"
+              placeholder="CPF"
               className="ml-3 flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
             />
           </div>
         </div>
 
-        <div className="bg-card  border border-border p-6">
+        <div className="  ">
 
-          <h3 className="mb-5 text-lg font-semibold text-foreground">
-            Dados da Ordem de Serviço
-          </h3>
 
           <div className="space-y-4">
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-foreground">
+              <label className="mb-2 block   text-foreground">
                 Nome do Cliente
               </label>
 
               <input
+                value={cliente?.nmCompleto ?? ""}
                 type="text"
                 placeholder="Selecione um cliente"
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block   text-foreground">
+                CPF
+              </label>
+
+              <input
+                value={cliente?.cpf ?? ""}
+                type="text"
+                placeholder="000.000.000-00"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block   text-foreground">
+                WhatsApp
+              </label>
+
+              <input
+                value={cliente?.telefone ?? ""}
+                type="text"
+                placeholder="(00)00000-0000"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block   text-foreground">
+                Email
+              </label>
+
+              <input
+                value={cliente?.email ?? ""}
+                type="text"
+                placeholder="cliente@email.com"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block   text-foreground">
+                Endereço
+              </label>
+
+              <input
+                value={cliente?.endereco ?? ""}
+                type="text"
+                placeholder="rua, numero, bairro, cidade"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
               />
             </div>
 
+
+            <h2 className="text-lg sm:text-xl  font-bold text-foreground mt-5 border-b-1">
+              {/** icone de aparelho */}
+              Aparelho
+            </h2>
+            <h2>Selecione ou crie um aparelho </h2>
+            <div className="">
+            <select className="bg-card p-3 ">
+              {cliente?.aparelhos?.map(aparelho => (
+                <option key={aparelho.id} value={aparelho.id}>
+                  {aparelho.modelo}
+                </option>
+              ))}
+            </select>
+
+              <button className="px-5">
+                criar novo aparelho
+              </button>
+            </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-foreground">
+              <label className="mb-2 block   text-foreground">
+                Categoria
+              </label>
+              {/**fazer sistema para escolher a categoria como, smartfone,tablet entre outros */}
+              <input
+                type="text"
+                placeholder="Selecione"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block   text-foreground">
+                Marca
+              </label>
+              {/**fazer sistema para escolher a marca como, apple, sansung, xiaomi, etc... */}
+              <input
+                type="text"
+                placeholder="Selecione"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block   text-foreground">
                 Modelo do Aparelho
               </label>
 
               <input
                 type="text"
                 placeholder="Ex.: iPhone 13"
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block   text-foreground">
+                IMEI / Nº de Série
+
+              </label>
+
+              <input
+                type="text"
+                placeholder="0000000000000"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block   text-foreground">
+                Cor
+
+              </label>
+
+              <input
+                type="text"
+                placeholder="0000000000000"
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block   text-foreground">
+                Tipo de bloqueio
+
+              </label>
+              {/**se for "padrão", "senha" ou "pin" coloque o input para ter o campo para se digitar a senha, caso for " sem senha " ou ""biometria" não coloque nada*/}
+              <input
+                type="text"
+                placeholder="Padrão "
+                className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
               />
             </div>
 
+
+
+
+            <h2 className="text-lg sm:text-xl  font-bold text-foreground mt-5 border-b-1">
+              {/** icone de aparelho */}
+              Ordem de Serviço
+            </h2>
             <div>
-              <label className="mb-2 block text-sm font-medium text-foreground">
+              <label className="">
+                Técnico responsavel
+              </label>
+              <input placeholder="Quem Recebeu o aparelho" className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary">{/**Usuario dono da empresa */}</input>
+            </div>
+            <div>
+              <label className="mb-2 block text-foreground ">
                 Relato do Problema
               </label>
 
               <textarea
                 rows={5}
                 placeholder="Descreva o problema..."
-                className="w-full resize-none rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+                className="w-full resize-none rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
               />
             </div>
 
