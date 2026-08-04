@@ -6,7 +6,13 @@ export interface AparelhoDto {
     modelo: string;
     cor: string;
     imei: string;
+    marca: {
+        id: number;
+        nome: string;
+    };
+    categoria: string;
 }
+
 
 export async function listarAparelho(){
     const response = await api.get("/aparelho")

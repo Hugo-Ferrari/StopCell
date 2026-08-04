@@ -16,7 +16,7 @@ export class AuthService {
 
   async register(dto: CadastroDto) {
     const senhaHash = await bcrypt.hash(dto.usuario.senha, 10);
-
+    
     try {
       const result = await this.prisma.$transaction(async (tx) => {
         const empresaCriada = await tx.empresa.create({

@@ -1,7 +1,4 @@
-// ============================================================
-// schema.prisma — stopCell (NestJS + Prisma + PostgreSQL)
-// Multi-tenant: cada empresa isola seus próprios dados
-// ============================================================
+
 
 generator client {
   provider = "prisma-client-js"
@@ -11,9 +8,6 @@ datasource db {
   provider = "postgresql"
 }
 
-// ─────────────────────────────────────────────
-// LOOKUP TABLES (agora por empresa)
-// ─────────────────────────────────────────────
 
 model Categoria {
   idCategoria Int    @id @default(autoincrement()) @map("id_categoria")
@@ -48,9 +42,6 @@ model Checklist {
   @@map("checklist")
 }
 
-// ─────────────────────────────────────────────
-// PESSOAS / EMPRESA
-// ─────────────────────────────────────────────
 
 model Cliente {
   cpf         String  @id @db.VarChar(11)
@@ -103,9 +94,6 @@ model Usuario {
   @@map("usuario")
 }
 
-// ─────────────────────────────────────────────
-// APARELHO
-// ─────────────────────────────────────────────
 
 model Aparelho {
   imei          String  @id @db.VarChar(50)
@@ -127,9 +115,6 @@ model Aparelho {
   @@map("aparelho")
 }
 
-// ─────────────────────────────────────────────
-// PEÇA / SERVIÇO (agora por empresa)
-// ─────────────────────────────────────────────
 
 model Peca {
   idPeca      Int      @id @default(autoincrement()) @map("id_peca")
@@ -156,9 +141,6 @@ model Servico {
   @@map("servico")
 }
 
-// ─────────────────────────────────────────────
-// ORDEM DE SERVIÇO
-// ─────────────────────────────────────────────
 
 model OrdemServico {
   numOs         Int       @id @default(autoincrement()) @map("num_os")
@@ -173,7 +155,7 @@ model OrdemServico {
   vlTotal       Decimal?  @map("vl_total") @db.Decimal(10, 2)
   diagnostico   String?
 
-  // Auto-referência: OS pai (retrabalho)
+  
   ordemServicoPai OrdemServico?  @relation("OsRetrabalho", fields: [numOsAnterior], references: [numOs])
   ordensFilhas    OrdemServico[] @relation("OsRetrabalho")
 
@@ -191,9 +173,7 @@ model OrdemServico {
   @@map("ordem_servico")
 }
 
-// ─────────────────────────────────────────────
-// ITENS DA OS
-// ─────────────────────────────────────────────
+
 
 model ItensOs {
   idItemOs      Int      @id @default(autoincrement()) @map("id_item_os")
@@ -210,9 +190,6 @@ model ItensOs {
   @@map("itens_os")
 }
 
-// ─────────────────────────────────────────────
-// DIAGNÓSTICO
-// ─────────────────────────────────────────────
 
 model Diagnostico {
   idDiagnostico Int       @id @default(autoincrement()) @map("id_diagnostico")
@@ -225,9 +202,6 @@ model Diagnostico {
   @@map("diagnostico")
 }
 
-// ─────────────────────────────────────────────
-// CHECKLIST DA OS (chave composta)
-// ─────────────────────────────────────────────
 
 model OsChecklist {
   numOs       Int     @map("num_os")
@@ -241,9 +215,6 @@ model OsChecklist {
   @@map("os_checklist")
 }
 
-// ─────────────────────────────────────────────
-// LOG DE NOTIFICAÇÃO
-// ─────────────────────────────────────────────
 
 model LogNotificacao {
   idLogNotificacao Int       @id @default(autoincrement()) @map("id_log_notificacao")
@@ -260,10 +231,6 @@ model LogNotificacao {
   @@map("log_notificacao")
 }
 
-// ─────────────────────────────────────────────
-// PAGAMENTO
-// ─────────────────────────────────────────────
-
 enum FormaPagamento {
   PIX
   CARTAO
@@ -276,12 +243,12 @@ model Pagamento {
   dtPagamento    DateTime?      @map("Dt_pagamento")
   formaPagamento FormaPagamento @map("Forma_pagamento")
 
-  // Campos de PagamentoPix
+ 
   chavePix String? @map("chave_pix") @db.VarChar(100)
   txid     String? @db.VarChar(100)
   qrCode   String? @map("qr_code") @db.VarChar(500)
 
-  // Campos de PagamentoCartao
+  
   numParcelas    Int?    @map("num_parcelas")
   bandeira       String? @db.VarChar(50)
   tipoCartao     String? @map("tipo_cartao") @db.VarChar(20)

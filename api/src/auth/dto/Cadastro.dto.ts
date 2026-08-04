@@ -9,6 +9,7 @@ export class CadastroDto {
   @Type(() => EmpresaDto)
   empresa!: EmpresaDto;
 
+
   @ValidateNested()
   @Type(() => UsuarioCadastroDto)
   usuario!: UsuarioCadastroDto;

@@ -1,3 +1,5 @@
+
+import type { AparelhoDto } from "@/services/aparelho.service";
 import { buscarClientePorCpf, type criarClienteDto } from "@/services/cliente.service";
 import { Search } from "lucide-react";
 import { useState } from "react";
@@ -6,9 +8,12 @@ function ClienteExistente() {
 
   const [cliente, setCliente] = useState<criarClienteDto | null>(null);
 
+
+  const [aparelhoSelecionado, setAparelhoSelecionado] = useState<AparelhoDto | null>(null)
   async function buscarCliente() {
     try {
       const dados = await buscarClientePorCpf(cpfBusca)
+      console.log(dados)
       setCliente(dados)
     }
     catch {
@@ -126,13 +131,28 @@ function ClienteExistente() {
             </h2>
             <h2>Selecione ou crie um aparelho </h2>
             <div className="">
-            <select className="bg-card p-3 ">
-              {cliente?.aparelhos?.map(aparelho => (
-                <option key={aparelho.id} value={aparelho.id}>
-                  {aparelho.modelo}
+
+              <select
+                className="bg-card p-3"
+                onChange={(e) => {
+                  const aparelho = cliente?.aparelhos?.find(
+                    (aparelho) => aparelho.id === Number(e.target.value)
+                  );
+
+                  setAparelhoSelecionado(aparelho ?? null);
+                }}
+              >
+                <option key="vazio" value="">
+                  Selecione um aparelho
                 </option>
-              ))}
-            </select>
+
+                {cliente?.aparelhos?.map((aparelho) => (
+                  <option key={aparelho.id} value={aparelho.id}>
+                    {aparelho.modelo}
+                  </option>
+                ))}
+              </select>
+
 
               <button className="px-5">
                 criar novo aparelho
@@ -144,6 +164,7 @@ function ClienteExistente() {
               </label>
               {/**fazer sistema para escolher a categoria como, smartfone,tablet entre outros */}
               <input
+                value={aparelhoSelecionado?.categoria ?? ""}
                 type="text"
                 placeholder="Selecione"
                 className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
@@ -153,8 +174,8 @@ function ClienteExistente() {
               <label className="mb-2 block   text-foreground">
                 Marca
               </label>
-              {/**fazer sistema para escolher a marca como, apple, sansung, xiaomi, etc... */}
               <input
+                value={aparelhoSelecionado?.marca.nome ?? ""}
                 type="text"
                 placeholder="Selecione"
                 className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
@@ -166,6 +187,7 @@ function ClienteExistente() {
               </label>
 
               <input
+                value={aparelhoSelecionado?.modelo ?? ""}
                 type="text"
                 placeholder="Ex.: iPhone 13"
                 className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
@@ -178,6 +200,7 @@ function ClienteExistente() {
               </label>
 
               <input
+                value={aparelhoSelecionado?.imei ?? ""}
                 type="text"
                 placeholder="0000000000000"
                 className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
@@ -190,6 +213,7 @@ function ClienteExistente() {
               </label>
 
               <input
+                value={aparelhoSelecionado?.cor ?? ""}
                 type="text"
                 placeholder="0000000000000"
                 className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
@@ -202,6 +226,7 @@ function ClienteExistente() {
               </label>
               {/**se for "padrão", "senha" ou "pin" coloque o input para ter o campo para se digitar a senha, caso for " sem senha " ou ""biometria" não coloque nada*/}
               <input
+
                 type="text"
                 placeholder="Padrão "
                 className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"

@@ -12,6 +12,9 @@ function NovoCliente() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if(nmCompleto.trim() === "" || cpf.trim() === "" || telefone.trim() === "" || email.trim() === "" || endereco.trim() === "") {
+      return alert("preencha todos os campos")
+    }
     try {
       const data: criarClienteDto = {
         nmCompleto,
@@ -19,10 +22,6 @@ function NovoCliente() {
         telefone,
         email,
         endereco
-      }
-      if(nmCompleto.trim() === "" || cpf.trim() === "" || telefone.trim() === "" || email.trim() === "" || endereco.trim() === "") {
-        return alert("preencha todos os campos")
-
       }
       await criandoCliente(data)
       alert(`Cliente criado`)

@@ -29,6 +29,25 @@ export class OrdemServicoRepository {
         dtEntrada:"desc"
     }})
     }
+
+    buscarPorNumOs(numOs: number, cnpjEmpresa: string) {
+        return this.prisma.ordemServico.findFirst({
+            where: { numOs, cnpjEmpresa },
+            include: {
+                cliente: true,
+                aparelho: true,
+                usuario: true,
+                diagnosticos: true,
+                itensOs: {
+                    include: {
+                        servico: true,
+                        peca: true,
+                    },
+                },
+            },
+        });
+    }
+
     buscarParaPdf(numOs: number, cnpjEmpresa: string) {
         return this.prisma.ordemServico.findFirst({
             where: { numOs, cnpjEmpresa },

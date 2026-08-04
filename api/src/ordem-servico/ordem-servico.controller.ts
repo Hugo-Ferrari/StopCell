@@ -26,14 +26,23 @@ export class OrdemServicoController {
     listar(@Req() req: any) {
         return this.service.listar(req.userCnpjEmpresa);
     }
+
+    @Get(':numOs')
+    async buscarPorNumOs(@Param('numOs') numOs: string, @Req() req: any) {
+        const os = await this.service.buscarPorNumOs(+numOs, req.userCnpjEmpresa as string);
+
+        if (!os) {
+            throw new NotFoundException('Ordem de serviço não encontrada');
+        }
+
+        return os;
+    }
+
     @Get(':numOs/pdf')
     async gerarPdf(@Param('numOs') numOs: string, @Res() res: Response, @Req() req: any) {
         const pdfBuffer = await this.service.gerarPdf(+numOs, req.userCnpjEmpresa as string);
 
-        res.set({
-            'Content-Type': 'application/pdf',
-            'Content-Disposition': `inline; filename=os-${numOs}.pdf`,
-        });
+        res.set({'Content-Type': 'application/pdf','Content-Disposition': `inline; filename=os-${numOs}.pdf`,});
 
         res.send(pdfBuffer);
     }

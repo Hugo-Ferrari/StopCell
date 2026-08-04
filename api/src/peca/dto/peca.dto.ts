@@ -11,5 +11,5 @@ export class PecaDto {
 
     @IsInt()
     @IsNotEmpty()
-    quantidade: number =0
+    quantidade?: number 
 }

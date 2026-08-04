@@ -13,6 +13,7 @@ export class OrdemServicoService {
         private readonly prisma: PrismaService,
     ) { }
 
+    
     async abrir(dto: OrdemServicoDto, cnpjEmpresa: string) {
         const aparelho = await this.prisma.aparelho.findFirst({
             where: { imei: dto.imeiAparelho, cnpjEmpresa },
@@ -56,6 +57,13 @@ export class OrdemServicoService {
     async listar(cnpjEmpresa: string) {
         return await this.repository.listar(cnpjEmpresa);
     }
+
+    async buscarPorNumOs(numOs: number, cnpjEmpresa: string) {
+        return await this.repository.buscarPorNumOs(numOs, cnpjEmpresa);
+    }
+
+
+
     async gerarPdf(numOs: number, cnpjEmpresa: string): Promise<Buffer> {
         const os = await this.repository.buscarParaPdf(numOs, cnpjEmpresa);
 
