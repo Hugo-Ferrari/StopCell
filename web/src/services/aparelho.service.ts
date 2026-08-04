@@ -2,15 +2,13 @@
 import api from "@/api/api"
 
 export interface AparelhoDto {
-    id: number;
     modelo: string;
     cor: string;
     imei: string;
-    marca: {
-        id: number;
-        nome: string;
-    };
-    categoria: string;
+    idMarca: number;
+    idCategoria: number;
+    senhaAparelho: string;
+    tipoSenha: string;
 }
 
 

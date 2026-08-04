@@ -4,6 +4,8 @@ import { buscarClientePorCpf, type criarClienteDto } from "@/services/cliente.se
 import { Search } from "lucide-react";
 import { useState } from "react";
 function ClienteExistente() {
+
+  
   const [cpfBusca, setCpfBusca] = useState("");
 
   const [cliente, setCliente] = useState<criarClienteDto | null>(null);
@@ -136,7 +138,7 @@ function ClienteExistente() {
                 className="bg-card p-3"
                 onChange={(e) => {
                   const aparelho = cliente?.aparelhos?.find(
-                    (aparelho) => aparelho.id === Number(e.target.value)
+                    (aparelho) => aparelho.imei === (e.target.value)
                   );
 
                   setAparelhoSelecionado(aparelho ?? null);
@@ -175,7 +177,7 @@ function ClienteExistente() {
                 Marca
               </label>
               <input
-                value={aparelhoSelecionado?.marca.nome ?? ""}
+                value={aparelhoSelecionado?.idMarca ?? ""}
                 type="text"
                 placeholder="Selecione"
                 className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
