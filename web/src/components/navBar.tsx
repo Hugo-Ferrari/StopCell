@@ -12,7 +12,8 @@ import {
 
 function NavBar() {
   const [aberta, setAberta] = useState(false);
-
+  
+  const close =()=> setAberta(false)
   const menuItens = [
     {
       icon: <ClipboardList size={20} />,
@@ -46,6 +47,7 @@ function NavBar() {
     },
   ];
 
+
   return (
     <aside
       className={`fixed top-0 left-0 z-50 py-3 overflow-hidden  text-foreground  transition-all duration-300 
@@ -66,6 +68,7 @@ function NavBar() {
       <nav className="px-2">
         {menuItens.map((item) => (
           <Link
+          onClick={close}
             key={item.text}
             to={item.path}
             className="group mb-2 flex items-center gap-4 rounded-xl p-3 transition-all hover:bg-accent"

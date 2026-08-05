@@ -6,6 +6,7 @@ import Financeiro from "../pages/Financeiro";
 import NovaOrdemServico from "../pages/NovaOrdemServico";
 import DetalhesOrdemServico from "../pages/DetalhesOrdemServico";
 import MainLayout from "@/layouts/MainLayout";
+import Historico from "@/pages/Historico";
 
 export function AppRoutes(){
     return (
@@ -25,6 +26,11 @@ export function AppRoutes(){
 
                 <Route
                     path="/ordemServico/:numOs" element={<DetalhesOrdemServico />} />
+
+                <Route
+                    path="/historico" element={<Historico/>}>
+                    
+                </Route>
             </Route>
 
         </Routes>

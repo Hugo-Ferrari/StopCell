@@ -12,7 +12,7 @@ function NovoCliente() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if(nmCompleto.trim() === "" || cpf.trim() === "" || telefone.trim() === "" || email.trim() === "" || endereco.trim() === "") {
+    if (nmCompleto.trim() === "" || cpf.trim() === "" || telefone.trim() === "" || email.trim() === "" || endereco.trim() === "") {
       return alert("preencha todos os campos")
     }
     try {
@@ -32,7 +32,7 @@ function NovoCliente() {
       setEmail("")
       setCpf("")
     }
-    catch (err: any) {
+    catch (err) {
       console.log(err)
     }
 
@@ -100,18 +100,20 @@ function NovoCliente() {
               className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
             />
           </div>
+          <div>
+            <label className="mt-4 mb-2 block font-medium text-foreground">
+              Endereço
+            </label>
 
-          <label className="mt-4 mb-2 block font-medium text-foreground">
-            Endereço
-          </label>
+            <input
+              value={endereco}
+              onChange={(e) => setEndereco(e.target.value)}
+              type="text"
+              placeholder="rua, numero, bairro, cidade"
+              className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
+            />
 
-          <input
-            value={endereco}
-            onChange={(e) => setEndereco(e.target.value)}
-            type="text"
-            placeholder="rua, numero, bairro, cidade"
-            className="w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary"
-          />
+          </div>
         </div>
 
         <button

@@ -12,9 +12,18 @@ export class ClientesRepository {
   }
 
   findByCpf(cpf: string, cnpjEmpresa: string) {
-    return this.prisma.cliente.findFirst({ where: { cpf, cnpjEmpresa }, include:
-      {aparelhos: true} });
-  }
+  return this.prisma.cliente.findFirst({
+    where: { cpf, cnpjEmpresa },
+    include: {
+      aparelhos: {
+        include: {
+          marca: true,
+          categoria: true,
+        },
+      },
+    },
+  });
+}
 
   create(dto: CreateClienteDto & { cnpjEmpresa: string }) {
     return this.prisma.cliente.create({

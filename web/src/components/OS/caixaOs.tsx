@@ -10,13 +10,7 @@ type Props = {
   data: string;
 };
 
-function CaixaOs({
-  numeroOs,
-  status,
-  cliente,
-  modelo,
-  data,
-}: Props) {
+function CaixaOs({numeroOs,status,cliente,modelo,data,}: Props) {
   return (
     <Link
       to={`/ordemServico/${numeroOs}`}

@@ -5,21 +5,28 @@ export interface AparelhoDto {
     modelo: string;
     cor: string;
     imei: string;
-    idMarca: number;
-    idCategoria: number;
+    marca: {
+        idMarca: number;
+        nmMarca: string;
+    }
+
+    categoria: {
+        idCategoria: number;
+        nmCategoria: string;
+    }
     senhaAparelho: string;
     tipoSenha: string;
 }
 
 
-export async function listarAparelho(){
+export async function listarAparelho() {
     const response = await api.get("/aparelho")
     return response.data
 
 }
 
-export async function BuscarAparelho(imei:string) {
+export async function BuscarAparelho(imei: string) {
     const response = await api.get(`/aparelho/${imei}`)
     return response.data
-    
+
 }
