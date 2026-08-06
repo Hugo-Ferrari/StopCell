@@ -25,7 +25,7 @@ function Login() {
       salvarToken(data.token, lembrar);
 
       navigate("/ordemServico");
-    } catch (err: any) {
+    } catch (err) {
       if (err?.response?.status === 401) {
         setErro("Usuário ou senha inválidos.");
       } else {

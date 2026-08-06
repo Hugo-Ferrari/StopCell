@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import BoxOs from "@/components/historico/BoxOs";
 import { listarOs } from "@/services/ordemServico.service";
+import BoxCliente from "@/components/historico/BoxCliente";
 
 interface OrdemServicoInterface {
   numOs: number;
@@ -32,7 +33,7 @@ function Historico() {
 
   return (
     <div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 p-2 border-1 rounded-2xl">
         <Search size={18} />
         <input
           type="text"
@@ -43,6 +44,7 @@ function Historico() {
       </div>
 
       <BoxOs ordens={ordens} />
+      
     </div>
   );
 }

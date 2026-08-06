@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ClipboardList,
@@ -12,9 +12,24 @@ import {
 
 function NavBar() {
   const [aberta, setAberta] = useState(false);
-  
-  const close =()=> setAberta(false)
+  const [isDesktop, setIsDescktop] = useState(window.innerWidth >=1024)
+
+  useEffect(() =>{
+    const handleResize = () =>{
+      setIsDescktop(window.innerWidth >=1024)
+    }
+    window.addEventListener("resize" , handleResize)
+    return () =>{
+      window.removeEventListener("resize", handleResize)
+    }
+  },[])
+
+  const close =()=> {
+    if(!isDesktop)
+      setAberta(false)
+}
   const menuItens = [
+  
     {
       icon: <ClipboardList size={20} />,
       text: "Ordem de Serviço",
@@ -47,22 +62,23 @@ function NavBar() {
     },
   ];
 
-
+    
+    const sidebarAberta = isDesktop || aberta
   return (
     <aside
       className={`fixed top-0 left-0 z-50 py-3 overflow-hidden  text-foreground  transition-all duration-300 
-        ${aberta ? "h-screen bg-card  w-60" : "h-15 w-15"
+        ${sidebarAberta ? "h-screen bg-card  w-60" : "h-15 w-15"
       }`}
     >
       <button
-        onClick={() => setAberta(!aberta)}
+        onClick={() => setAberta((prev) => !prev)}
         className={`flex p-4 transition-colors hover:text-primary ${
-          aberta
+          sidebarAberta
             ? "w-full justify-end"
             : "justify-center rotate-180"
         }`}
       >
-        {aberta ? <X /> : <Menu />}
+        {sidebarAberta ? <X /> : <Menu />}
       </button>
 
       <nav className="px-2">
@@ -73,7 +89,7 @@ function NavBar() {
             to={item.path}
             className="group mb-2 flex items-center gap-4 rounded-xl p-3 transition-all hover:bg-accent"
           >
-            {aberta && (
+            {sidebarAberta && (
               <div className="flex flex-col">
                 <div className="text-muted-foreground transition-colors group-hover:text-primary">
                   {item.icon}

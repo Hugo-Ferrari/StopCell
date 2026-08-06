@@ -1,5 +1,5 @@
 import type { AparelhoDto } from '@/services/aparelho.service'
-import React from 'react'
+
 interface DadosAparelhosProps{
     aparelho: AparelhoDto | null
 }

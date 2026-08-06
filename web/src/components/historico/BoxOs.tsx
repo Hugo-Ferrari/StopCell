@@ -20,7 +20,7 @@ interface BoxOsProps {
 }
 function BoxOs({ordens}: BoxOsProps) {
   return (
-    <div className='bg-card'>
+    <div>
         <div className="mt-2 flex flex-col gap-4">
 
         {ordens.map((os) => (

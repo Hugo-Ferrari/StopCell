@@ -1,8 +1,22 @@
-import React from 'react'
 
-function BoxCliente() {
+interface ClienteInterface {
+  nmCompleto: string,
+  ordem_servico:string,
+  endereco:string,
+  email:string
+}
+interface BoxCliente{
+  cliente: ClienteInterface[]
+}
+
+function BoxCliente({cliente}:BoxCliente) {
   return (
-    <div>BoxCliente</div>
+    <div>
+      <div className=''>
+        
+        
+      </div>
+    </div>
   )
 }
 

@@ -46,7 +46,7 @@ function DetalhesOrdemServico() {
     const [ordem, setOrdem] = useState<OrdemDetalheInterface | null>(null);
     const [carregando, setCarregando] = useState(true);
 
-
+// colocar quantidade para os valores dasa peças se multiplicarem e colocar o valor total, acho que a descrição da peça e da mão de obra vai ser irrelevante(caso nn for, adicionar)
     const [descricao, setDescricao] = useState("")
     const [valorPeca, setValorPeca] = useState(0)
     const [quantidade, setQuantidade] = useState(1)
@@ -80,9 +80,6 @@ function DetalhesOrdemServico() {
 
 
     }
-    //fazer os estados de "descrição (""), valor (0) e quantidade(1)"
-    // criar o handleSubmit, para o envio do formulario usar o data ={ descrição, valor, quantidade} e chamar  a função que esta no service
-    //ultimo passo, chamar o handleSubmit no form para digitar o valor das peças
 
     useEffect(() => {
         async function carregarOrdem() {

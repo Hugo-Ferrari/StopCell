@@ -20,7 +20,7 @@ function ClienteExistente() {
     <div className=" sm:p-6">
       <div className="space-y-4">
         {/** colocar icone aqui  */}
-        <h2 className="text-lg sm:text-xl font-bold text-foreground border-b-1">
+        <h2 className="text-lg sm:text-xl font-bold text-foreground ">
           Cliente
         </h2>
         <div className="bg-card  border border-border p-6">
@@ -43,7 +43,7 @@ function ClienteExistente() {
           <DadosCliente cliente={cliente} />
 
 
-          <h2 className="text-lg sm:text-xl  font-bold text-foreground mt-5 border-b-1">
+          <h2 className="text-lg sm:text-xl  font-bold text-foreground mt-5 ">
             {/** icone de aparelho */}
             Aparelho
           </h2>
@@ -81,7 +81,7 @@ function ClienteExistente() {
 
 
 
-          <h2 className="text-lg sm:text-xl  font-bold text-foreground mt-5 border-b-1">
+          <h2 className="text-lg sm:text-xl  font-bold text-foreground mt-5 ">
             {/** icone de aparelho */}
             Ordem de Serviço
           </h2>

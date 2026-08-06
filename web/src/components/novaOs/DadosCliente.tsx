@@ -1,5 +1,5 @@
 import type { criarClienteDto } from '@/services/cliente.service'
-import React from 'react'
+
 interface DadosClienteProps {
     cliente :  criarClienteDto | null 
 }
