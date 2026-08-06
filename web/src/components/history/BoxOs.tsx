@@ -1,4 +1,4 @@
-import CaixaOs from '@/components/orders/status/caixaOs'
+import CaixaOs from '@/components/orders/status/CashOs'
 
 interface OrdemServicoInterface {
   numOs: number;

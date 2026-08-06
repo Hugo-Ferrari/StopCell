@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ItenOsRepository } from './itemOs.repository';
+import { ItenOsRepository } from './item-os.repository';
 import { ItemOsDto } from './dto/itemOs.dto';
 
 @Injectable()

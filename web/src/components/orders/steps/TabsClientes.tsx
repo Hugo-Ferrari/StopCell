@@ -1,6 +1,6 @@
 import { useState } from "react";
-import ClienteExistente from "./ClienteExistente";
-import NovoCliente from "./NovoCliente";
+import ClienteExistente from "./ExistingCustomer";
+import NovoCliente from "./NewCustomer";
 import { User, UserRoundPlus } from "lucide-react";
 
 function TabsClientes() {

@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
-import { EmpresaDto } from 'src/empresa/dto/empresa.dto';
-import { UsuarioCadastroDto } from 'src/usuario/dto/Usuario.dto';
+import { EmpresaDto } from 'src/enterprise/dto/enterprise.dto';
+import { UsuarioCadastroDto } from 'src/user/dto/user.dto';
 
 export class CadastroDto {
 

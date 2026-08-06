@@ -1,47 +1,38 @@
-
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
+// O Enum customizado
+enum FormaPagamento {
+  PIX
+  CARTAO
+  DINHEIRO
+  BOLETO
 
-model Categoria {
-  idCategoria Int    @id @default(autoincrement()) @map("id_categoria")
-  cnpjEmpresa String @map("cnpj_empresa") @db.VarChar(14)
-  nmCategoria String? @map("nm_categoria") @db.VarChar(100)
-
-  empresa   Empresa    @relation(fields: [cnpjEmpresa], references: [cnpj])
-  aparelhos Aparelho[]
-
-  @@map("categoria")
+  @@map("forma_pagamento_enum")
 }
 
-model Marca {
-  idMarca     Int    @id @default(autoincrement()) @map("id_marca")
-  cnpjEmpresa String @map("cnpj_empresa") @db.VarChar(14)
-  nmMarca     String? @map("nm_marca") @db.VarChar(100)
+model Empresa {
+  cnpj         String  @id @db.VarChar(14)
+  nomeFantasia String? @map("nome_fantasia") @db.VarChar(100)
+  razaoSocial  String? @map("razao_social") @db.VarChar(100)
+  telefone     String? @db.VarChar(20)
+  endereco     String? @db.VarChar(150)
 
-  empresa   Empresa    @relation(fields: [cnpjEmpresa], references: [cnpj])
-  aparelhos Aparelho[]
+  usuarios      Usuario[]
+  ordensServico OrdemServico[]
+  clientes      Cliente[]
+  servicos      Servico[]
+  pecas         Peca[]
+  checklists    Checklist[]
 
-  @@map("marca")
+  @@map("empresa")
 }
-
-model Checklist {
-  idChecklist Int    @id @default(autoincrement()) @map("id_checklist")
-  cnpjEmpresa String @map("cnpj_empresa") @db.VarChar(14)
-  descricao   String? @db.VarChar(100)
-
-  empresa      Empresa       @relation(fields: [cnpjEmpresa], references: [cnpj])
-  osChecklists OsChecklist[]
-
-  @@map("checklist")
-}
-
 
 model Cliente {
   cpf         String  @id @db.VarChar(11)
@@ -59,74 +50,22 @@ model Cliente {
   @@map("cliente")
 }
 
-model Empresa {
-  cnpj         String  @id @db.VarChar(14)
-  nomeFantasia String? @map("nome_fantasia") @db.VarChar(100)
-  razaoSocial  String? @map("razao_social") @db.VarChar(100)
-  telefone     String? @db.VarChar(20)
-  endereco     String? @db.VarChar(150)
+model Marca {
+  idMarca Int     @id @default(autoincrement()) @map("id_marca")
+  nmMarca String? @map("nm_marca") @db.VarChar(100)
 
-  usuarios      Usuario[]
-  ordensServico OrdemServico[]
-  clientes      Cliente[]
-  aparelhos     Aparelho[]
-  servicos      Servico[]
-  pecas         Peca[]
-  categorias    Categoria[]
-  marcas        Marca[]
-  checklists    Checklist[]
+  aparelhos Aparelho[]
 
-  @@map("empresa")
+  @@map("marca")
 }
 
-model Usuario {
-  idUsuario    Int     @id @default(autoincrement()) @map("id_usuario")
-  cnpjEmpresa  String? @map("cnpj_empresa") @db.VarChar(14)
-  nome         String? @db.VarChar(100)
-  login        String? @db.VarChar(50)
-  emailUsuario String? @map("email_usuario") @db.VarChar(100) @unique
-  senha        String? @db.VarChar(255)
-  nivelAcesso  String? @map("nivel_acesso") @db.VarChar(20)
+model Categoria {
+  idCategoria Int     @id @default(autoincrement()) @map("id_categoria")
+  nmCategoria String? @map("nm_categoria") @db.VarChar(100)
 
-  empresa       Empresa?       @relation(fields: [cnpjEmpresa], references: [cnpj])
-  ordensServico OrdemServico[]
+  aparelhos Aparelho[]
 
-  @@map("usuario")
-}
-
-
-model Aparelho {
-  imei          String  @id @db.VarChar(50)
-  cnpjEmpresa   String  @map("cnpj_empresa") @db.VarChar(14)
-  idCategoria   Int     @map("id_categoria")
-  idMarca       Int     @map("id_marca")
-  cpfCliente    String  @map("cpf_cliente") @db.VarChar(11)
-  modelo        String? @db.VarChar(100)
-  cor           String? @db.VarChar(50)
-  senhaAparelho String? @map("senha_aparelho") @db.VarChar(255)
-  tipoSenha     String? @map("tipo_senha") @db.VarChar(50)
-
-  empresa       Empresa        @relation(fields: [cnpjEmpresa], references: [cnpj])
-  categoria     Categoria      @relation(fields: [idCategoria], references: [idCategoria])
-  marca         Marca          @relation(fields: [idMarca], references: [idMarca])
-  cliente       Cliente        @relation(fields: [cpfCliente], references: [cpf])
-  ordensServico OrdemServico[]
-
-  @@map("aparelho")
-}
-
-
-model Peca {
-  idPeca      Int      @id @default(autoincrement()) @map("id_peca")
-  cnpjEmpresa String   @map("cnpj_empresa") @db.VarChar(14)
-  descricao   String?  @db.VarChar(150)
-  valor       Decimal? @db.Decimal(10, 2)
-  quantidade  Int?
-
-  empresa Empresa   @relation(fields: [cnpjEmpresa], references: [cnpj])
-  itensOs ItensOs[]
-
-  @@map("peca")
+  @@map("categoria")
 }
 
 model Servico {
@@ -141,6 +80,63 @@ model Servico {
   @@map("servico")
 }
 
+model Peca {
+  idPeca      Int      @id @default(autoincrement()) @map("id_peca")
+  cnpjEmpresa String   @map("cnpj_empresa") @db.VarChar(14)
+  descricao   String?  @db.VarChar(150)
+  valor       Decimal? @db.Decimal(10, 2)
+  quantidade  Int?
+
+  empresa Empresa   @relation(fields: [cnpjEmpresa], references: [cnpj])
+  itensOs ItensOs[]
+
+  @@map("peca")
+}
+
+model Checklist {
+  idChecklist Int     @id @default(autoincrement()) @map("id_checklist")
+  cnpjEmpresa String  @map("cnpj_empresa") @db.VarChar(14)
+  descricao   String? @db.VarChar(100)
+
+  empresa      Empresa       @relation(fields: [cnpjEmpresa], references: [cnpj])
+  osChecklists OsChecklist[]
+
+  @@map("checklist")
+}
+
+model Usuario {
+  idUsuario    Int     @id @default(autoincrement()) @map("id_usuario")
+  cnpjEmpresa  String? @map("cnpj_empresa") @db.VarChar(14)
+  nome         String? @db.VarChar(100)
+  login        String? @db.VarChar(50)
+  emailUsuario String? @unique @map("email_usuario") @db.VarChar(100) // O Unique dele!
+  senha        String? @db.VarChar(255)
+  nivelAcesso  String? @map("nivel_acesso") @db.VarChar(20)
+
+  empresa       Empresa?       @relation(fields: [cnpjEmpresa], references: [cnpj])
+  ordensServico OrdemServico[]
+
+  @@map("usuario")
+}
+
+model Aparelho {
+  imei          String  @id @db.VarChar(50)
+  idCategoria   Int     @map("id_categoria")
+  idMarca       Int     @map("id_marca")
+  cpfCliente    String  @map("cpf_cliente") @db.VarChar(11)
+  modelo        String? @db.VarChar(100)
+  cor           String? @db.VarChar(50)
+  senhaAparelho String? @map("senha_aparelho") @db.VarChar(255)
+  tipoSenha     String? @map("tipo_senha") @db.VarChar(50)
+
+  categoria     Categoria      @relation(fields: [idCategoria], references: [idCategoria])
+  marca         Marca          @relation(fields: [idMarca], references: [idMarca])
+  cliente       Cliente        @relation(fields: [cpfCliente], references: [cpf])
+  
+  ordensServico OrdemServico[]
+
+  @@map("aparelho")
+}
 
 model OrdemServico {
   numOs         Int       @id @default(autoincrement()) @map("num_os")
@@ -155,7 +151,6 @@ model OrdemServico {
   vlTotal       Decimal?  @map("vl_total") @db.Decimal(10, 2)
   diagnostico   String?
 
-  
   ordemServicoPai OrdemServico?  @relation("OsRetrabalho", fields: [numOsAnterior], references: [numOs])
   ordensFilhas    OrdemServico[] @relation("OsRetrabalho")
 
@@ -173,8 +168,6 @@ model OrdemServico {
   @@map("ordem_servico")
 }
 
-
-
 model ItensOs {
   idItemOs      Int      @id @default(autoincrement()) @map("id_item_os")
   numOs         Int      @map("num_os")
@@ -190,19 +183,6 @@ model ItensOs {
   @@map("itens_os")
 }
 
-
-model Diagnostico {
-  idDiagnostico Int       @id @default(autoincrement()) @map("id_diagnostico")
-  numOs         Int       @map("num_os")
-  relatoTecnico String?   @map("relato_tecnico")
-  dataHora      DateTime? @map("data_hora")
-
-  ordemServico OrdemServico @relation(fields: [numOs], references: [numOs])
-
-  @@map("diagnostico")
-}
-
-
 model OsChecklist {
   numOs       Int     @map("num_os")
   idChecklist Int     @map("id_checklist")
@@ -215,6 +195,39 @@ model OsChecklist {
   @@map("os_checklist")
 }
 
+model Diagnostico {
+  idDiagnostico Int       @id @default(autoincrement()) @map("id_diagnostico")
+  numOs         Int       @map("num_os")
+  relatoTecnico String?   @map("relato_tecnico")
+  dataHora      DateTime? @map("data_hora")
+
+  ordemServico OrdemServico @relation(fields: [numOs], references: [numOs])
+
+  @@map("diagnostico")
+}
+
+model Pagamento {
+  idPagamento    Int             @id @default(autoincrement()) @map("id_pagamento")
+  numOs          Int             @map("num_os")
+  valorPago      Decimal?        @map("valor_pago") @db.Decimal(10, 2)
+  dtPagamento    DateTime?       @map("dt_pagamento")
+  formaPagamento FormaPagamento? @map("forma_pagamento")
+
+  // Campos de PIX (Inovação)
+  chavePix String? @map("chave_pix") @db.VarChar(100)
+  txid     String? @db.VarChar(100)
+  qrCode   String? @map("qr_code") @db.Text
+
+  // Campos de Cartão (Inovação)
+  numParcelas    Int?    @map("num_parcelas")
+  bandeira       String? @db.VarChar(50)
+  tipoCartao     String? @map("tipo_cartao") @db.VarChar(20)
+  ultimosDigitos String? @map("ultimos_digitos") @db.VarChar(4)
+
+  ordemServico OrdemServico @relation(fields: [numOs], references: [numOs])
+
+  @@map("pagamento")
+}
 
 model LogNotificacao {
   idLogNotificacao Int       @id @default(autoincrement()) @map("id_log_notificacao")
@@ -229,32 +242,4 @@ model LogNotificacao {
   cliente      Cliente      @relation(fields: [cpfCliente], references: [cpf])
 
   @@map("log_notificacao")
-}
-
-enum FormaPagamento {
-  PIX
-  CARTAO
-}
-
-model Pagamento {
-  idPagamento    Int            @id @default(autoincrement()) @map("idPagamento")
-  numOs          Int            @map("Ordem_Servico_Num_Os")
-  valorPago      Decimal?       @map("Valor_pago") @db.Decimal(10, 2)
-  dtPagamento    DateTime?      @map("Dt_pagamento")
-  formaPagamento FormaPagamento @map("Forma_pagamento")
-
- 
-  chavePix String? @map("chave_pix") @db.VarChar(100)
-  txid     String? @db.VarChar(100)
-  qrCode   String? @map("qr_code") @db.VarChar(500)
-
-  
-  numParcelas    Int?    @map("num_parcelas")
-  bandeira       String? @db.VarChar(50)
-  tipoCartao     String? @map("tipo_cartao") @db.VarChar(20)
-  ultimosDigitos String? @map("ultimos_digitos") @db.VarChar(4)
-
-  ordemServico OrdemServico @relation(fields: [numOs], references: [numOs])
-
-  @@map("Pagamento")
 }
