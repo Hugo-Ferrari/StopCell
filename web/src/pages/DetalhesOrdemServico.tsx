@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Smartphone, UserStar } from "lucide-react";
+import { ArrowLeft, Smartphone } from "lucide-react";
 import { buscarOrdemServicoPorNumero } from "@/services/ordemServico.service";
 import { criandoPeca, type PecaDto } from "@/services/peca.service";
 import { criarServico, type ServicoDto } from "@/services/servico.service";
@@ -46,7 +46,7 @@ function DetalhesOrdemServico() {
     const [ordem, setOrdem] = useState<OrdemDetalheInterface | null>(null);
     const [carregando, setCarregando] = useState(true);
 
-// colocar quantidade para os valores dasa peças se multiplicarem e colocar o valor total, acho que a descrição da peça e da mão de obra vai ser irrelevante(caso nn for, adicionar)
+    // colocar quantidade para os valores dasa peças se multiplicarem e colocar o valor total, acho que a descrição da peça e da mão de obra vai ser irrelevante(caso nn for, adicionar)
     const [descricao, setDescricao] = useState("")
     const [valorPeca, setValorPeca] = useState(0)
     const [quantidade, setQuantidade] = useState(1)
@@ -74,7 +74,7 @@ function DetalhesOrdemServico() {
 
 
         }
-        catch (err: any) {
+        catch (err) {
             console.log(err)
         }
 
@@ -152,30 +152,36 @@ function DetalhesOrdemServico() {
 
                             <form onSubmit={HandleSubmit}>
 
-                                <div className="p-2 flex">
+                                <div className="p-2 flex gap-2 text-sm font-bold">
                                     {/** preciso retornar as descrições de Servico e da peça caso necessario, se nn for necessario pode se excuir ela */}
-                                    <label >
+                                    <label className="">
                                         Peça:
                                     </label>
-                                    <input type="number" value={valorPeca ===0? "" : valorPeca} onChange={(e) => setValorPeca(Number(e.target.value))} />
+                                    <input type="number" value={valorPeca === 0 ? "" : valorPeca} onChange={(e) => setValorPeca(Number(e.target.value))} className="border-1 " />
 
 
                                 </div>
-                                <div className="p-2 flex">
+                                <div className="p-2 flex gap-2 text-sm font-bold">
                                     <label >
                                         Serviço:
                                     </label>
-                                    <input type="number" value={valorServico === 0? "" : valorServico} onChange={(e) => setValorServico(Number(e.target.value))} />
+                                    <input type="number" value={valorServico === 0 ? "" : valorServico} onChange={(e) => setValorServico(Number(e.target.value))} className="border-1 " />
 
 
                                 </div>
                                 <div>
-                                
+
 
                                 </div>
-                                
+
                             </form>
                         </div>
+                    </div>
+                    <div>
+                        <label>
+                            TOTAL
+                        </label>
+                        <p>{/** valor total */}</p>
                     </div>
                 </div>
             </div>
