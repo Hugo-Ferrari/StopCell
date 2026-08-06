@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { User, Lock, Loader2, Sun, Moon } from "lucide-react";
-import { login, salvarToken } from "@/services/auth.service";
+
 import Marca from "@/components/common/Mark";
+import { login, salvarToken } from "../authService";
 
 function Login() {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ function Login() {
   }
 
   return (
-    <div className="relative flex min-h-screen w-full items-center justify-center bg-gradient-to-b from-background via-background to-card px-4">
+    <div className="relative flex min-h-screen w-full items-center justify-center bg-linear-to-b from-background via-background to-card px-4">
 
       
       <div className="absolute top-0 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />

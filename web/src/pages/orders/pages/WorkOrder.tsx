@@ -1,7 +1,7 @@
 
 import BoxOs from "@/components/history/BoxOs";
 import CaixaStatusOs from "@/components/orders/status/StatusCashOs";
-import { listarOs } from "@/pages/orders/serviceOrderService";
+import { listarOs } from "@/services/serviceOrderService";
 import { Plus, Search } from "lucide-react";
 
 import { useEffect, useState } from "react";

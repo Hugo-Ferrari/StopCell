@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Smartphone } from "lucide-react";
-import { buscarOrdemServicoPorNumero } from "@/pages/orders/serviceOrderService";
+import { buscarOrdemServicoPorNumero } from "@/services/serviceOrderService";
 import { criandoPeca, type PecaDto } from "@/services/partService";
-import { criarServico, type ServicoDto } from "@/services/servico.service";
+import { criarServico, type Servico } from "@/services/servicoService";
 import type { OrdemDetalheInterface } from "../models/ServiceOrderDetailsModels";
 
 
@@ -25,7 +25,7 @@ function DetalhesOrdemServico() {
                 valorPeca,
                 quantidade
             }
-            const dataServico: ServicoDto = {
+            const dataServico: Servico = {
                 descricao,
                 valorServico,
             }
@@ -125,7 +125,7 @@ function DetalhesOrdemServico() {
                                     <label className="">
                                         Peça:
                                     </label>
-                                    <input type="number" value={valorPeca === 0 ? "" : valorPeca} onChange={(e) => setValorPeca(Number(e.target.value))} className="border-1 " />
+                                    <input type="number" value={valorPeca === 0 ? "" : valorPeca} onChange={(e) => setValorPeca(Number(e.target.value))} className="border" />
 
 
                                 </div>
@@ -133,7 +133,7 @@ function DetalhesOrdemServico() {
                                     <label >
                                         Serviço:
                                     </label>
-                                    <input type="number" value={valorServico === 0 ? "" : valorServico} onChange={(e) => setValorServico(Number(e.target.value))} className="border-1 " />
+                                    <input type="number" value={valorServico === 0 ? "" : valorServico} onChange={(e) => setValorServico(Number(e.target.value))} className="border" />
 
 
                                 </div>

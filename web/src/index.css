@@ -1,41 +1,48 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
+
+@import "@fontsource-variable/geist/index.css";
 
 @theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: "Geist Variable", sans-serif;
+   
+    --font-sans: "Inter", sans-serif;
+    --font-heading: "Space Grotesk", sans-serif;
 
-    /* Shadcn */
     --color-background: var(--background);
     --color-foreground: var(--foreground);
 
+    
     --color-card: var(--card);
     --color-card-foreground: var(--card-foreground);
 
+   
     --color-popover: var(--popover);
     --color-popover-foreground: var(--popover-foreground);
 
+   
     --color-primary: var(--primary);
     --color-primary-foreground: var(--primary-foreground);
 
+    
     --color-secondary: var(--secondary);
     --color-secondary-foreground: var(--secondary-foreground);
 
     --color-muted: var(--muted);
     --color-muted-foreground: var(--muted-foreground);
 
+    
     --color-accent: var(--accent);
     --color-accent-foreground: var(--accent-foreground);
 
+    
     --color-destructive: var(--destructive);
 
+    
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
 
-    /* Sidebar */
     --color-sidebar: var(--sidebar);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar-primary: var(--sidebar-primary);
@@ -45,14 +52,14 @@
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
 
-    /* Charts */
+  
     --color-chart-1: var(--chart-1);
     --color-chart-2: var(--chart-2);
     --color-chart-3: var(--chart-3);
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
 
-    /* Radius */
+    
     --radius-sm: calc(var(--radius) * .6);
     --radius-md: calc(var(--radius) * .8);
     --radius-lg: var(--radius);
@@ -64,83 +71,81 @@
 
 :root {
 
-    /* ========= CORES DA STOPCELL ========= */
+   
 
-    --brand: #ff4500;
+    --brand: #F56333;
+    --brand-gradient-start: #FF6D31;
+    --brand-gradient-end: #E54533;
+    --brand-muted: rgb(245 99 51 / 14%);
 
-    --background: #121212;
-    --foreground: #ffffff;
+   
 
-    --surface: #2c2c2c;
-    --surface-hover: #353535;
+    --background: #0B0808;
+    --surface: #141110;
+    --surface-2: #1E1918;
 
-    --border: #3a3a3a;
+    --card: #161312;
+    --popover: #161312;
 
-    /* ========= TEXTOS ========= */
+    --sidebar: #080505;
 
-    --text-primary: #ffffff;
-    --text-secondary: #bdbdbd;
-    --text-muted: #8a8a8a;
-    --text-disabled: #555555;
+    --border: rgb(45 39 39 / 70%);
+    --input: #231E1D;
 
-    /* ========= STATUS ========= */
+    
 
-    --status-aberta: #22c55e;
-    --status-diagnostico: #f5c524;
-    --status-aprovacao: #fb923c;
-    --status-reparo: #3b82f6;
-    --status-retrabalho: #8b5cf6;
-    --status-cancelado: #ef4444;
+    --foreground: #F8F4F2;
+    --muted-foreground: #9E9694;
 
-    /* ========= SHADCN ========= */
+   
 
-    --card: var(--surface);
-    --card-foreground: var(--text-primary);
+    --success: #00C470;
+    --warning: #F3BA25;
+    --info: #339FEE;
+    --danger: #F94144;
 
-    --popover: var(--surface);
-    --popover-foreground: var(--text-primary);
 
     --primary: var(--brand);
     --primary-foreground: #ffffff;
 
     --secondary: var(--surface);
-    --secondary-foreground: var(--text-primary);
+    --secondary-foreground: var(--foreground);
 
-    --muted: var(--surface);
-    --muted-foreground: var(--text-secondary);
+    --muted: var(--surface-2);
+    --accent: var(--surface-2);
+    --accent-foreground: var(--foreground);
 
-    --accent: var(--surface-hover);
-    --accent-foreground: var(--text-primary);
+    --destructive: var(--danger);
 
-    --destructive: #ef4444;
-
-    --input: var(--border);
+    --card-foreground: var(--foreground);
+    --popover-foreground: var(--foreground);
 
     --ring: var(--brand);
 
-    /* ========= SIDEBAR ========= */
+  
 
-    --sidebar: #1b1b1b;
-    --sidebar-foreground: #ffffff;
+    --sidebar-foreground: var(--foreground);
 
     --sidebar-primary: var(--brand);
-    --sidebar-primary-foreground: #ffffff;
+    --sidebar-primary-foreground: #fff;
 
-    --sidebar-accent: var(--surface-hover);
-    --sidebar-accent-foreground: #ffffff;
+    --sidebar-accent: var(--surface);
+    --sidebar-accent-foreground: var(--foreground);
 
     --sidebar-border: var(--border);
     --sidebar-ring: var(--brand);
 
-    /* ========= CHARTS ========= */
+   
 
-    --chart-1: #ff4500;
-    --chart-2: #3b82f6;
-    --chart-3: #22c55e;
-    --chart-4: #f5c524;
-    --chart-5: #8b5cf6;
+    --chart-1: var(--brand);
+    --chart-2: var(--info);
+    --chart-3: var(--success);
+    --chart-4: var(--warning);
+    --chart-5: #9B5CF6;
 
-    --radius: .75rem;
+    
+
+    --radius: .875rem;
 }
 
 @layer base {
@@ -160,6 +165,14 @@
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        font-family: var(--font-heading);
+        letter-spacing: -0.01em;
     }
 
     ::selection {
@@ -182,17 +195,17 @@
     }
 
     ::-webkit-scrollbar-thumb:hover {
-        background: #4a4a4a;
+        background: #444;
     }
 
     input,
     textarea,
     select {
-        color: var(--text-primary);
+        color: var(--foreground);
     }
 
     input::placeholder,
     textarea::placeholder {
-        color: var(--text-muted);
+        color: var(--muted-foreground);
     }
 }

@@ -9,7 +9,7 @@ interface BoxClienteProps {
   cliente: ClienteInterface[]
 }
 
-function BoxCliente(cliente: BoxClienteProps) {
+function BoxCliente(_props: BoxClienteProps) {
   return (
     <div>
       <div className=''>
