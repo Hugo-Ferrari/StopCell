@@ -1,5 +1,4 @@
-import React from 'react'
-import CaixaOs from '../OS/caixaOs'
+import CaixaOs from '@/components/orders/status/caixaOs'
 
 interface OrdemServicoInterface {
   numOs: number;

@@ -1,5 +1,5 @@
 
-import TabsClientes from '@/components/novaOs/TabsClientes'
+import TabsClientes from '@/components/orders/steps/TabsClientes'
 
 
 function NovaOrdemServico() {

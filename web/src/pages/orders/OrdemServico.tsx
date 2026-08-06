@@ -1,6 +1,6 @@
 
-import BoxOs from "@/components/historico/BoxOs";
-import CaixaStatusOs from "@/components/OS/CaixaStatusOs";
+import BoxOs from "@/components/history/BoxOs";
+import CaixaStatusOs from "@/components/orders/status/CaixaStatusOs";
 import { listarOs } from "@/services/ordemServico.service";
 import { Plus, Search } from "lucide-react";
 

@@ -1,12 +1,12 @@
 import { Route, Routes } from "react-router-dom";
-import Login from "../pages/Login";
-import RecuperarSenha from "../pages/RecuperarSenha";
-import OrdemServico from "../pages/OrdemServico";
-import Financeiro from "../pages/Financeiro";
-import NovaOrdemServico from "../pages/NovaOrdemServico";
-import DetalhesOrdemServico from "../pages/DetalhesOrdemServico";
+import Login from "@/pages/auth/Login";
+import RecuperarSenha from "@/pages/auth/RecuperarSenha";
+import OrdemServico from "@/pages/orders/OrdemServico";
+import Financeiro from "@/pages/finance/Financeiro";
+import NovaOrdemServico from "@/pages/orders/NovaOrdemServico";
+import DetalhesOrdemServico from "@/pages/orders/DetalhesOrdemServico";
 import MainLayout from "@/layouts/MainLayout";
-import Historico from "@/pages/Historico";
+import Historico from "@/pages/history/Historico";
 
 export function AppRoutes(){
     return (

@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { User, Lock, Loader2, Sun, Moon } from "lucide-react";
 import { login, salvarToken } from "@/services/auth.service";
-import Marca from "../components/marca";
+import Marca from "@/components/common/Marca";
 
 function Login() {
   const navigate = useNavigate();
@@ -25,8 +25,9 @@ function Login() {
       salvarToken(data.token, lembrar);
 
       navigate("/ordemServico");
-    } catch (err) {
-      if (err?.response?.status === 401) {
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      if (status === 401) {
         setErro("Usuário ou senha inválidos.");
       } else {
         setErro("Não foi possível logar. Tente novamente.");

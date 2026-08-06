@@ -1,5 +1,5 @@
 import { matchPath, useLocation } from "react-router-dom";
-import NavBar from "./navBar";
+import NavBar from "./NavBar";
 
 function Header() {
   const location = useLocation();

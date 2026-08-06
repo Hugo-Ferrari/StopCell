@@ -5,11 +5,11 @@ interface ClienteInterface {
   endereco:string,
   email:string
 }
-interface BoxCliente{
+interface BoxClienteProps {
   cliente: ClienteInterface[]
 }
 
-function BoxCliente({cliente}:BoxCliente) {
+function BoxCliente(cliente: BoxClienteProps) {
   return (
     <div>
       <div className=''>

@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
-import BoxOs from "@/components/historico/BoxOs";
+import BoxOs from "@/components/history/BoxOs";
 import { listarOs } from "@/services/ordemServico.service";
-import BoxCliente from "@/components/historico/BoxCliente";
 
 interface OrdemServicoInterface {
   numOs: number;

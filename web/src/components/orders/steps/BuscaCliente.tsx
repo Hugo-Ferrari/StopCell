@@ -1,6 +1,6 @@
 import { buscarClientePorCpf, type criarClienteDto } from '@/services/cliente.service';
 import { Search } from 'lucide-react'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 interface BuscarClienteProps{
     onBuscar:(cliente:criarClienteDto) => void

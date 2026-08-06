@@ -1,5 +1,5 @@
 import { criandoCliente, type criarClienteDto } from "@/services/cliente.service";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 function NovoCliente() {
@@ -21,7 +21,8 @@ function NovoCliente() {
         cpf,
         telefone,
         email,
-        endereco
+        endereco,
+        aparelhos: []
       }
       await criandoCliente(data)
       alert(`Cliente criado`)

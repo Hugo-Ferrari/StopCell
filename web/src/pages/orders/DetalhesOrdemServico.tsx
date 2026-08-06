@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Smartphone } from "lucide-react";
 import { buscarOrdemServicoPorNumero } from "@/services/ordemServico.service";
@@ -47,13 +47,12 @@ function DetalhesOrdemServico() {
     const [carregando, setCarregando] = useState(true);
 
     // colocar quantidade para os valores dasa peças se multiplicarem e colocar o valor total, acho que a descrição da peça e da mão de obra vai ser irrelevante(caso nn for, adicionar)
-    const [descricao, setDescricao] = useState("")
+    const [descricao] = useState("")
     const [valorPeca, setValorPeca] = useState(0)
-    const [quantidade, setQuantidade] = useState(1)
+    const [quantidade] = useState(1)
 
-    const [descricaoServico, setDescricaoServico] = useState("")
     const [valorServico, setValorServico] = useState(0)
-    async function HandleSubmit(e: React.FormEvent) {
+    async function HandleSubmit() {
         try {
             const data: PecaDto = {
                 descricao,
@@ -150,7 +149,10 @@ function DetalhesOrdemServico() {
                     <div className="bg-card">
                         <div className="grid p-4 text-sm text-muted-foreground sm:grid-cols-3 bg-card gap-2">
 
-                            <form onSubmit={HandleSubmit}>
+                            <form onSubmit={(e) => {
+                                e.preventDefault();
+                                void HandleSubmit();
+                            }}>
 
                                 <div className="p-2 flex gap-2 text-sm font-bold">
                                     {/** preciso retornar as descrições de Servico e da peça caso necessario, se nn for necessario pode se excuir ela */}
