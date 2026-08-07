@@ -1,7 +1,7 @@
-import { UsuarioCadastroDto } from 'src/user/dto/user.dto';
 import { Body, Controller, Post } from '@nestjs/common';
 import { UsuarioService } from './user.service';
-import { Public } from 'src/common/decorators/public.decorator';
+import { Public } from '@/common/decorators/public.decorator';
+import { UsuarioCadastroDto } from './dto/user.dto';
 
 
 @Controller('usuario')

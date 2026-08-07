@@ -1,7 +1,8 @@
+import { EmpresaDto } from '@/enterprise/dto/enterprise.dto';
+import { UsuarioCadastroDto } from '@/user/dto/user.dto';
 import { Type } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
-import { EmpresaDto } from 'src/enterprise/dto/enterprise.dto';
-import { UsuarioCadastroDto } from 'src/user/dto/user.dto';
+
 
 export class CadastroDto {
 

@@ -30,3 +30,8 @@ export async function BuscarAparelho(imei: string) {
     return response.data
 
 }
+
+export async function criarAparelho(data: AparelhoDto) {
+    const response = await api.post("/aparelho", data)
+    return response.data
+}
