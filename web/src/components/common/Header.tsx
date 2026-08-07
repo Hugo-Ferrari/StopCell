@@ -1,5 +1,5 @@
 import { matchPath, useLocation } from "react-router-dom";
-import NavBar from "./NavBar";
+
 
 function Header() {
   const location = useLocation();
@@ -13,34 +13,34 @@ function Header() {
     "/configuracoes": "Configurações",
   };
 
-  const titulo =
-    matchPath({ path: "/ordemServico/:numOs", end: true }, location.pathname)
-      ? "Diagnóstico e Orçamento"
-      : titulos[location.pathname] || "Stop Cell";
+  const titulo = matchPath(
+    { path: "/ordemServico/:numOs", end: true },
+    location.pathname
+  )
+    ? "Diagnóstico e Orçamento"
+    : titulos[location.pathname] || "Stop Cell";
 
   return (
-    <header className="flex items-center border-b border-border bg-background/95 p-5 backdrop-blur-sm">
-      <NavBar />
+    <>
 
-      <div className="ml-10">
-        <span className="relative text-2xl font-extrabold uppercase leading-tight tracking-wide">
-          <div className="text-sm">
+      <header
+        className=" sticky top-0 z-10 flex h-20 items-center border-b border-border bg-background/95 px-5 backdrop-blur-sm transition-all duration-300 lg:pl-72
+        ">
+        <div className="flex flex-col">
+          <span className="text-xs font-extrabold uppercase tracking-widest lg:text-sm">
             <span className="text-foreground">
               ST<span className="text-primary">O</span>P
             </span>
 
-            <span className="text-primary">
-              CELL
-            </span>
-          </div>
-        </span>
+            <span className="text-primary">CELL</span>
+          </span>
 
-        <h1 className="text-xl font-bold text-foreground">
-          {titulo}
-        </h1>
-      </div>
-
-    </header>
+          <h1 className="text-lg font-bold text-foreground lg:text-2xl">
+            {titulo}
+          </h1>
+        </div>
+      </header>
+    </>
   );
 }
 

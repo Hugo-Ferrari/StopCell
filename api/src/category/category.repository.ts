@@ -6,20 +6,26 @@ import { categoriaDto } from './dto/category.dto';
 export class categoriaRepository {
     constructor(private readonly prisma: PrismaService) {}
 
-    cadastro(dto: categoriaDto & { cnpjEmpresa: string }) {
+    cadastro(dto: categoriaDto) {
         return this.prisma.categoria.create({
-            data: {
-                ...dto,
-                cnpjEmpresa: dto.cnpjEmpresa,
+            data: dto,
+        });
+    }
+
+    findByid(id: number) {
+        return this.prisma.categoria.findFirst({
+            where: {
+                idCategoria: id,
             },
         });
     }
 
-    findByid(id: number, cnpjEmpresa: string) {
-        return this.prisma.categoria.count({ where: { idCategoria: id, cnpjEmpresa } });
-    }
-
-    atualizar(id: number, dto: categoriaDto, cnpjEmpresa: string) {
-        return this.prisma.categoria.update({ where: { idCategoria: id, cnpjEmpresa }, data: dto });
+    atualizar(id: number, dto: categoriaDto) {
+        return this.prisma.categoria.update({
+            where: {
+                idCategoria: id,
+            },
+            data: dto,
+        });
     }
 }

@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // O Enum customizado
@@ -129,10 +128,10 @@ model Aparelho {
   senhaAparelho String? @map("senha_aparelho") @db.VarChar(255)
   tipoSenha     String? @map("tipo_senha") @db.VarChar(50)
 
-  categoria     Categoria      @relation(fields: [idCategoria], references: [idCategoria])
-  marca         Marca          @relation(fields: [idMarca], references: [idMarca])
-  cliente       Cliente        @relation(fields: [cpfCliente], references: [cpf])
-  
+  categoria Categoria @relation(fields: [idCategoria], references: [idCategoria])
+  marca     Marca     @relation(fields: [idMarca], references: [idMarca])
+  cliente   Cliente   @relation(fields: [cpfCliente], references: [cpf])
+
   ordensServico OrdemServico[]
 
   @@map("aparelho")

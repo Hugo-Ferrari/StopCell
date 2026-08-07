@@ -1,4 +1,3 @@
-
 import type { AparelhoDto } from "@/services/deviceService";
 import { type criarClienteDto } from "@/services/customerService";
 
@@ -7,89 +6,138 @@ import BuscaCliente from "./CustomerSearch";
 import DadosCliente from "./CustomerDetails";
 import DadosAparelhos from "./DamagedDevices";
 import DadosOrdemServico from "./ServiceOrderData";
+
 function ClienteExistente() {
 
-
-
-
   const [cliente, setCliente] = useState<criarClienteDto | null>(null);
-  const [aparelhoSelecionado, setAparelhoSelecionado] = useState<AparelhoDto | null>(null)
+
+  const [aparelhoSelecionado, setAparelhoSelecionado] =
+    useState<AparelhoDto | null>(null);
+
+
+  function selecionarAparelho(
+    imei: string
+  ) {
+
+    const aparelho = cliente?.aparelhos?.find(
+      (aparelho) => aparelho.imei === imei
+    );
+
+    setAparelhoSelecionado(aparelho ?? null);
+  }
 
 
   return (
-    <div className=" sm:p-6">
-      <div className="space-y-4">
-        {/** colocar icone aqui  */}
-        <h2 className="text-lg sm:text-xl font-bold text-foreground ">
+    <div
+      className=" space-y-6 p-4 sm:p-6">
+
+  
+      <section
+        className=" rounded-2xl border border-border bg-card p-5 shadow-sm">
+
+        <h2
+          className="  mb-1 text-xl  font-bold text-foreground  ">
           Cliente
         </h2>
-        <div className="bg-card  border border-border p-6">
 
-          {/** criar campo no backend para filtar os clientes de acorco com o numero de telefone ou cpf */}
 
-          <p className="mt-1 mb-4  text-muted-foreground">
-            Selecione um cliente para criar a Ordem de Serviço.
-          </p>
-          <BuscaCliente onBuscar={setCliente} />
+        <p
+          className="  mb-5  text-sm  text-muted-foreground  ">
+          Selecione um cliente para criar a Ordem de Serviço.
+        </p>
 
+
+        <BuscaCliente
+          onBuscar={setCliente}
+        />
+
+
+        <div className="mt-6">
+          <DadosCliente cliente={cliente}/>
         </div>
-      </div>
 
-      <div className="  ">
-
-
-        <div className="space-y-4">
-
-          <DadosCliente cliente={cliente} />
+      </section>
 
 
-          <h2 className="text-lg sm:text-xl  font-bold text-foreground mt-5 ">
-            {/** icone de aparelho */}
-            Aparelho
-          </h2>
-          <h2>Selecione ou crie um aparelho </h2>
-          <div className="">
 
-            <select
-              className="bg-card p-3"
-              onChange={(e) => {
-                const aparelho = cliente?.aparelhos?.find(
-                  (aparelho) => aparelho.imei === (e.target.value)
-                );
+     
+      <section
+        className=" rounded-2xl border border-border bg-card p-5 shadow-sm ">
 
-                setAparelhoSelecionado(aparelho ?? null);
-              }}
-            >
-              <option key="vazio" value="">
-                Selecione um aparelho
+        <h2
+          className=" mb-1 text-xl  font-bold  text-foreground ">
+          Aparelho
+        </h2>
+
+
+        <p
+          className=" mb-5 text-sm  text-muted-foreground ">
+          Selecione um aparelho existente ou cadastre um novo.
+        </p>
+
+
+        <div
+          className=" flex flex-col  gap-3  sm:flex-row">
+
+          <select
+            className=" flex-1 rounded-lg border border-border bg-background px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30 "
+            onChange={(e) =>
+              selecionarAparelho(e.target.value)
+            }
+          >
+
+            <option value="">
+              Selecione um aparelho
+            </option>
+
+
+            {cliente?.aparelhos?.map((aparelho) => (
+
+              <option
+                key={aparelho.imei}
+                value={aparelho.imei}
+              >
+                {aparelho.modelo}
               </option>
 
-              {cliente?.aparelhos?.map((aparelho) => (
-                <option key={aparelho.imei} value={aparelho.imei}>
-                  {aparelho.modelo}
-                </option>
-              ))}
-            </select>
+            ))}
+
+          </select>
 
 
-            <button className="px-5">
-              criar novo aparelho
-            </button>
-          </div>
+          <button
+            className=" rounded-l bg-primary px-5 py-3 font-semibold text-primary-foreground  transition hover:opacity-90">
+            Novo aparelho
+          </button>
 
-          <DadosAparelhos aparelho={aparelhoSelecionado} />
-
-
-
-          <h2 className="text-lg sm:text-xl  font-bold text-foreground mt-5 ">
-            {/** icone de aparelho */}
-            Ordem de Serviço
-          </h2>
-          <DadosOrdemServico />
         </div>
-        /</div>
-    </div>
 
+
+        <div className="mt-6">
+          <DadosAparelhos
+            aparelho={aparelhoSelecionado}
+          />
+        </div>
+
+      </section>
+
+
+
+      
+      <section
+        className=" rounded-2xl border border-border bg-card p-5  shadow-sm">
+
+        <h2
+          className=" mb-5 text-xl font-boldtext-foreground">
+          Ordem de Serviço
+        </h2>
+
+
+        <DadosOrdemServico />
+
+      </section>
+
+    </div>
   );
 }
 

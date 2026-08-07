@@ -10,24 +10,41 @@ type Props = {
   data: string;
 };
 
-function CaixaOs({numeroOs,status,cliente,modelo,data,}: Props) {
+function CaixaOs({
+  numeroOs,
+  status,
+  cliente,
+  modelo,
+  data,
+}: Props) {
   return (
     <Link
       to={`/ordemServico/${numeroOs}`}
-      className="block w-full rounded-xl border border-border bg-card p-5 transition-all duration-200 hover:shadow-lg hover:border-primary/40"
-    >
+      className=" group block w-full  rounded-2xl  border  border-border  bg-card  p-5  shadow-sm  transition-all  duration-300  hover:-translate-y-1  hover:border-primary/40 hover:shadow-xl ">
+      
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">
+            Ordem de Serviço
+          </p>
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-muted-foreground">
-          #{numeroOs}
-        </p>
+          <p className="font-bold text-foreground">
+            #{numeroOs}
+          </p>
+        </div>
 
         <StatusDeFinalizacaoDeServico status={status} />
       </div>
 
-      <div className="mt-4 flex items-center gap-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-          <Smartphone className="text-primary" size={28} />
+     
+      <div className="mt-6 flex items-center gap-4">
+        <div
+          className=" flex h-14 w-14 shrink-0 items-center justify-center  rounded-xl   bg-primary/10   transition-colors  group-hover:bg-primary/20"
+        >
+          <Smartphone
+            size={28}
+            className="text-primary"
+          />
         </div>
 
         <div className="min-w-0 flex-1">
@@ -38,13 +55,19 @@ function CaixaOs({numeroOs,status,cliente,modelo,data,}: Props) {
           <p className="truncate text-sm text-muted-foreground">
             {modelo}
           </p>
-
-          <p className="text-xs text-[var(--text-muted)]">
-            {data}
-          </p>
         </div>
       </div>
 
+      
+      <div className="mt-5 border-t border-border pt-4">
+        <p className="text-xs text-muted-foreground">
+          Entrada em
+        </p>
+
+        <p className="text-sm font-medium text-foreground">
+          {data}
+        </p>
+      </div>
     </Link>
   );
 }

@@ -1,20 +1,23 @@
+
+
 import { Injectable } from '@nestjs/common';
 import { categoriaRepository } from './category.repository';
 import { categoriaDto } from './dto/category.dto';
 
+
 @Injectable()
 export class CategoriaService {
-    constructor(private readonly repository: categoriaRepository){}
+    constructor(private readonly repository: categoriaRepository) {}
 
-    async cadastrar(dto: categoriaDto, cnpjEmpresa: string) {
-        return await this.repository.cadastro({ ...dto, cnpjEmpresa });
+    async cadastrar(dto: categoriaDto) {
+        return await this.repository.cadastro(dto);
     }
 
-    async atualizar(id: number, dto: categoriaDto, cnpjEmpresa: string) {
-        const total = await this.repository.findByid(id, cnpjEmpresa);
+    async atualizar(id: number, dto: categoriaDto) {
+        const categoria = await this.repository.findByid(id);
 
-        if (total > 0) {
-            return this.repository.atualizar(id, dto, cnpjEmpresa);
+        if (categoria) {
+            return this.repository.atualizar(id, dto);
         }
         return null;
     }

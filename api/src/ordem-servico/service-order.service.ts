@@ -16,7 +16,7 @@ export class OrdemServicoService {
     
     async abrir(dto: OrdemServicoDto, cnpjEmpresa: string) {
         const aparelho = await this.prisma.aparelho.findFirst({
-            where: { imei: dto.imeiAparelho, cnpjEmpresa },
+            where: { imei: dto.imeiAparelho },
         });
         if (!aparelho) throw new NotFoundException('Aparelho não encontrado para esta empresa');
 

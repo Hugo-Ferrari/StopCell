@@ -44,7 +44,7 @@ function Login() {
       
       <div className="absolute top-0 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
 
-      {/* toggle de tema */}
+      
       <div className="absolute right-6 top-6 flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-lg">
 
         <button
@@ -76,7 +76,7 @@ function Login() {
 
       <div className="relative w-full max-w-sm">
 
-        {/* Logo */}
+        
         <div className="flex flex-col items-center text-center">
           <Marca size={176} />
 
@@ -85,7 +85,7 @@ function Login() {
           </p>
         </div>
 
-        {/* Formulário */}
+       
         <form
           onSubmit={handleSubmit}
           className="mt-10 flex flex-col gap-5"

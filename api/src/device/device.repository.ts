@@ -6,23 +6,46 @@ import { AparelhoDto } from './dto/device.dto';
 export class AparelhoRepository {
     constructor(private readonly prisma: PrismaService) {}
 
-    cadastro(dto: AparelhoDto & { cnpjEmpresa: string }) {
+    cadastro(dto: AparelhoDto) {
         return this.prisma.aparelho.create({
-            data: {
-                ...dto,
-                cnpjEmpresa: dto.cnpjEmpresa,
+            data: dto,
+        });
+    }
+
+    atualizar(id: string, dto: AparelhoDto) {
+        return this.prisma.aparelho.update({
+            where: {
+                imei: id,
+            },
+            data: dto,
+        });
+    }
+    findById(id: string) {
+        return this.prisma.aparelho.findFirst({
+            where: {
+                imei: id,
+                cliente: {
+                    
+                },
             },
         });
     }
 
-    atualizar(id: string, dto: AparelhoDto, cnpjEmpresa: string) {
-        return this.prisma.aparelho.update({ where: { imei: id, cnpjEmpresa }, data: dto });
+    listar() {
+        return this.prisma.aparelho.findMany({
+            where: {
+                cliente: {
+                    
+                },
+            },
+        });
     }
 
-    findById(id: string, cnpjEmpresa: string) {
-        return this.prisma.aparelho.count({ where: { imei: id, cnpjEmpresa } });
-    }
-    listar(cnpjEmpresa: string){
-        return this.prisma.aparelho.findMany({where:{cnpjEmpresa}})
+    listarPorCliente(cpfCliente: string) {
+        return this.prisma.aparelho.findMany({
+            where: {
+                cpfCliente,
+            },
+        });
     }
 }

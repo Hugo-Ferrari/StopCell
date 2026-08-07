@@ -1,23 +1,24 @@
-
 import { Injectable } from '@nestjs/common';
 import { AparelhoRepository } from './device.repository';
 import { AparelhoDto } from './dto/device.dto';
 
 @Injectable()
 export class AparelhoService {
-    constructor(private readonly repository: AparelhoRepository) { }
+    constructor(private readonly repository: AparelhoRepository) {}
 
-    async cadastro(dto: AparelhoDto, cnpjEmpresa: string) {
-        return await this.repository.cadastro({ ...dto, cnpjEmpresa });
-    }
-    async listar(cnpjEmpresa:string){
-        return await this.repository.listar(cnpjEmpresa)
+    async cadastro(dto: AparelhoDto) {
+        
+        return await this.repository.cadastro({ ...dto });
     }
 
-    async atualizar(id: string, dto: AparelhoDto, cnpjEmpresa: string) {
-        const total = await this.repository.findById(id, cnpjEmpresa);
+    async listar() {
+        return await this.repository.listar();
+    }
 
-        if (total > 0) return this.repository.atualizar(id, dto, cnpjEmpresa);
+    async atualizar(id: string, dto: AparelhoDto) {
+        const aparelho = await this.repository.findById(id, );
+
+        if (aparelho) return this.repository.atualizar(id, dto);
 
         return null;
     }
