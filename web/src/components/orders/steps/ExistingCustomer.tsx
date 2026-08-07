@@ -6,8 +6,13 @@ import BuscaCliente from "./CustomerSearch";
 import DadosCliente from "./CustomerDetails";
 import DadosAparelhos from "./DamagedDevices";
 import DadosOrdemServico from "./ServiceOrderData";
+import DeviceModal from "./DeviceModal";
 
 function ClienteExistente() {
+
+  const [modalAberto, setModalAberto] = useState(false)
+
+
 
   const [cliente, setCliente] = useState<criarClienteDto | null>(null);
 
@@ -31,7 +36,7 @@ function ClienteExistente() {
     <div
       className=" space-y-6 p-4 sm:p-6">
 
-  
+
       <section
         className=" rounded-2xl border border-border bg-card p-5 shadow-sm">
 
@@ -53,14 +58,14 @@ function ClienteExistente() {
 
 
         <div className="mt-6">
-          <DadosCliente cliente={cliente}/>
+          <DadosCliente cliente={cliente} />
         </div>
 
       </section>
 
 
 
-     
+
       <section
         className=" rounded-2xl border border-border bg-card p-5 shadow-sm ">
 
@@ -106,9 +111,12 @@ function ClienteExistente() {
 
 
           <button
+            onClick={() => setModalAberto(true)}
             className=" rounded-l bg-primary px-5 py-3 font-semibold text-primary-foreground  transition hover:opacity-90">
             Novo aparelho
           </button>
+
+
 
         </div>
 
@@ -123,7 +131,7 @@ function ClienteExistente() {
 
 
 
-      
+
       <section
         className=" rounded-2xl border border-border bg-card p-5  shadow-sm">
 
@@ -136,8 +144,17 @@ function ClienteExistente() {
         <DadosOrdemServico />
 
       </section>
+      {modalAberto &&
+        < div >
+        <DeviceModal 
+         aberto={modalAberto}
+        clienteCpf={cliente?.cpf?? ""}
+        onClose={()=> setModalAberto(false)}
+      />
+      </div>
+}
 
-    </div>
+    </div >
   );
 }
 
