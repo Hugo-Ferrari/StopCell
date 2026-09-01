@@ -6,7 +6,7 @@ import { MarcaDto } from './dto/mark.dto';
 export class MarcaRepository {
     constructor(private readonly prisma: PrismaService) { }
 
-    cadastro(dto: MarcaDto) {
+    cadastro(dto: MarcaDto,) {
         return this.prisma.marca.create({
             data: dto
         });
@@ -15,7 +15,7 @@ export class MarcaRepository {
     findByMarcaNome(nome: string) {
         return this.prisma.marca.findMany({
             where: {
-                nmMarca: nome
+                nmMarca: nome,
             }
         });
     }

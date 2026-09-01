@@ -28,13 +28,12 @@ export class ClientesRepository {
   create(dto: CreateClienteDto & { cnpjEmpresa: string }) {
     return this.prisma.cliente.create({
       data: {
-        ...dto,
-        cnpjEmpresa: dto.cnpjEmpresa,
+        ...dto,cnpjEmpresa: dto.cnpjEmpresa,
       },
     });
   }
 
   delete(cpf: string, cnpjEmpresa: string) {
-    return this.prisma.cliente.delete({ where: { cpf, cnpjEmpresa } as any });
+    return this.prisma.cliente.delete({ where: { cpf, AND:{cnpjEmpresa} }});
   }
 }

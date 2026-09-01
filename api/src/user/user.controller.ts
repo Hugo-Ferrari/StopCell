@@ -10,8 +10,8 @@ export class UsuarioController {
 
     @Public()
     @Post('register')
-    cadastrar(@Body() usuario: UsuarioCadastroDto) {
-        return this.usuarioService.cadastrar(usuario,req.userCnpjEmpresa as string);
+    cadastrar(@Body() usuario: UsuarioCadastroDto,) {
+        return this.usuarioService.cadastrar(usuario,);
     }
     
 }

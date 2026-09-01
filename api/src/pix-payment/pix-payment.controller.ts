@@ -8,16 +8,16 @@ export class PagamentoPixController {
 
     @Post()
     registrar(@Body() dto: PagamentoPixDto, @Req() req: any) {
-        return this.service.registrar(dto, req.userCnpjEmpresa as string);
+        return this.service.registrar(dto, req.userCnpjEmpresa );
     }
 
     @Get('qrcode')
     gerarQrCode(@Body() dto: PagamentoPixDto) {
-        return this.service.gerarQrCode(dto,req.userCnpjEmpresa as string);
+        return this.service.gerarQrCode(dto,req.userCnpjEmpresa );
     }
 
     @Get('verificar/:txid')
     verificarTransacao(@Param('txid') txid: string, @Req() req: any) {
-        return this.service.verificarTransacao(txid, req.userCnpjEmpresa as string);
+        return this.service.verificarTransacao(txid, req.userCnpjEmpresa );
     }
 }

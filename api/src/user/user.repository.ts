@@ -8,7 +8,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 export class UsuarioRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  findByEmail(emailUsuario: string) {
+  findByEmail(emailUsuario: string, ) {
     return this.prisma.usuario.findFirst({ where: { emailUsuario } });
   }
 

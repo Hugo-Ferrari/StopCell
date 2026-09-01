@@ -18,7 +18,7 @@ export class OsChecklistController {
       +ordemServicoId,
       +checklistId,
       status,
-      req.userCnpjEmpresa as string,
+      req.userCnpjEmpresa ,
     );
 
     if (!resposta) {

@@ -212,12 +212,12 @@ model Pagamento {
   dtPagamento    DateTime?       @map("dt_pagamento")
   formaPagamento FormaPagamento? @map("forma_pagamento")
 
-  // Campos de PIX (Inovação)
+  // Campos de PIX 
   chavePix String? @map("chave_pix") @db.VarChar(100)
   txid     String? @db.VarChar(100)
   qrCode   String? @map("qr_code") @db.Text
 
-  // Campos de Cartão (Inovação)
+  // Campos de Cartão 
   numParcelas    Int?    @map("num_parcelas")
   bandeira       String? @db.VarChar(50)
   tipoCartao     String? @map("tipo_cartao") @db.VarChar(20)

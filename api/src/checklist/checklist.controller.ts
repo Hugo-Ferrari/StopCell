@@ -7,12 +7,12 @@ export class ChecklistController {
     constructor(private readonly service: ChecklistService) {}
 
     @Post()
-    registrar(@Body() dto: ChecklistDto, @Req() req: any) {
-        return this.service.registrar(dto, req.userCnpjEmpresa as string);
+    registrar(@Body() dto: ChecklistDto, @Req() req) {
+        return this.service.registrar(dto, req.userCnpjEmpresa );
     }
 
     @Put(':id')
-    atualizar(@Param('id') id: string, @Body() dto: ChecklistDto, @Req() req: any) {
-        return this.service.atualizar(+id, dto, req.userCnpjEmpresa as string);
+    atualizar(@Param('id') id: string, @Body() dto: ChecklistDto, @Req() req) {
+        return this.service.atualizar(+id, dto, req.userCnpjEmpresa );
     }
 }

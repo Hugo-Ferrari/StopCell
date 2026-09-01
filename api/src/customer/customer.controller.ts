@@ -9,21 +9,21 @@ export class ClientesController {
 @UseGuards(JwtAuthGuard)
   @Get() 
   listarCliente(@Req() req: any) {
-    return this.clientesService.listaCliente(req.userCnpjEmpresa as string);
+    return this.clientesService.listaCliente(req.userCnpjEmpresa );
   }
   @Get(":cpf")
   buscarPorId(@Param("cpf") cpf: string, @Req() req: any) {
-    return this.clientesService.buscarPorId(cpf, req.userCnpjEmpresa as string);
+    return this.clientesService.buscarPorId(cpf, req.userCnpjEmpresa );
   }
 
   @Post()
   criarClientePorId(@Body() dto: CreateClienteDto, @Req() req: any) {
-    return this.clientesService.criarCliente(dto, req.userCnpjEmpresa as string);
+    return this.clientesService.criarCliente(dto, req.userCnpjEmpresa );
   }
 
   @Delete(":cpf")
   deletarPorid(@Param("cpf") cpf:string, @Req() req: any ){
-    return this.clientesService.removerPorId(cpf, req.userCnpjEmpresa as string);
+    return this.clientesService.removerPorId(cpf, req.userCnpjEmpresa );
   }
 
 }

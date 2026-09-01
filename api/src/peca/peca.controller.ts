@@ -8,16 +8,16 @@ export class PecaController {
 
     @Post()
     cadastrar(@Body() peca: PecaDto, @Req() req: any) {
-        return this.service.cadastrar(peca, req.userCnpjEmpresa as string);
+        return this.service.cadastrar(peca, req.userCnpjEmpresa );
     }
 
     @Put(':id')
     atualizar(@Param('id') id: number, @Body() peca: PecaDto, @Req() req: any) {
-        return this.service.atualizar(id, peca, req.userCnpjEmpresa as string);
+        return this.service.atualizar(id, peca, req.userCnpjEmpresa );
     }
 
     @Get()
     verificarEstoque(@Req() req: any) {
-        return this.service.verificarEstoque(req.userCnpjEmpresa as string);
+        return this.service.verificarEstoque(req.userCnpjEmpresa );
     }
 }

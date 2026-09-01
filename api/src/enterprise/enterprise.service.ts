@@ -11,9 +11,9 @@ export class EmpresaService {
     return this.repository.create(dto);
   }
 
-  async atualizar(cnpj: string, dto: EmpresaDto) {
+  async atualizar(cnpj: string, dto: EmpresaDto, cnpjEmpresa:string) {
     const empresa = await this.repository.findByCnpj(cnpj);
     if (!empresa) throw new NotFoundException(`Empresa com CNPJ ${cnpj} não encontrada`);
-    return this.repository.update(cnpj, dto);
+    return this.repository.update(cnpj, dto,cnpjEmpresa);
   }
 }

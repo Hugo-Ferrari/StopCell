@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Put, Get } from '@nestjs/common';
+import { Body, Controller, Param, Post, Put, Get, Req } from '@nestjs/common';
 import { AparelhoService } from './device.service';
 import { AparelhoDto } from './dto/device.dto';
 
@@ -7,17 +7,17 @@ export class AparelhoController {
     constructor(private readonly service: AparelhoService) {}
 
     @Post()
-    cadastrar(@Body() dto: AparelhoDto) {
-        return this.service.cadastro(dto,req.userCnpjEmpresa as string);
+    cadastrar(@Body() dto: AparelhoDto, @Req() req) {
+        return this.service.cadastro(dto,req.userCnpjEmpresa);
     }
 
     @Get()
-    listar() {
-        return this.service.listar(req.userCnpjEmpresa as string);
+    listar(@Req() req) {
+        return this.service.listar(req.userCnpjEmpresa);
     }
 
     @Put(':id')
-    atualizar(@Param('id') id: string, @Body() dto: AparelhoDto,  ) {
-        return this.service.atualizar(id, dto, req.userCnpjEmpresa as string);
+    atualizar(@Param('id') id: string, @Body() dto: AparelhoDto, @Req() req  ) {
+        return this.service.atualizar(id, dto, req.userCnpjEmpresa);
     }
 }
