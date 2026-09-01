@@ -15,7 +15,7 @@ export class EmpresaRepository {
     return this.prisma.empresa.create({ data: dto });
   }
 
-  update(cnpj: string, dto: EmpresaDto) {
-    return this.prisma.empresa.update({ where: { cnpj }, data: dto });
+  update(cnpj: string, dto: EmpresaDto,cnpjEmpresa:string ) {
+    return this.prisma.empresa.update({ where: { cnpj, AND:{cnpj: cnpjEmpresa}}, data: dto });
   }
 }

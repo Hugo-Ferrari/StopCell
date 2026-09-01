@@ -8,16 +8,16 @@ export class PagamentoCartaoController {
 
     @Post()
     registrar(@Body() dto: PagamentoCartaoDto, @Req() req: any) {
-        return this.service.registrar(dto, req.userCnpjEmpresa as string);
+        return this.service.registrar(dto, req.userCnpjEmpresa );
     }
 
     @Get('parcelas')
-    calcularValorParcela(@Body() dto: PagamentoCartaoDto) {
-        return this.service.calcularValorParcela(dto);
+    calcularValorParcela(@Body() dto: PagamentoCartaoDto, ) {
+        return this.service.calcularValorParcela(dto,);
     }
 
     @Get('verificar/:idPagamento')
     verificarTransacao(@Param('idPagamento') idPagamento: string, @Req() req: any) {
-        return this.service.verificarTransacao(+idPagamento, req.userCnpjEmpresa as string);
+        return this.service.verificarTransacao(+idPagamento, req.userCnpjEmpresa );
     }
 }

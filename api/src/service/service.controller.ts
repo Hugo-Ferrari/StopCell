@@ -8,11 +8,11 @@ export class ServicoController {
 
     @Post()
     cadastrar(@Body() servico: ServicoDto, @Req() req: any) {
-        return this.servicoService.cadastrar(servico, req.userCnpjEmpresa as string);
+        return this.servicoService.cadastrar(servico, req.userCnpjEmpresa);
     }
 
     @Put(':id')
     atualizar(@Param('id') id: number, @Body() servico: ServicoDto, @Req() req: any) {
-        return this.servicoService.atualizar(id, servico, req.userCnpjEmpresa as string);
+        return this.servicoService.atualizar(id, servico, req.userCnpjEmpresa);
     }
 }

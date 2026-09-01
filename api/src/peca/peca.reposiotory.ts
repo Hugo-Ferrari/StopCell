@@ -16,14 +16,14 @@ export class PecaRepository {
     }
 
     atualizar(id: number, dto: PecaDto, cnpjEmpresa: string) {
-        return this.prisma.peca.update({ where: { idPeca: id, cnpjEmpresa }, data: dto });
+        return this.prisma.peca.update({ where: { idPeca: id, AND:{cnpjEmpresa }}, data: dto });
     }
 
     findByIdPeca(id: number, cnpjEmpresa: string) {
-        return this.prisma.peca.findFirst({ where: { idPeca: id, cnpjEmpresa } });
+        return this.prisma.peca.findFirst({ where: { idPeca: id, AND:{cnpjEmpresa } }});
     }
 
     findAll(cnpjEmpresa: string) {
-        return this.prisma.peca.findMany({ where: { cnpjEmpresa, quantidade: { gt: 0 } } });
+        return this.prisma.peca.findMany({ where: { cnpjEmpresa,AND:{ quantidade: { gt: 0 } }} });
     }
 }

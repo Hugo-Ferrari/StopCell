@@ -8,11 +8,11 @@ export class ItemOsController {
 
     @Post()
     registrar(@Body() dto: ItemOsDto, @Req() req: any) {
-        return this.service.registrar(dto, req.userCnpjEmpresa as string);
+        return this.service.registrar(dto, req.userCnpjEmpresa );
     }
 
     @Get(':numOs')
     findByNumOs(@Param('numOs') numOs: string, @Req() req: any) {
-        return this.service.findByNumOs(+numOs, req.userCnpjEmpresa as string);
+        return this.service.findByNumOs(+numOs, req.userCnpjEmpresa );
     }
 }

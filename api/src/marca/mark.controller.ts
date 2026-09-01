@@ -7,17 +7,17 @@ export class MarcaController {
     constructor(private readonly service: MarcaService) {}
 
     @Post()
-    cadastrar(@Body() dto: MarcaDto) {
+    cadastrar(@Body() dto: MarcaDto, ) {
         return this.service.cadastrar(dto);
     }
 
     @Put(':id')
-    atualizar(@Param('id') id: string, @Body() dto: MarcaDto) {
-        return this.service.atualizar(+id, dto);
+    atualizar(@Param('id') id: string, @Body() dto: MarcaDto,) {
+        return this.service.atualizar(+id, dto );
     }
 
     @Get(':nome')
-    listarPorNomes(@Param('nome') nome: string) {
-        return this.service.listarPorNomes(nome);
+    listarPorNomes(@Param('nome') nome: string,) {
+        return this.service.listarPorNomes(nome );
     }
 }

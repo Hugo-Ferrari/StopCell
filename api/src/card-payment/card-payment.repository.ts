@@ -5,7 +5,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class PagamentoCartaoRepository {
     constructor(private readonly prisma: PrismaService) {}
 
-    registrar(data: any) {
+    registrar(data: any  ) {
+        
         return this.prisma.pagamento.create({ data });
     }
 

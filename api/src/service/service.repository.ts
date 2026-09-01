@@ -16,10 +16,10 @@ export class ServicoRepository {
     }
 
     atualizar(id: number, dto: ServicoDto, cnpjEmpresa: string) {
-        return this.prisma.servico.update({ where: { idServico: id, cnpjEmpresa }, data: dto });
+        return this.prisma.servico.update({ where: { idServico: id, AND:{cnpjEmpresa }}, data: dto });
     }
 
     findByIdServico(idServico: number, cnpjEmpresa: string) {
-        return this.prisma.servico.findFirst({ where: { idServico: idServico, cnpjEmpresa } });
+        return this.prisma.servico.findFirst({ where: { idServico: idServico, AND:{cnpjEmpresa }} });
     }
 }

@@ -8,6 +8,6 @@ export class PagamentoController {
 
     @Post()
     registrar(@Body() dto: PagamentoDto, @Req() req: any) {
-        return this.service.registrar(dto, req.userCnpjEmpresa as string);
+        return this.service.registrar(dto, req.userCnpjEmpresa );
     }
 }

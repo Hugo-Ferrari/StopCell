@@ -16,12 +16,12 @@ export class ChecklistRepository {
     }
 
     existsById(id: number, cnpjEmpresa: string) {
-        return this.prisma.checklist.count({ where: { idChecklist: id, cnpjEmpresa } });
+        return this.prisma.checklist.count({ where: { idChecklist: id, AND:{cnpjEmpresa} } });
     }
 
     atualizar(id: number, dto: ChecklistDto, cnpjEmpresa: string) {
         return this.prisma.checklist.update({
-            where: { idChecklist: id, cnpjEmpresa },
+            where: { idChecklist: id, AND:{ cnpjEmpresa} },
             data: dto,
         });
     }

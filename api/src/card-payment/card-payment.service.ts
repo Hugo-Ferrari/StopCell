@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Req } from '@nestjs/common';
 import { PagamentoCartaoDto } from './dto/pagamentoCartao.dto';
 import { PagamentoCartaoRepository } from './card-payment.repository';
 
@@ -7,7 +7,7 @@ import { PagamentoCartaoRepository } from './card-payment.repository';
 export class PagamentoCartaoService {
     constructor(private readonly repository: PagamentoCartaoRepository) {}
 
-    registrar(dto: PagamentoCartaoDto, cnpjEmpresa: string) {
+    registrar(dto: PagamentoCartaoDto, cnpjEmpresa: string, @Req() req: Request) {
         return this.repository.registrar({
             ...dto,
             cnpjEmpresa,

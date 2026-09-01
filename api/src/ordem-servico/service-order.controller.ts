@@ -9,12 +9,12 @@ export class OrdemServicoController {
 
     @Post()
     abrir(@Body() dto: OrdemServicoDto, @Req() req: any) {
-        return this.service.abrir(dto, req.userCnpjEmpresa as string);
+        return this.service.abrir(dto, req.userCnpjEmpresa );
     }
 
     @Patch(':numOs/status')
     async atualizarStatus(@Param('numOs') numOs: string, @Query('status') status: string, @Req() req: any) {
-        const resposta = await this.service.atualizarStatus(+numOs, status, req.userCnpjEmpresa as string);
+        const resposta = await this.service.atualizarStatus(+numOs, status, req.userCnpjEmpresa );
 
         if (!resposta) {
             throw new NotFoundException();
@@ -29,7 +29,7 @@ export class OrdemServicoController {
 
     @Get(':numOs')
     async buscarPorNumOs(@Param('numOs') numOs: string, @Req() req: any) {
-        const os = await this.service.buscarPorNumOs(+numOs, req.userCnpjEmpresa as string);
+        const os = await this.service.buscarPorNumOs(+numOs, req.userCnpjEmpresa );
 
         if (!os) {
             throw new NotFoundException('Ordem de serviço não encontrada');
@@ -40,7 +40,7 @@ export class OrdemServicoController {
 
     @Get(':numOs/pdf')
     async gerarPdf(@Param('numOs') numOs: string, @Res() res: Response, @Req() req: any) {
-        const pdfBuffer = await this.service.gerarPdf(+numOs, req.userCnpjEmpresa as string);
+        const pdfBuffer = await this.service.gerarPdf(+numOs, req.userCnpjEmpresa );
 
         res.set({'Content-Type': 'application/pdf','Content-Disposition': `inline; filename=os-${numOs}.pdf`,});
 

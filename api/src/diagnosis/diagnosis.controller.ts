@@ -8,6 +8,6 @@ export class DiagnosticoController {
 
     @Post()
     cadastrar(@Body() dto: DiagnosticoDto, @Req() req: any) {
-        return this.service.cadastrar(dto, req.userCnpjEmpresa as string);
+        return this.service.cadastrar(dto, req.userCnpjEmpresa );
     }
 }
