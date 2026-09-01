@@ -13,11 +13,11 @@ export class MarcaController {
 
     @Put(':id')
     atualizar(@Param('id') id: string, @Body() dto: MarcaDto) {
-        return this.service.atualizar(+id, dto);
+        return this.service.atualizar(+id, dto,req.userCnpjEmpresa as string);
     }
 
     @Get(':nome')
     listarPorNomes(@Param('nome') nome: string) {
-        return this.service.listarPorNomes(nome);
+        return this.service.listarPorNomes(nome,req.userCnpjEmpresa as string);
     }
 }

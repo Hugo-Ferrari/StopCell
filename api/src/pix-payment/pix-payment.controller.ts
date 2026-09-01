@@ -13,7 +13,7 @@ export class PagamentoPixController {
 
     @Get('qrcode')
     gerarQrCode(@Body() dto: PagamentoPixDto) {
-        return this.service.gerarQrCode(dto);
+        return this.service.gerarQrCode(dto,req.userCnpjEmpresa as string);
     }
 
     @Get('verificar/:txid')

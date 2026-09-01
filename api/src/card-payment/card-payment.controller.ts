@@ -12,8 +12,8 @@ export class PagamentoCartaoController {
     }
 
     @Get('parcelas')
-    calcularValorParcela(@Body() dto: PagamentoCartaoDto) {
-        return this.service.calcularValorParcela(dto);
+    calcularValorParcela(@Body() dto: PagamentoCartaoDto, ) {
+        return this.service.calcularValorParcela(dto,);
     }
 
     @Get('verificar/:idPagamento')

@@ -8,16 +8,16 @@ export class AparelhoController {
 
     @Post()
     cadastrar(@Body() dto: AparelhoDto) {
-        return this.service.cadastro(dto);
+        return this.service.cadastro(dto,req.userCnpjEmpresa as string);
     }
 
     @Get()
     listar() {
-        return this.service.listar();
+        return this.service.listar(req.userCnpjEmpresa as string);
     }
 
     @Put(':id')
-    atualizar(@Param('id') id: string, @Body() dto: AparelhoDto, ) {
-        return this.service.atualizar(id, dto);
+    atualizar(@Param('id') id: string, @Body() dto: AparelhoDto,  ) {
+        return this.service.atualizar(id, dto, req.userCnpjEmpresa as string);
     }
 }

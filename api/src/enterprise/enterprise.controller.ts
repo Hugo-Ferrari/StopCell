@@ -7,10 +7,10 @@ export class EmpresaController {
     constructor(private readonly empresaService: EmpresaService){}
     @Post()
     cadastar(@Body()empresa : EmpresaDto ){
-        return this.empresaService.cadastrar(empresa )
+        return this.empresaService.cadastrar(empresa,req.userCnpjEmpresa as string )
     }
     @Patch(":cnpj") 
     atualizar(@Param() cnpj: string,@Body() empresa: EmpresaDto){
-        return this.empresaService.atualizar(cnpj, empresa)
+        return this.empresaService.atualizar(cnpj, empresa,req.userCnpjEmpresa as string)
     }
 }

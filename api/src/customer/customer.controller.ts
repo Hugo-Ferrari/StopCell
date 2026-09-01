@@ -7,7 +7,7 @@ import { JwtAuthGuard } from 'src/auth/jwt.guards';
 export class ClientesController {
   constructor(private readonly clientesService: ClientesService) {} // instanciando o ClientesService por meio de construtor
 @UseGuards(JwtAuthGuard)
-  @Get() //falando que o metodo que vamo usar é o get
+  @Get() 
   listarCliente(@Req() req: any) {
     return this.clientesService.listaCliente(req.userCnpjEmpresa as string);
   }
