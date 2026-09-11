@@ -114,6 +114,16 @@ A API ficará disponível em:
 http://localhost:3000
 ```
 
+#### Documentação Swagger
+
+A API possui documentação interativa via Swagger disponível em:
+
+```bash
+http://localhost:3000/api/docs
+```
+
+Essa página permite testar os endpoints, consultar parâmetros e visualizar os schemas da API.
+
 ### Frontend
 
 1. Acesse a pasta do frontend:
