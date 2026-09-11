@@ -1,36 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { PagamentoPixDto } from './dto/pix-payment.dto';
+import { PagamentoPixDto } from '@/type/pix-payment.dto';
 import { PagamentoPixRepository } from './pix-payment.repository';
-
 
 @Injectable()
 export class PagamentoPixService {
-    constructor(private readonly repository: PagamentoPixRepository) {}
+  constructor(private readonly repository: PagamentoPixRepository) {}
 
-    registrar(dto: PagamentoPixDto, cnpjEmpresa: string) {
-        const qrCode = this.gerarQrCode(dto);
-        const txid = randomUUID().replace(/-/g, '').substring(0, 32);
+  registrar(dto: PagamentoPixDto, cnpjEmpresa: string) {
+    const qrCode = this.gerarQrCode(dto);
+    const txid = randomUUID().replace(/-/g, '').substring(0, 32);
 
-        return this.repository.registrar({
-            ...dto,
-            cnpjEmpresa,
-            qrCode,
-            txid,
-            formaPagamento: 'PIX',
-            dtPagamento: new Date(),
-        });
-    }
+    return this.repository.registrar({
+      ...dto,
+      cnpjEmpresa,
+      qrCode,
+      txid,
+      formaPagamento: 'PIX',
+      dtPagamento: new Date(),
+    });
+  }
 
-    gerarQrCode(dto: PagamentoPixDto): string {
-        const chavePix = dto.chavePix ?? '';
-        const valor = dto.valorPago != null ? dto.valorPago.toFixed(2) : '0.00';
+  gerarQrCode(dto: PagamentoPixDto): string {
+    const chavePix = dto.chavePix ?? '';
+    const valor = dto.valorPago != null ? dto.valorPago.toFixed(2) : '0.00';
 
-        return `00020126${chavePix.length}${chavePix}${valor}6304ABCD`;
-    }
+    return `00020126${chavePix.length}${chavePix}${valor}6304ABCD`;
+  }
 
-    async verificarTransacao(txid: string, cnpjEmpresa: string): Promise<boolean> {
-        const pagamento = await this.repository.findByTxid(txid, cnpjEmpresa);
-        return pagamento !== null;
-    }
+  async verificarTransacao(
+    txid: string,
+    cnpjEmpresa: string,
+  ): Promise<boolean> {
+    const pagamento = await this.repository.findByTxid(txid, cnpjEmpresa);
+    return pagamento !== null;
+  }
 }

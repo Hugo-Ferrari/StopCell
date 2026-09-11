@@ -1,7 +1,7 @@
 // empresa/empresa.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EmpresaRepository } from './enterprise.repository';
-import { EmpresaDto } from './dto/enterprise.dto';
+import { EmpresaDto } from '@/type/enterprise.dto';
 
 @Injectable()
 export class EmpresaService {
@@ -11,9 +11,10 @@ export class EmpresaService {
     return this.repository.create(dto);
   }
 
-  async atualizar(cnpj: string, dto: EmpresaDto, cnpjEmpresa:string) {
+  async atualizar(cnpj: string, dto: EmpresaDto, cnpjEmpresa: string) {
     const empresa = await this.repository.findByCnpj(cnpj);
-    if (!empresa) throw new NotFoundException(`Empresa com CNPJ ${cnpj} não encontrada`);
-    return this.repository.update(cnpj, dto,cnpjEmpresa);
+    if (!empresa)
+      throw new NotFoundException(`Empresa com CNPJ ${cnpj} não encontrada`);
+    return this.repository.update(cnpj, dto, cnpjEmpresa);
   }
 }

@@ -1,10 +1,14 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsuarioRepository } from '../user/user.repository';
-import { CadastroDto } from './dto/Cadastro.dto';
-import { LoginDto } from './dto/Login.dto';
+import { CadastroDto } from '@/type/Cadastro.dto';
+import { LoginDto } from '@/type/Login.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +20,7 @@ export class AuthService {
 
   async register(dto: CadastroDto) {
     const senhaHash = await bcrypt.hash(dto.usuario.senha, 10);
-    
+
     try {
       const result = await this.prisma.$transaction(async (tx) => {
         const empresaCriada = await tx.empresa.create({
@@ -60,14 +64,20 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const usuario = await this.usuarioRepository.findByEmail(dto.emailUsuario);
-    const senhaCorreta = usuario ? await bcrypt.compare(dto.senha, usuario.senha ?? '') : false;
+    const senhaCorreta = usuario
+      ? await bcrypt.compare(dto.senha, usuario.senha ?? '')
+      : false;
 
     if (!usuario || !senhaCorreta) {
       throw new UnauthorizedException('Email ou senha inválidos');
     }
 
     const token = this.jwt.sign(
-      { sub: usuario.idUsuario, email: usuario.emailUsuario, cnpjEmpresa: usuario.cnpjEmpresa },
+      {
+        sub: usuario.idUsuario,
+        email: usuario.emailUsuario,
+        cnpjEmpresa: usuario.cnpjEmpresa,
+      },
       { expiresIn: '8h' },
     );
     return { token };

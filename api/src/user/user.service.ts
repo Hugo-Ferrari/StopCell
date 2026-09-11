@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { LoginDto } from '../auth/dto/Login.dto';
-import { UsuarioCadastroDto } from './dto/user.dto';
+import { LoginDto } from '@/type/Login.dto';
+import { UsuarioCadastroDto } from '@/type/user.dto';
 import { UsuarioRepository } from './user.repository';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class UsuarioService {
     private readonly jwt: JwtService,
   ) {}
 
-  async cadastrar(dto: UsuarioCadastroDto, ) {
+  async cadastrar(dto: UsuarioCadastroDto) {
     if (dto.emailUsuario === 'teste@teste.com' && dto.senha === '123456') {
       const token = this.jwt.sign(
         {

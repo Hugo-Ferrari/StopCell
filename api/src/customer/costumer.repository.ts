@@ -1,7 +1,7 @@
 // clientes/clientes.repository.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateClienteDto } from './dto/create-cliente.dto/create-customer.dto';
+import { CreateClienteDto } from '@/type/create-customer.dto';
 
 @Injectable()
 export class ClientesRepository {
@@ -12,28 +12,29 @@ export class ClientesRepository {
   }
 
   findByCpf(cpf: string, cnpjEmpresa: string) {
-  return this.prisma.cliente.findFirst({
-    where: { cpf, cnpjEmpresa },
-    include: {
-      aparelhos: {
-        include: {
-          marca: true,
-          categoria: true,
+    return this.prisma.cliente.findFirst({
+      where: { cpf, cnpjEmpresa },
+      include: {
+        aparelhos: {
+          include: {
+            marca: true,
+            categoria: true,
+          },
         },
       },
-    },
-  });
-}
+    });
+  }
 
   create(dto: CreateClienteDto & { cnpjEmpresa: string }) {
     return this.prisma.cliente.create({
       data: {
-        ...dto,cnpjEmpresa: dto.cnpjEmpresa,
+        ...dto,
+        cnpjEmpresa: dto.cnpjEmpresa,
       },
     });
   }
 
   delete(cpf: string, cnpjEmpresa: string) {
-    return this.prisma.cliente.delete({ where: { cpf, AND:{cnpjEmpresa} }});
+    return this.prisma.cliente.delete({ where: { cpf, AND: { cnpjEmpresa } } });
   }
 }

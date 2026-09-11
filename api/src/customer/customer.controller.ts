@@ -1,29 +1,37 @@
-import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ClientesService } from './costumer.service';
-import { CreateClienteDto } from './dto/create-cliente.dto/create-customer.dto';
+import { CreateClienteDto } from '@/type/create-customer.dto';
 import { JwtAuthGuard } from 'src/auth/jwt.guards';
 
 @Controller('clientes')
 export class ClientesController {
   constructor(private readonly clientesService: ClientesService) {} // instanciando o ClientesService por meio de construtor
-@UseGuards(JwtAuthGuard)
-  @Get() 
+  @UseGuards(JwtAuthGuard)
+  @Get()
   listarCliente(@Req() req: any) {
-    return this.clientesService.listaCliente(req.userCnpjEmpresa );
+    return this.clientesService.listaCliente(req.userCnpjEmpresa);
   }
-  @Get(":cpf")
-  buscarPorId(@Param("cpf") cpf: string, @Req() req: any) {
-    return this.clientesService.buscarPorId(cpf, req.userCnpjEmpresa );
+  @Get(':cpf')
+  buscarPorId(@Param('cpf') cpf: string, @Req() req: any) {
+    return this.clientesService.buscarPorId(cpf, req.userCnpjEmpresa);
   }
 
   @Post()
   criarClientePorId(@Body() dto: CreateClienteDto, @Req() req: any) {
-    return this.clientesService.criarCliente(dto, req.userCnpjEmpresa );
+    return this.clientesService.criarCliente(dto, req.userCnpjEmpresa);
   }
 
-  @Delete(":cpf")
-  deletarPorid(@Param("cpf") cpf:string, @Req() req: any ){
-    return this.clientesService.removerPorId(cpf, req.userCnpjEmpresa );
+  @Delete(':cpf')
+  deletarPorid(@Param('cpf') cpf: string, @Req() req: any) {
+    return this.clientesService.removerPorId(cpf, req.userCnpjEmpresa);
   }
-
 }

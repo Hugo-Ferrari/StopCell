@@ -1,6 +1,6 @@
 // clientes/clientes.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateClienteDto } from './dto/create-cliente.dto/create-customer.dto';
+import { CreateClienteDto } from '@/type/create-customer.dto';
 import { ClientesRepository } from './costumer.repository';
 
 @Injectable()
@@ -17,8 +17,9 @@ export class ClientesService {
 
   async buscarPorId(cpf: string, cnpjEmpresa: string) {
     const cliente = await this.repository.findByCpf(cpf, cnpjEmpresa);
-    if (!cliente) throw new NotFoundException(`Cliente com CPF ${cpf} não encontrado`);
-    console.log(JSON.stringify(cliente, null,2))
+    if (!cliente)
+      throw new NotFoundException(`Cliente com CPF ${cpf} não encontrado`);
+    console.log(JSON.stringify(cliente, null, 2));
     return cliente;
   }
 

@@ -1,8 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { Public } from '../common/decorators/public.decorator';
 import { AuthService } from './auth.service';
-import { CadastroDto } from './dto/Cadastro.dto';
-import { LoginDto } from './dto/Login.dto';
+import { CadastroDto } from '@/type/Cadastro.dto';
+import { LoginDto } from '@/type/Login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -19,5 +19,4 @@ export class AuthController {
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
-  
 }

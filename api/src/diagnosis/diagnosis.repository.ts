@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { DiagnosticoDto } from './dto/diagnosis.dto';
+import { DiagnosticoDto } from '@/type/diagnosis.dto';
 
 @Injectable()
 export class DiagnosticoRepository {
-    constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-    cadastrar(dto: DiagnosticoDto) {
-        return this.prisma.diagnostico.create({
-            data: {
-                numOs: dto.numOs,
-                relatoTecnico: dto.relatoTecnico,
-                dataHora: new Date(),
-            },
-        });
-    }
+  cadastrar(dto: DiagnosticoDto) {
+    return this.prisma.diagnostico.create({
+      data: {
+        numOs: dto.numOs,
+        relatoTecnico: dto.relatoTecnico,
+        dataHora: new Date(),
+      },
+    });
+  }
 }
