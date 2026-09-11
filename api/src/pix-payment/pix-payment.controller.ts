@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Param, Req } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param } from '@nestjs/common';
 import { PagamentoPixService } from './pix-payment.service';
 import { PagamentoPixDto } from '@/type/pix-payment.dto';
 
@@ -7,17 +7,17 @@ export class PagamentoPixController {
   constructor(private readonly service: PagamentoPixService) {}
 
   @Post()
-  registrar(@Body() dto: PagamentoPixDto, @Req() req: any) {
-    return this.service.registrar(dto, req.userCnpjEmpresa);
+  registrar(@Body() dto: PagamentoPixDto,  ) {
+    return this.service.registrar(dto);
   }
 
   @Get('qrcode')
   gerarQrCode(@Body() dto: PagamentoPixDto) {
-    return this.service.gerarQrCode(dto, req.userCnpjEmpresa);
+    return this.service.gerarQrCode(dto);
   }
 
   @Get('verificar/:txid')
-  verificarTransacao(@Param('txid') txid: string, @Req() req: any) {
-    return this.service.verificarTransacao(txid, req.userCnpjEmpresa);
+  verificarTransacao(@Param('txid') txid: string, ) {
+    return this.service.verificarTransacao(txid);
   }
 }

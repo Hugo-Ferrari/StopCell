@@ -24,6 +24,18 @@ export class ItenOsRepository {
     });
   }
 
+  findServicoById(idServico: number, cnpjEmpresa: string) {
+    return this.prisma.servico.findFirst({
+      where: { idServico, cnpjEmpresa },
+    });
+  }
+
+  findPecaById(idPeca: number, cnpjEmpresa: string) {
+    return this.prisma.peca.findFirst({
+      where: { idPeca, cnpjEmpresa },
+    });
+  }
+
   findByNumOs(numOs: number, cnpjEmpresa: string) {
     return this.prisma.itensOs.findMany({
       where: {

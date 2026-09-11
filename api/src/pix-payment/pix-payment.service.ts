@@ -7,13 +7,12 @@ import { PagamentoPixRepository } from './pix-payment.repository';
 export class PagamentoPixService {
   constructor(private readonly repository: PagamentoPixRepository) {}
 
-  registrar(dto: PagamentoPixDto, cnpjEmpresa: string) {
+  registrar(dto: PagamentoPixDto,) {
     const qrCode = this.gerarQrCode(dto);
     const txid = randomUUID().replace(/-/g, '').substring(0, 32);
 
     return this.repository.registrar({
       ...dto,
-      cnpjEmpresa,
       qrCode,
       txid,
       formaPagamento: 'PIX',
@@ -30,9 +29,8 @@ export class PagamentoPixService {
 
   async verificarTransacao(
     txid: string,
-    cnpjEmpresa: string,
   ): Promise<boolean> {
-    const pagamento = await this.repository.findByTxid(txid, cnpjEmpresa);
+    const pagamento = await this.repository.findByTxid(txid,);
     return pagamento !== null;
   }
 }

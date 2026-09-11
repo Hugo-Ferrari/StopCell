@@ -1,20 +1,73 @@
+function escapeHtml(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function moeda(value: unknown): string {
+  return Number(value ?? 0).toLocaleString('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function dataHora(value: unknown): string {
+  if (!value) return 'Não informada';
+
+  const data = new Date(String(value));
+  if (Number.isNaN(data.getTime())) return 'Não informada';
+
+  return data.toLocaleString('pt-BR', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  });
+}
+
 export function gerarHtmlOrdemServico(os: any): string {
-  const servicosHtml = os.itensOs
+  const nomeEmpresa =
+    os.empresa?.nomeFantasia ?? os.empresa?.razaoSocial ?? 'Empresa';
+  const itens = Array.isArray(os.itensOs) ? os.itensOs : [];
+  const diagnosticos = Array.isArray(os.diagnosticos) ? os.diagnosticos : [];
+  const totalItens = itens.reduce(
+    (total: number, item: any) =>
+      total +
+      (Number(item.quantidade ?? 1) || 0) *
+        (Number(item.valorUnitario ?? 0) || 0),
+    0,
+  );
+  const total = os.vlTotal == null ? totalItens : Number(os.vlTotal);
+  const descricaoDiagnostico =
+    os.diagnostico ??
+    diagnosticos
+      .map((diagnostico: any) => diagnostico.relatoTecnico)
+      .filter(Boolean)
+      .join(' | ');
+  const servicosHtml = itens
     .map((item: any) => {
-      const descricao = item.servico?.descricao ?? item.peca?.descricao ?? '';
-      const subtotal =
-        (item.quantidade ?? 1) * Number(item.valorUnitario ?? 0);
+      const descricao =
+        item.servico?.descricao ??
+        item.peca?.descricao ??
+        'Item não identificado';
+      const quantidade = Number(item.quantidade ?? 1) || 0;
+      const valorUnitario = Number(item.valorUnitario ?? 0) || 0;
+      const subtotal = quantidade * valorUnitario;
 
       return `
         <tr>
-            <td>${descricao}</td>
-            <td align="center">${item.quantidade ?? 1}</td>
-            <td align="right">R$ ${Number(item.valorUnitario ?? 0).toFixed(2)}</td>
-            <td align="right">R$ ${subtotal.toFixed(2)}</td>
+                        <td>${escapeHtml(descricao)}</td>
+                        <td class="center">${quantidade}</td>
+                        <td class="right">R$ ${moeda(valorUnitario)}</td>
+                        <td class="right">R$ ${moeda(subtotal)}</td>
         </tr>
       `;
     })
     .join('');
+  const linhasItens =
+    servicosHtml ||
+    '<tr><td colspan="4" class="empty">Nenhum serviço ou peça lançado.</td></tr>';
 
   return `
 <!DOCTYPE html>
@@ -33,39 +86,35 @@ export function gerarHtmlOrdemServico(os: any): string {
 
 body{
     font-family:Arial, Helvetica, sans-serif;
-    background:#f5f5f5;
-    color:#333;
-    padding:30px;
+    background:#eef1f4;
+    color:#263238;
+    padding:24px;
 }
 
 .container{
     background:white;
     max-width:900px;
     margin:auto;
-    border-radius:10px;
+    border-radius:6px;
     overflow:hidden;
     border:1px solid #DDD;
 }
 
 .header{
 
-    background:#7F7F7F;
+    background:#263238;
     color:white;
 
     display:flex;
     justify-content:space-between;
     align-items:center;
 
-    padding:25px;
+    padding:24px 28px;
 }
 
 .logo{
-    font-size:32px;
+    font-size:28px;
     font-weight:bold;
-}
-
-.logo span{
-    color:#FFA500;
 }
 
 .os{
@@ -73,7 +122,7 @@ body{
 }
 
 .os h1{
-    font-size:30px;
+    font-size:26px;
 }
 
 .section{
@@ -89,7 +138,7 @@ body{
 .card-title{
 
     background:#f0f4f8;
-    color:#00000;
+    color:#263238;
 
     font-weight:bold;
     padding:10px 15px;
@@ -103,11 +152,12 @@ body{
 table{
     width:100%;
     border-collapse:collapse;
-    margin-top:20px;
+    margin-top:24px;
+    font-size:13px;
 }
 
 thead{
-    background:#7F7F7F;
+    background:#455a64;
     color:white;
 }
 
@@ -120,6 +170,10 @@ td{
     border-bottom:1px solid #EEE;
 }
 
+.center{ text-align:center; }
+.right{ text-align:right; white-space:nowrap; }
+.empty{ color:#78909c; text-align:center; padding:18px; }
+
 tfoot td{
     font-weight:bold;
 }
@@ -131,7 +185,7 @@ tfoot td{
     text-align:right;
 
     font-size:22px;
-    color:#000000;
+    color:#263238;
     font-weight:bold;
 }
 
@@ -162,6 +216,17 @@ tfoot td{
     margin-bottom:5px;
 }
 
+.meta{
+    color:#b0bec5;
+    font-size:12px;
+    margin-top:4px;
+}
+
+@media print{
+    body{ background:white; padding:0; }
+    .container{ border:0; max-width:none; }
+}
+
 </style>
 
 </head>
@@ -175,22 +240,24 @@ tfoot td{
 <div>
 
 <div class="logo">
-STOP<span>CELL</span>
+${escapeHtml(nomeEmpresa)}
 </div>
 
-<div>${os.empresa?.nomeFantasia ?? ''}</div>
+<div>${escapeHtml(os.empresa?.razaoSocial ?? '')}</div>
 
-<div>${os.empresa?.endereco ?? ''}</div>
+<div class="meta">${escapeHtml(os.empresa?.endereco ?? '')}</div>
 
-<div>CNPJ: ${os.empresa?.cnpj ?? ''}</div>
+<div class="meta">CNPJ: ${escapeHtml(os.empresa?.cnpj ?? '')} | Tel.: ${escapeHtml(os.empresa?.telefone ?? '')}</div>
 
 </div>
 
 <div class="os">
 
-<h1>OS #${os.numOs}</h1>
+<h1>OS #${escapeHtml(os.numOs)}</h1>
 
-<div>Status: <strong>${os.status}</strong></div>
+<div>Status: <strong>${escapeHtml(os.status ?? 'Não informado')}</strong></div>
+
+<div class="meta">Entrada: ${dataHora(os.dtEntrada)}</div>
 
 </div>
 
@@ -206,11 +273,15 @@ DADOS DO CLIENTE
 
 <div class="card-content">
 
-<strong>Nome:</strong> ${os.cliente?.nmCompleto ?? ''}<br>
+<strong>Nome:</strong> ${escapeHtml(os.cliente?.nmCompleto ?? '')}<br>
 
-<strong>CPF:</strong> ${os.cliente?.cpf ?? ''}<br>
+<strong>CPF:</strong> ${escapeHtml(os.cliente?.cpf ?? '')}<br>
 
-<strong>Telefone:</strong> ${os.cliente?.telefone ?? ''}
+<strong>Telefone:</strong> ${escapeHtml(os.cliente?.telefone ?? '')}<br>
+
+<strong>E-mail:</strong> ${escapeHtml(os.cliente?.email ?? '')}<br>
+
+<strong>Endereço:</strong> ${escapeHtml(os.cliente?.endereco ?? '')}
 
 </div>
 
@@ -224,11 +295,13 @@ EQUIPAMENTO
 
 <div class="card-content">
 
-<strong>Modelo:</strong> ${os.aparelho?.modelo ?? ''}<br>
+<strong>Modelo:</strong> ${escapeHtml(os.aparelho?.modelo ?? '')}<br>
 
-<strong>Cor:</strong> ${os.aparelho?.cor ?? ''}<br>
+<strong>Cor:</strong> ${escapeHtml(os.aparelho?.cor ?? '')}<br>
 
-<strong>IMEI:</strong> ${os.aparelho?.imei ?? ''}
+<strong>IMEI:</strong> ${escapeHtml(os.aparelho?.imei ?? '')}<br>
+
+<strong>Tipo de senha:</strong> ${escapeHtml(os.aparelho?.tipoSenha ?? 'Não informada')}
 
 </div>
 
@@ -244,15 +317,16 @@ DIAGNÓSTICO
 
 <strong>Problema:</strong>
 
-${os.diagnosticos[0]?.relatoTecnico ?? ''}
+${escapeHtml(descricaoDiagnostico || 'Não informado')}
 
 <br><br>
 
 <strong>Solução:</strong>
 
-${os.itensOs
-  .map((i: any) => i.servico?.descricao)
+${itens
+  .map((i: any) => i.servico?.descricao ?? i.peca?.descricao)
   .filter(Boolean)
+  .map((descricao: string) => escapeHtml(descricao))
   .join(', ')}
 
 </div>
@@ -279,7 +353,7 @@ ${os.itensOs
 
 <tbody>
 
-${servicosHtml}
+${linhasItens}
 
 </tbody>
 
@@ -287,7 +361,7 @@ ${servicosHtml}
 
 <div class="total">
 
-TOTAL: R$ ${Number(os.vlTotal ?? 0).toFixed(2)}
+TOTAL: R$ ${moeda(total)}
 
 </div>
 
@@ -297,7 +371,7 @@ TOTAL: R$ ${Number(os.vlTotal ?? 0).toFixed(2)}
 
 <br><br>
 
-• Garantia válida apenas para os serviços executados.
+• A garantia aplica-se apenas aos serviços executados, conforme as condições informadas pela empresa.
 
 <br>
 
@@ -305,7 +379,7 @@ TOTAL: R$ ${Number(os.vlTotal ?? 0).toFixed(2)}
 
 <br>
 
-• A StopCell não se responsabiliza por dados armazenados no aparelho.
+• A empresa não se responsabiliza por dados armazenados no aparelho.
 
 </div>
 
