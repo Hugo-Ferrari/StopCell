@@ -40,13 +40,10 @@ function Login() {
 
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center bg-linear-to-b from-background via-background to-card px-4">
-
       
       <div className="absolute top-0 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
-
       
       <div className="absolute right-6 top-6 flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-lg">
-
         <button
           type="button"
           onClick={() => setTema("claro")}
@@ -75,7 +72,6 @@ function Login() {
       </div>
 
       <div className="relative w-full max-w-sm">
-
         
         <div className="flex flex-col items-center text-center">
           <Marca size={176} />
@@ -84,7 +80,6 @@ function Login() {
             Sistema Interno
           </p>
         </div>
-
        
         <form
           onSubmit={handleSubmit}
@@ -111,7 +106,8 @@ function Login() {
                 value={emailUsuario}
                 onChange={(e) => setEmailUsuario(e.target.value)}
                 required
-                className=" w-full rounded-full border  border-border  bg-card  py-3  pl-11  pr-4  text-sm  text-foreground  placeholder:text-muted-foreground  outline-none  transition-all  focus:border-primary focus:ring-2 focus:ring-primary/30"/>
+                className=" w-full rounded-full border border-border bg-card py-3 pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/30"
+              />
             </div>
           </div>
 
@@ -135,8 +131,7 @@ function Login() {
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
                 required
-                className="w-full rounded-full border border-border
-                  bg-card py-3 pl-11 pr-4 text-sm text-foregro placeholder:text-muted-foregroun outline-none transition-all focus:border-primary  focus:ring-2 focus:ring-primary/30   "
+                className="w-full rounded-full border border-border bg-card py-3 pl-11 pr-4 text-sm text-foregro placeholder:text-muted-foregroun outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/30"
               />
             </div>
           </div>
@@ -169,7 +164,7 @@ function Login() {
           <button
             type="submit"
             disabled={carregando}
-            className=" mt-1 flex items-center justify-center gap-2 rounded-full border-2 border-primary py-3 text-sm font-bold text-primary transition-all hover:bg-primary  hover:text-primary-foreground disabled:cursor-not-allowed disabled:opacity-60">
+            className=" mt-1 flex items-center justify-center gap-2 rounded-full border-2 border-primary py-3 text-sm font-bold text-primary transition-all hover:bg-primary hover:text-primary-foreground disabled:cursor-not-allowed disabled:opacity-60">
             {carregando ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -180,12 +175,23 @@ function Login() {
             )}
           </button>
 
-          <Link
-            to="/recuperarSenha"
-            className="text-center text-sm text-muted-foreground transition-colors hover:text-primary"
-          >
-            Esqueceu sua senha?
-          </Link>
+          {/* Área de links agrupados e padronizados */}
+          <div className="flex flex-col items-center gap-3 pt-1">
+            <Link
+              to="/recuperarSenha"
+              className="text-center text-sm text-muted-foreground transition-colors hover:text-primary"
+            >
+              Esqueceu sua senha?
+            </Link>
+            
+            <Link
+              to="/cadastro"
+              className="text-center text-sm text-muted-foreground transition-colors hover:text-primary"
+            >
+              Ainda não tem conta? Cadastre-se
+            </Link>
+          </div>
+
         </form>
       </div>
     </div>

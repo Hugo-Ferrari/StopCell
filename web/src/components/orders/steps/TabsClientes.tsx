@@ -1,342 +1,360 @@
 import { useState } from "react";
-import { Search, User, UserPlus, Loader2 } from "lucide-react";
-import { 
-  criandoCliente, 
-  buscarClientePorCpf, 
-  type criarClienteDto 
-} from "@/services/customerService";
+import { Search, User, UserPlus, Loader2, Smartphone, CheckCircle2, XCircle } from "lucide-react";
+import { criandoCliente, buscarClientePorCpf, type criarClienteDto } from "@/services/customerService";
 
-function TabsClientes() {
+// Listas fixas para evitar duplicidade no banco
+const CATEGORIAS = ["Smartphone", "Tablet", "Notebook", "Smartwatch", "Outro"];
+const MARCAS = ["Apple", "Samsung", "Xiaomi", "Motorola", "LG", "Asus", "Realme", "Outra"];
+const TIPOS_SENHA = ["Numérica (PIN)", "Alfanumérica", "Padrão (Desenho)", "Sem Senha", "Não Informada"];
+
+export default function TabsClientes() {
   const [abaAtiva, setAbaAtiva] = useState<"existente" | "novo">("existente");
 
-  // aba de cliente existente
+  // notificações
+  const [toast, setToast] = useState<{ visivel: boolean; msg: string; tipo: "sucesso" | "erro" }>({ visivel: false, msg: "", tipo: "sucesso" });
+
+  function mostrarToast(msg: string, tipo: "sucesso" | "erro") {
+    setToast({ visivel: true, msg, tipo });
+    setTimeout(() => setToast({ visivel: false, msg: "", tipo: "sucesso" }), 4000); 
+  }
+
+  // aba 1: cliente existente
   const [cpfBusca, setCpfBusca] = useState("");
   const [buscandoCliente, setBuscandoCliente] = useState(false);
   const [clienteSelecionado, setClienteSelecionado] = useState<criarClienteDto>({
-    nmCompleto: "",
-    cpf: "",
-    telefone: "",
-    email: "",
-    endereco: "",
-    aparelhos: []
+    nmCompleto: "", cpf: "", telefone: "", email: "", endereco: "", aparelhos: []
   });
+  
+  // -- estado do aparelhi
+  const [imei, setImei] = useState("");
+  const [categoriaOs, setCategoriaOs] = useState("");
+  const [marcaOs, setMarcaOs] = useState("");
+  const [modelo, setModelo] = useState("");
+  const [cor, setCor] = useState("");
+  const [tipoSenha, setTipoSenha] = useState("");
+  const [senhaAparelho, setSenhaAparelho] = useState("");
 
-  // aba de cadastrar novo cliente
+  // aba 2: novo cliente
   const [nomeNovo, setNomeNovo] = useState("");
   const [cpfNovo, setCpfNovo] = useState("");
   const [whatsAppNovo, setWhatsAppNovo] = useState("");
   const [emailNovo, setEmailNovo] = useState("");
-  const [enderecoNovo, setEnderecoNovo] = useState("");
+  
+  // estados separados para o endereço
+  const [cepNovo, setCepNovo] = useState("");
+  const [logradouroNovo, setLogradouroNovo] = useState("");
+  const [numeroNovo, setNumeroNovo] = useState("");
+  const [bairroNovo, setBairroNovo] = useState("");
+  const [cidadeNovo, setCidadeNovo] = useState("");
+  const [estadoNovo, setEstadoNovo] = useState("");
+  
   const [carregando, setCarregando] = useState(false);
 
-  // buscar cliente existente - cpf
-  async function handleBuscarCliente() {
-    if (!cpfBusca.trim()) {
-      alert("Digite o CPF do cliente para buscar.");
-      return;
+  // buscar cep por api viacep
+  async function handleBuscarCep(cepDigitado: string) {
+    const cepLimpo = cepDigitado.replace(/\D/g, "");
+    setCepNovo(cepLimpo);
+
+    if (cepLimpo.length === 8) {
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+        const data = await response.json();
+        if (!data.erro) {
+          // Preenche os campos separados automaticamente
+          setLogradouroNovo(data.logradouro || "");
+          setBairroNovo(data.bairro || "");
+          setCidadeNovo(data.localidade || "");
+          setEstadoNovo(data.uf || "");
+          mostrarToast("Endereço encontrado!", "sucesso");
+        } else {
+          mostrarToast("CEP não encontrado.", "erro");
+        }
+      } catch {
+        mostrarToast("Erro ao buscar CEP.", "erro");
+      }
     }
+  }
+
+  // buscar cliente
+  async function handleBuscarCliente() {
+    const cpfLimpo = cpfBusca.replace(/\D/g, "");
+    if (cpfLimpo.length !== 11) return mostrarToast("O CPF deve conter 11 dígitos.", "erro");
 
     try {
       setBuscandoCliente(true);
-      const dados = await buscarClientePorCpf(cpfBusca.trim());
-      
+      const dados = await buscarClientePorCpf(cpfLimpo);
       if (dados) {
         setClienteSelecionado(dados);
+        mostrarToast("Cliente encontrado!", "sucesso");
       } else {
-        alert("Cliente não encontrado.");
+        mostrarToast("Cliente não encontrado.", "erro");
       }
-    } catch (error) {
-      console.error("Erro ao buscar cliente:", error);
-      alert("Cliente não encontrado ou erro na busca.");
+    } catch {
+      mostrarToast("Erro ou cliente não existe.", "erro");
     } finally {
       setBuscandoCliente(false);
     }
   }
 
-  // cadastrar novo cliente
+  // cadastar cliente
   async function handleCadastrarCliente(e: React.FormEvent) {
     e.preventDefault();
+    const cpfLimpo = cpfNovo.replace(/\D/g, "");
+    const whatsLimpo = whatsAppNovo.replace(/\D/g, "");
 
-    if (!nomeNovo.trim() || !cpfNovo.trim() || !whatsAppNovo.trim() || !emailNovo.trim() || !enderecoNovo.trim()) {
-      alert("Por favor, preencha TODOS os campos do formulário.");
-      return;
+    if (!nomeNovo.trim() || cpfLimpo.length !== 11 || !whatsLimpo || !logradouroNovo || !numeroNovo) {
+      return mostrarToast("Preencha todos os campos obrigatórios (*).", "erro");
     }
 
     try {
       setCarregando(true);
+      
+      // Junta o endereço formatado para salvar no banco
+      const enderecoCompleto = `${logradouroNovo}, ${numeroNovo} - ${bairroNovo}, ${cidadeNovo} - ${estadoNovo}`;
 
-      // dados do novo cliente
-      const dadosNovoCliente = {
-        nmCompleto: nomeNovo,
-        cpf: cpfNovo,
-        telefone: whatsAppNovo,
-        email: emailNovo,
-        endereco: enderecoNovo,
+      const dadosNovo = {
+        nmCompleto: nomeNovo.trim(),
+        cpf: cpfLimpo,
+        telefone: whatsLimpo,
+        email: emailNovo.trim(),
+        endereco: enderecoCompleto,
       };
 
-      const clienteCriado = await criandoCliente(dadosNovoCliente as any);
-
-      alert("Cliente cadastrado com sucesso!");
-
-      // preenche automaticamente os campos da aba de cliente existente com os dados do cliente recém-criado
-      setClienteSelecionado({
-        nmCompleto: clienteCriado?.nmCompleto || nomeNovo,
-        cpf: clienteCriado?.cpf || cpfNovo,
-        telefone: clienteCriado?.telefone || whatsAppNovo,
-        email: clienteCriado?.email || emailNovo,
-        endereco: clienteCriado?.endereco || enderecoNovo,
-        aparelhos: clienteCriado?.aparelhos || []
-      });
-
-      // Limpa os campos do formulário
-      setNomeNovo("");
-      setCpfNovo("");
-      setWhatsAppNovo("");
-      setEmailNovo("");
-      setEnderecoNovo("");
-
-      // Alterna automaticamente para a aba de cliente existente
+      const criado = await criandoCliente(dadosNovo as any);
+      
+      setClienteSelecionado({ ...criado, aparelhos: [] });
+      mostrarToast("Cliente cadastrado com sucesso!", "sucesso");
+      
+      // Limpa os campos e volta pra aba de existente
+      setNomeNovo(""); setCpfNovo(""); setWhatsAppNovo(""); setEmailNovo(""); 
+      setCepNovo(""); setLogradouroNovo(""); setNumeroNovo(""); setBairroNovo(""); setCidadeNovo(""); setEstadoNovo("");
       setAbaAtiva("existente");
     } catch (error: any) {
-      console.error("Erro completo ao cadastrar cliente:", error);
-      
-      const mensagemBackend = error.response?.data?.message;
-      if (Array.isArray(mensagemBackend)) {
-        alert(`Erro de validação: ${mensagemBackend.join(", ")}`);
-      } else if (mensagemBackend) {
-        alert(`Erro do servidor: ${mensagemBackend}`);
-      } else {
-        alert(`Erro de conexão (${error.response?.status || 'Servidor indisponível'}).`);
-      }
+      const msg = error.response?.data?.message || "Erro ao cadastrar. Verifique o CPF.";
+      mostrarToast(Array.isArray(msg) ? msg[0] : msg, "erro");
     } finally {
       setCarregando(false);
     }
   }
 
   return (
-    <div className="w-full max-w-4xl flex flex-col gap-6">
+    <div className="w-full max-w-4xl flex flex-col gap-6 relative">
       
-    
-      <div className="flex flex-col mb-2">
-        <span className="text-white text-xs font-bold uppercase tracking-widest">
-          <span className="text-[#F25C38]">Stop</span> Cell
-        </span>
-        <h1 className="text-2xl md:text-3xl font-bold mt-1 text-white">Nova Ordem de Serviço</h1>
-      </div>
+      {/* pop-up */}
+      {toast.visivel && (
+        <div className={`fixed top-10 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl transition-all animate-in slide-in-from-top-5 ${toast.tipo === "sucesso" ? "bg-green-500/10 border border-green-500/50 text-green-500" : "bg-red-500/10 border border-red-500/50 text-red-500"}`}>
+          {toast.tipo === "sucesso" ? <CheckCircle2 size={24} /> : <XCircle size={24} />}
+          <span className="font-bold text-sm">{toast.msg}</span>
+        </div>
+      )}
 
-      
+      {/* --- ABAS --- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <button
-          type="button"
-          onClick={() => setAbaAtiva("existente")}
-          className={`flex items-center justify-center gap-2 py-4 rounded-2xl font-medium transition-all ${
-            abaAtiva === "existente"
-              ? "bg-[#F25C38] text-white"
-              : "bg-[#141414] border border-[#222222] text-zinc-400 hover:text-white"
-          }`}
-        >
+        <button type="button" onClick={() => setAbaAtiva("existente")} className={`flex items-center justify-center gap-2 py-4 rounded-2xl font-medium transition-all ${abaAtiva === "existente" ? "bg-[#F25C38] text-white" : "bg-[#141414] border border-[#222222] text-zinc-400 hover:text-white"}`}>
           <User size={20} /> Cliente Existente
         </button>
-        <button
-          type="button"
-          onClick={() => setAbaAtiva("novo")}
-          className={`flex items-center justify-center gap-2 py-4 rounded-2xl font-medium transition-all ${
-            abaAtiva === "novo"
-              ? "bg-[#F25C38] text-white"
-              : "bg-[#141414] border border-[#222222] text-zinc-400 hover:text-white"
-          }`}
-        >
+        <button type="button" onClick={() => setAbaAtiva("novo")} className={`flex items-center justify-center gap-2 py-4 rounded-2xl font-medium transition-all ${abaAtiva === "novo" ? "bg-[#F25C38] text-white" : "bg-[#141414] border border-[#222222] text-zinc-400 hover:text-white"}`}>
           <UserPlus size={20} /> Cadastrar novo cliente
         </button>
       </div>
 
-      { //aba cliente existente 
-      }
+      {/* aba cliente existente */}
       {abaAtiva === "existente" && (
         <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2">
           
-          {/* Bloco dados do Cliente */}
-          <div className="bg-[#141414] border border-[#222222] rounded-3xl p-6 md:p-8 flex flex-col gap-6">
-            <div>
-              <h2 className="text-xl font-bold text-white">Cliente</h2>
-              <p className="text-sm text-zinc-400 mt-1">Selecione um cliente para criar a Ordem de Serviço.</p>
-            </div>
-
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex flex-1 items-center rounded-2xl border border-[#222222] bg-[#0A0A0A] px-4 py-1 focus-within:border-[#F25C38] transition-colors">
+          <div className="bg-[#141414] border border-[#222222] rounded-3xl p-5 md:p-8">
+            <h2 className="text-white font-bold mb-4">1. Buscar Cliente</h2>
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <div className="flex flex-1 items-center bg-[#0A0A0A] border border-[#222222] rounded-xl px-4 py-1 focus-within:border-[#F25C38] transition-colors">
                 <Search size={20} className="text-zinc-500 mr-2" />
-                <input
-                  type="text"
-                  placeholder="Digite o CPF do cliente"
-                  value={cpfBusca}
-                  onChange={(e) => setCpfBusca(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleBuscarCliente()}
-                  className="w-full bg-transparent p-2 text-white placeholder:text-zinc-500 outline-none"
-                />
+                <input type="text" placeholder="Digite apenas os números do CPF" value={cpfBusca} onChange={(e) => setCpfBusca(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleBuscarCliente()} className="w-full bg-transparent p-2 text-white outline-none" />
               </div>
-              <button 
-                type="button"
-                onClick={handleBuscarCliente}
-                disabled={buscandoCliente}
-                className="bg-[#F25C38] hover:bg-[#e04f2d] text-white px-8 py-3 rounded-2xl font-bold transition-colors disabled:opacity-50 flex items-center justify-center"
-              >
+              <button type="button" onClick={handleBuscarCliente} disabled={buscandoCliente} className="bg-[#F25C38] hover:bg-[#e04f2d] text-white px-8 py-3 rounded-xl font-bold transition-colors flex justify-center items-center">
                 {buscandoCliente ? <Loader2 className="animate-spin" size={20} /> : "Buscar"}
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-white">Nome do Cliente</label>
-                <input type="text" readOnly value={clienteSelecionado.nmCompleto} placeholder="Selecione um cliente" className="bg-[#0A0A0A] border border-[#222222] rounded-xl p-3 text-zinc-300 outline-none cursor-not-allowed" />
+                <label className="text-xs md:text-sm font-bold text-white">Nome</label>
+                <input type="text" readOnly value={clienteSelecionado.nmCompleto} className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-zinc-400 outline-none cursor-not-allowed" />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-white">CPF</label>
-                <input type="text" readOnly value={clienteSelecionado.cpf} placeholder="000.000.000-00" className="bg-[#0A0A0A] border border-[#222222] rounded-xl p-3 text-zinc-300 outline-none cursor-not-allowed" />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-white">WhatsApp</label>
-                <input type="text" readOnly value={clienteSelecionado.telefone} placeholder="(00)00000-0000" className="bg-[#0A0A0A] border border-[#222222] rounded-xl p-3 text-zinc-300 outline-none cursor-not-allowed" />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-white">Email</label>
-                <input type="text" readOnly value={clienteSelecionado.email} placeholder="cliente@email.com" className="bg-[#0A0A0A] border border-[#222222] rounded-xl p-3 text-zinc-300 outline-none cursor-not-allowed" />
+                <label className="text-xs md:text-sm font-bold text-white">CPF</label>
+                <input type="text" readOnly value={clienteSelecionado.cpf} className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-zinc-400 outline-none cursor-not-allowed" />
               </div>
               <div className="flex flex-col gap-2 md:col-span-2">
-                <label className="text-sm font-medium text-white">Endereço</label>
-                <input type="text" readOnly value={clienteSelecionado.endereco} placeholder="rua, numero, bairro, cidade" className="bg-[#0A0A0A] border border-[#222222] rounded-xl p-3 text-zinc-300 outline-none cursor-not-allowed" />
+                <label className="text-xs md:text-sm font-bold text-white">Endereço Atual</label>
+                <input type="text" readOnly value={clienteSelecionado.endereco} className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-zinc-400 outline-none cursor-not-allowed" />
               </div>
             </div>
           </div>
 
-          {/* Bloco dados do Aparelho */}
-          <div className="bg-[#141414] border border-[#222222] rounded-3xl p-6 md:p-8 flex flex-col gap-6">
-            <div>
-              <h2 className="text-xl font-bold text-white">Aparelho</h2>
-              <p className="text-sm text-zinc-400 mt-1">Selecione um aparelho existente ou cadastre um novo.</p>
+          <div className="bg-[#141414] border border-[#222222] rounded-3xl p-5 md:p-8">
+            <h2 className="text-white font-bold mb-4 flex items-center gap-2"><Smartphone size={18}/> 2. Dados do Aparelho</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              
+              {/* IMEI Obrigatório */}
+              <div className="flex flex-col gap-2 md:col-span-2">
+                <label className="text-xs md:text-sm font-bold text-white flex justify-between">
+                  <span>IMEI / Nº de Série *</span>
+                  <span className="text-zinc-500 font-normal">Identificador Único</span>
+                </label>
+                <input type="text" required value={imei} onChange={(e) => setImei(e.target.value)} placeholder="Digite o IMEI ou Nº de Série" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-4 text-white outline-none focus:border-[#F25C38]" />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs md:text-sm font-bold text-white">Categoria *</label>
+                <select value={categoriaOs} onChange={(e) => setCategoriaOs(e.target.value)} className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl py-4 px-4 text-white outline-none focus:border-[#F25C38] appearance-none">
+                  <option value="" disabled>Selecione...</option>
+                  {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs md:text-sm font-bold text-white">Marca *</label>
+                <select value={marcaOs} onChange={(e) => setMarcaOs(e.target.value)} className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl py-4 px-4 text-white outline-none focus:border-[#F25C38] appearance-none">
+                  <option value="" disabled>Selecione...</option>
+                  {MARCAS.map(m => <option key={m} value={m}>{m}</option>)}
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs md:text-sm font-bold text-white">Modelo / Descrição</label>
+                <input type="text" value={modelo} onChange={(e) => setModelo(e.target.value)} placeholder="Ex: iPhone 13 Pro Max" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-4 text-white outline-none focus:border-[#F25C38]" />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs md:text-sm font-bold text-white">Cor</label>
+                <input type="text" value={cor} onChange={(e) => setCor(e.target.value)} placeholder="Ex: Preto, Azul" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-4 text-white outline-none focus:border-[#F25C38]" />
+              </div>
+
+              {/* tipo de senha */}
+              <div className="flex flex-col gap-2 md:col-span-2 mt-2">
+                <label className="text-xs md:text-sm font-bold text-white">Tipo de Senha</label>
+                <select value={tipoSenha} onChange={(e) => { setTipoSenha(e.target.value); setSenhaAparelho(""); }} className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl py-4 px-4 text-white outline-none focus:border-[#F25C38] appearance-none">
+                  <option value="" disabled>Selecione o tipo de bloqueio...</option>
+                  {TIPOS_SENHA.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+
+              {/* senha de texto/pin */}
+              {(tipoSenha === "Numérica (PIN)" || tipoSenha === "Alfanumérica") && (
+                <div className="flex flex-col gap-2 md:col-span-2 animate-in fade-in slide-in-from-top-2">
+                  <label className="text-xs md:text-sm font-bold text-[#F25C38]">Senha do Aparelho</label>
+                  <input type={tipoSenha === "Numérica (PIN)" ? "number" : "text"} value={senhaAparelho} onChange={(e) => setSenhaAparelho(e.target.value)} placeholder="Digite a senha de desbloqueio" className="w-full bg-[#F25C38]/10 border border-[#F25C38]/30 rounded-xl p-4 text-white outline-none focus:border-[#F25C38]" />
+                </div>
+              )}
+
+              {/* senha de desenho */}
+              {tipoSenha === "Padrão (Desenho)" && (
+                <div className="flex flex-col md:flex-row gap-6 items-center bg-[#0A0A0A] border border-[#222222] p-5 rounded-2xl md:col-span-2 animate-in fade-in slide-in-from-top-2">
+                  
+                  {/* Grid visual 3x3 de ajuda */}
+                  <div className="grid grid-cols-3 gap-2 p-3 bg-[#141414] rounded-xl border border-[#222222] shrink-0">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
+                      const isActive = senhaAparelho.includes(num.toString());
+                      return (
+                        <div 
+                          key={num} 
+                          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                            isActive 
+                              ? "bg-[#F25C38] text-white border-none shadow-[0_0_10px_rgba(242,92,56,0.5)] scale-110" 
+                              : "border border-zinc-600 text-zinc-400"
+                          }`}
+                        >
+                          {num}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  <div className="flex flex-col gap-2 w-full">
+                    <label className="text-xs md:text-sm font-bold text-[#F25C38]">Sequência do Desenho</label>
+                    <p className="text-xs text-zinc-400 mb-1">Use a grade ao lado como referência (ex: 14789)</p>
+                    <input type="number" value={senhaAparelho} onChange={(e) => setSenhaAparelho(e.target.value)} placeholder="Digite os números na ordem" className="w-full bg-[#F25C38]/10 border border-[#F25C38]/30 rounded-xl p-4 text-white outline-none focus:border-[#F25C38]" />
+                  </div>
+                </div>
+              )}
+
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4">
-              <select className="flex-1 bg-[#0A0A0A] border border-[#222222] rounded-2xl p-4 text-white outline-none appearance-none cursor-pointer">
-                <option value="">Selecione um aparelho</option>
-                {clienteSelecionado.aparelhos?.map((aparelho) => (
-                  <option key={aparelho.imei} value={aparelho.imei}>
-                    {aparelho.modelo}
-                  </option>
-                ))}
-              </select>
-              <button type="button" className="bg-[#F25C38] hover:bg-[#e04f2d] text-white px-8 py-4 rounded-2xl font-bold transition-colors">
-                Novo aparelho
-              </button>
-            </div>
+            <button type="button" className="w-full md:w-auto mt-8 bg-[#F25C38] hover:bg-[#e04f2d] text-white px-10 py-4 rounded-2xl font-bold transition-colors">
+              Gerar Ordem de Serviço
+            </button>
           </div>
 
-          {/* Bloco Ordem de Serviço */}
-          <div className="bg-[#141414] border border-[#222222] rounded-3xl p-6 md:p-8 flex flex-col gap-6">
-            <h2 className="text-xl font-bold text-white">Ordem de Serviço</h2>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-white">Técnico responsável</label>
-              <input type="text" placeholder="Quem recebeu o aparelho" className="bg-[#0A0A0A] border border-[#222222] rounded-xl p-4 text-white outline-none focus:border-[#F25C38]" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-white">Relato do problema</label>
-              <textarea rows={4} placeholder="Descreva o problema..." className="bg-[#0A0A0A] border border-[#222222] rounded-xl p-4 text-white outline-none focus:border-[#F25C38] resize-none"></textarea>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-              <button type="button" className="bg-[#F25C38] hover:bg-[#e04f2d] text-white py-4 rounded-2xl font-bold transition-colors">
-                Gerar OS Digital
-              </button>
-              <button type="button" className="bg-[#0A0A0A] border border-[#222222] text-zinc-300 hover:text-white py-4 rounded-2xl font-bold transition-colors">
-                Cancelar
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
-      {/*aba cadastrar novo cliente*/}
+      {/* aba cadastar novo cliente */}
       {abaAtiva === "novo" && (
-        <form onSubmit={handleCadastrarCliente} className="bg-[#141414] border border-[#222222] rounded-3xl p-6 md:p-8 flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2">
+        <form onSubmit={handleCadastrarCliente} className="bg-[#141414] border border-[#222222] rounded-3xl p-5 md:p-8 flex flex-col gap-4 md:gap-6 animate-in fade-in slide-in-from-bottom-2">
+          <h2 className="text-white font-bold mb-2">Dados do Novo Cliente</h2>
           
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-white">Cliente *</label>
-            <input 
-              type="text" 
-              required
-              placeholder="Digite o nome completo" 
-              value={nomeNovo}
-              onChange={(e) => setNomeNovo(e.target.value)}
-              className="bg-[#0A0A0A] border border-[#222222] rounded-xl p-4 text-white outline-none focus:border-[#F25C38] transition-colors" 
-            />
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-xs md:text-sm font-bold text-white">Nome Completo *</label>
+              <input type="text" value={nomeNovo} onChange={(e) => setNomeNovo(e.target.value)} placeholder="Digite o nome" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-white">CPF *</label>
-              <input 
-                type="text" 
-                required
-                placeholder="000.000.000-00" 
-                value={cpfNovo}
-                onChange={(e) => setCpfNovo(e.target.value)}
-                className="bg-[#0A0A0A] border border-[#222222] rounded-xl p-4 text-white outline-none focus:border-[#F25C38] transition-colors" 
-              />
+              <label className="text-xs md:text-sm font-bold text-white">CPF *</label>
+              <input type="text" value={cpfNovo} onChange={(e) => setCpfNovo(e.target.value)} placeholder="000.000.000-00" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
             </div>
+
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-white">WhatsApp *</label>
-              <input 
-                type="text" 
-                required
-                placeholder="(00) 00000-0000" 
-                value={whatsAppNovo}
-                onChange={(e) => setWhatsAppNovo(e.target.value)}
-                className="bg-[#0A0A0A] border border-[#222222] rounded-xl p-4 text-white outline-none focus:border-[#F25C38] transition-colors" 
-              />
+              <label className="text-xs md:text-sm font-bold text-white">WhatsApp *</label>
+              <input type="text" value={whatsAppNovo} onChange={(e) => setWhatsAppNovo(e.target.value)} placeholder="(00) 00000-0000" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
             </div>
+
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-white">Email *</label>
-              <input 
-                type="email" 
-                required
-                placeholder="cliente@email.com" 
-                value={emailNovo}
-                onChange={(e) => setEmailNovo(e.target.value)}
-                className="bg-[#0A0A0A] border border-[#222222] rounded-xl p-4 text-white outline-none focus:border-[#F25C38] transition-colors" 
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-white">Endereço *</label>
-              <input 
-                type="text" 
-                required
-                placeholder="rua, número, bairro, cidade" 
-                value={enderecoNovo}
-                onChange={(e) => setEnderecoNovo(e.target.value)}
-                className="bg-[#0A0A0A] border border-[#222222] rounded-xl p-4 text-white outline-none focus:border-[#F25C38] transition-colors" 
-              />
+              <label className="text-xs md:text-sm font-bold text-white">E-mail</label>
+              <input type="email" value={emailNovo} onChange={(e) => setEmailNovo(e.target.value)} placeholder="cliente@email.com" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-            <button 
-              type="submit"
-              disabled={carregando}
-              className="flex items-center justify-center gap-2 bg-[#F25C38] hover:bg-[#e04f2d] text-white py-4 rounded-2xl font-bold transition-colors disabled:opacity-50"
-            >
-              {carregando ? <Loader2 className="animate-spin" size={20} /> : "Cadastrar cliente"}
-            </button>
-            <button 
-              type="button"
-              onClick={() => setAbaAtiva("existente")}
-              className="bg-[#0A0A0A] border border-[#222222] text-zinc-300 hover:text-white hover:bg-[#222222] py-4 rounded-2xl font-bold transition-colors"
-            >
-              Cancelar
-            </button>
+          <hr className="border-[#222222] my-2" />
+          <h2 className="text-white font-bold text-sm">Endereço</h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-xs md:text-sm font-bold text-white">CEP</label>
+              <input type="text" maxLength={9} value={cepNovo} onChange={(e) => handleBuscarCep(e.target.value)} placeholder="00000-000" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
+            </div>
+            
+            <div className="flex flex-col gap-2 sm:col-span-2 lg:col-span-3">
+              <label className="text-xs md:text-sm font-bold text-white">Logradouro (Rua/Av) *</label>
+              <input type="text" value={logradouroNovo} onChange={(e) => setLogradouroNovo(e.target.value)} placeholder="Ex: Avenida Brasil" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-xs md:text-sm font-bold text-[#F25C38]">Número *</label>
+              <input type="text" value={numeroNovo} onChange={(e) => setNumeroNovo(e.target.value)} placeholder="Ex: 123" className="w-full bg-[#F25C38]/10 border border-[#F25C38]/30 rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-xs md:text-sm font-bold text-white">Bairro</label>
+              <input type="text" value={bairroNovo} onChange={(e) => setBairroNovo(e.target.value)} placeholder="Bairro" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-xs md:text-sm font-bold text-white">Cidade</label>
+              <input type="text" value={cidadeNovo} onChange={(e) => setCidadeNovo(e.target.value)} placeholder="Cidade" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-xs md:text-sm font-bold text-white">Estado (UF)</label>
+              <input type="text" maxLength={2} value={estadoNovo} onChange={(e) => setEstadoNovo(e.target.value)} placeholder="SP" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38] uppercase" />
+            </div>
           </div>
+
+          <button type="submit" disabled={carregando} className="w-full md:w-auto mt-4 flex items-center justify-center gap-2 bg-[#F25C38] hover:bg-[#e04f2d] text-white px-10 py-4 rounded-2xl font-bold transition-colors disabled:opacity-50">
+            {carregando ? <Loader2 className="animate-spin" size={20} /> : "Cadastrar Cliente"}
+          </button>
         </form>
       )}
-
     </div>
   );
 }
-
-export default TabsClientes;
