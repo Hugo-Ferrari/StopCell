@@ -6,6 +6,7 @@ import BoxOs from "@/components/history/BoxOs";
 import { listarOs } from "@/services/serviceOrderService";
 import type { OrdemServicoInterface } from "../models/WorkOrder";
 
+// corrigir filtros( EM_REPARO, AGUARDANDO_PEÇA, EM_REPARO, FINALIZADO)
 function OrdemServico() {
   const [busca, setBusca] = useState("");
   const [filtroStatus, setFiltroStatus] = useState("Todas");
@@ -15,7 +16,9 @@ function OrdemServico() {
     async function carregarOs() {
       try {
         const dados = await listarOs();
+        console.log(dados)
         setOrdens(dados);
+        
       } catch (error) {
         console.error("Erro ao carregar Ordens de Serviço:", error);
       }
@@ -57,7 +60,6 @@ function OrdemServico() {
   return (
     <div className="flex flex-col w-full min-h-screen bg-[#0A0A0A] text-white p-4 md:p-8">
       
-      {/* header responsivo  */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6 md:mb-8">
         <div>
           <span className="text-[#F25C38] text-[10px] md:text-xs font-bold uppercase tracking-widest">Stop Cell</span>
@@ -76,7 +78,7 @@ function OrdemServico() {
         </div>
       </div>
 
-      {/* busca e filtro avançado */}
+      {/* busca e filtro da OS */}
       <div className="flex gap-2 md:gap-4 mb-6 md:mb-8">
         <div className="flex flex-1 items-center rounded-2xl bg-[#141414] border border-[#222222] px-3 md:px-4 py-1 md:py-1.5 focus-within:border-[#F25C38] transition-colors">
           <Search size={18} className="mr-2 md:mr-3 text-zinc-500" />
@@ -93,7 +95,7 @@ function OrdemServico() {
         </button>
       </div>
 
-      {/* card status  */}
+      {/* status da os   */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
         <div className="bg-[#141414] border border-[#222222] rounded-2xl p-4 md:p-5 flex flex-col justify-between min-h-[90px] md:min-h-[110px]">
           <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px] font-bold text-zinc-400 tracking-wider">
@@ -124,7 +126,7 @@ function OrdemServico() {
         </div>
       </div>
 
-      {/* filtro de pesquisa */}
+      {/* filtro para pesquisar  */}
       <div className="flex gap-2 md:gap-3 mb-6 overflow-x-auto pb-2 scrollbar-hide w-full snap-x">
         {chips.map((chip) => (
           <button

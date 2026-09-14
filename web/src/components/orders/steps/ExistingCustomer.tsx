@@ -11,9 +11,6 @@ import DeviceModal from "./DeviceModal";
 function ClienteExistente() {
 
   const [modalAberto, setModalAberto] = useState(false)
-
-
-
   const [cliente, setCliente] = useState<criarClienteDto | null>(null);
 
   const [aparelhoSelecionado, setAparelhoSelecionado] =
