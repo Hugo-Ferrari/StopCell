@@ -16,6 +16,7 @@ enum FormaPagamento {
   @@map("forma_pagamento_enum")
 }
 
+
 model Empresa {
   cnpj         String  @id @db.VarChar(14)
   nomeFantasia String? @map("nome_fantasia") @db.VarChar(100)
