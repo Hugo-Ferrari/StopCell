@@ -8,6 +8,7 @@ import NovaOrdemServico from "@/pages/orders/pages/NewServiceOrder";
 import DetalhesOrdemServico from "@/pages/orders/pages/ServiceOrderDetails";
 import MainLayout from "@/layouts/MainLayout";
 import Historico from "@/pages/history/History";
+import Estoque from "@/pages/orders/pages/Stock";
 
 export function AppRoutes() {
   return (
@@ -20,6 +21,7 @@ export function AppRoutes() {
       {/* rotas priv */}
       <Route element={<MainLayout />}>
         <Route path="/ordemServico" element={<OrdemServico />} />
+        <Route path="/estoque" element={<Estoque />} />
         <Route path="/financeiro" element={<Financeiro />} />
         <Route path="/nova-ordem-servico" element={<NovaOrdemServico />} />
         <Route path="/ordemServico/:numOs" element={<DetalhesOrdemServico />} />

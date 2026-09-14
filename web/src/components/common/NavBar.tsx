@@ -7,6 +7,7 @@ import {
   Settings,
   Van,
   Wallet,
+  Warehouse,
   X,
 } from "lucide-react";
 
@@ -63,6 +64,12 @@ function NavBar() {
       text: "Fornecedores",
       subtext: "Cadastre fornecedores",
       path: "/fornecedores",
+    },
+    {
+      icon: <Warehouse size={20} />,
+      text: "Estoque",
+      subtext: "Gerencie seu Estoque",
+      path: "/estoque",
     },
     {
       icon: <Wallet size={20} />,

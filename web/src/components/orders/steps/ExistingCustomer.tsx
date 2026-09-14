@@ -91,7 +91,7 @@ export default function ExistingCustomer({ mostrarToast, clienteSelecionado, set
         cpfCliente: clienteSelecionado.cpf,
         email: clienteSelecionado.email, 
         imeiAparelho: imei,
-        idUsuario: 1, 
+        idUsuario: 6,
         diagnostico: "Aparelho recebido na recepção."
       });
 
