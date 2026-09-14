@@ -35,3 +35,13 @@ export function removerToken() {
     localStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(TOKEN_KEY);
 }
+
+export async function esqueceuSenha(email: string) {
+  const { data } = await api.post('/auth/esqueci-senha', { email });
+  return data;
+}
+
+export async function redefinirSenha(payload: { email: string; codigo: string; novaSenha: string }) {
+  const { data } = await api.post('/auth/redefinir-senha', payload);
+  return data;
+}

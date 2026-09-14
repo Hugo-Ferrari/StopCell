@@ -2,7 +2,10 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Building2, MapPin, User, Phone, Mail, Lock, Loader2 } from "lucide-react";
 import Marca from "@/components/common/Mark";
+import FormInput from "@/components/common/FormInput";
 import { cadastrarUsuario } from "../authService";
+import { formatarCnpj, formatarTelefone } from "@/utils/masks";
+import { emailValido } from "@/utils/validartors";
 
 function Register() {
   const navigate = useNavigate();
@@ -17,15 +20,32 @@ function Register() {
   const [nomeCompleto, setNomeCompleto] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
+  const [emailTocado, setEmailTocado] = useState(false);
 
   // Estados - ACESSO AO SISTEMA
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [confirmarSenhaTocado, setConfirmarSenhaTocado] = useState(false);
+
+  const erroEmail = emailTocado && email.length > 0 && !emailValido(email)
+    ? "Digite um e-mail válido (ex: nome@dominio.com)"
+    : undefined;
+
+  const erroConfirmarSenha = confirmarSenhaTocado && confirmarSenha.length > 0 && senha !== confirmarSenha
+    ? "As senhas não coincidem"
+    : undefined;
+
+  const formularioValido = emailValido(email) && senha === confirmarSenha && senha.length >= 6;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    
+
+    if (!emailValido(email)) {
+      alert("Digite um e-mail válido!");
+      return;
+    }
+
     if (senha !== confirmarSenha) {
       alert("As senhas não coincidem!");
       return;
@@ -33,12 +53,11 @@ function Register() {
 
     setCarregando(true);
     try {
-      // Monta o objeto no formato exato que o backend NestJS espera (CadastroDto)
       const payload = {
         empresa: {
           nomeFantasia: nomeEmpresa,
           razaoSocial: nomeEmpresa,
-          cnpj: cnpj.replace(/\D/g, "") || "00000000000000", // Remove pontuações do CNPJ
+          cnpj: cnpj.replace(/\D/g, "") || "00000000000000",
           telefone: whatsapp.replace(/\D/g, ""),
           endereco: cidade,
         },
@@ -51,9 +70,9 @@ function Register() {
       };
 
       await cadastrarUsuario(payload);
-      
+
       alert("Cadastro realizado com sucesso!");
-      navigate("/"); // Redireciona para o Login
+      navigate("/");
     } catch (error: any) {
       console.error(error);
       const msgErro = error.response?.data?.message || "Erro ao criar conta. Verifique os dados.";
@@ -65,7 +84,7 @@ function Register() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white p-4 md:p-8 flex flex-col items-center relative overflow-x-hidden">
-      
+
       <div className="w-full max-w-2xl flex justify-start mb-6 md:mb-8">
         <Link to="/" className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
           <ArrowLeft size={20} />
@@ -82,142 +101,109 @@ function Register() {
       </div>
 
       <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-[#141414] border border-[#222222] rounded-3xl p-6 md:p-10 flex flex-col gap-10">
+
         
-        {/* SESSÃO: EMPRESA */}
         <section className="flex flex-col gap-4">
           <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Empresa</h2>
-          
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-white">Nome da empresa</label>
-            <div className="relative flex items-center">
-              <Building2 className="absolute left-4 text-zinc-500" size={18} />
-              <input 
-                type="text" required
-                value={nomeEmpresa} onChange={(e) => setNomeEmpresa(e.target.value)}
-                placeholder="Ex: Stop Cell Assistência Técnica" 
-                className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl py-3.5 pl-11 pr-4 text-white outline-none focus:border-[#F25C38] transition-colors"
-              />
-            </div>
-          </div>
+
+          <FormInput
+            label="Nome da empresa"
+            icon={<Building2 size={18} />}
+            type="text" required
+            value={nomeEmpresa} onChange={(e) => setNomeEmpresa(e.target.value)}
+            placeholder="Ex: Stop Cell Assistência Técnica"
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-bold text-white">CNPJ (opcional)</label>
-              <input 
-                type="text" 
-                value={cnpj} onChange={(e) => setCnpj(e.target.value)}
-                placeholder="00.000.000/0000-00" 
-                className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl py-3.5 px-4 text-white outline-none focus:border-[#F25C38] transition-colors"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-bold text-white">Cidade</label>
-              <div className="relative flex items-center">
-                <MapPin className="absolute left-4 text-zinc-500" size={18} />
-                <input 
-                  type="text" required
-                  value={cidade} onChange={(e) => setCidade(e.target.value)}
-                  placeholder="Ex: Franca" 
-                  className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl py-3.5 pl-11 pr-4 text-white outline-none focus:border-[#F25C38] transition-colors"
-                />
-              </div>
-            </div>
+            <FormInput
+              label="CNPJ"
+              type="text"
+              value={cnpj}
+              onChange={(e) => setCnpj(formatarCnpj(e.target.value))}
+              placeholder="00.000.000/0000-00"
+              maxLength={18}
+            />
+            <FormInput
+              label="Cidade"
+              icon={<MapPin size={18} />}
+              type="text" required
+              value={cidade} onChange={(e) => setCidade(e.target.value)}
+              placeholder="Ex: Franca"
+            />
           </div>
         </section>
 
-        {/* SESSÃO: DONO DA EMPRESA */}
+        
         <section className="flex flex-col gap-4">
           <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Dono da Empresa</h2>
-          
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-white">Nome completo</label>
-            <div className="relative flex items-center">
-              <User className="absolute left-4 text-zinc-500" size={18} />
-              <input 
-                type="text" required
-                value={nomeCompleto} onChange={(e) => setNomeCompleto(e.target.value)}
-                placeholder="Digite o nome completo" 
-                className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl py-3.5 pl-11 pr-4 text-white outline-none focus:border-[#F25C38] transition-colors"
-              />
-            </div>
-          </div>
+
+          <FormInput
+            label="Nome completo"
+            icon={<User size={18} />}
+            type="text" required
+            value={nomeCompleto} onChange={(e) => setNomeCompleto(e.target.value)}
+            placeholder="Digite o nome completo"
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-bold text-white">WhatsApp</label>
-              <div className="relative flex items-center">
-                <Phone className="absolute left-4 text-zinc-500" size={18} />
-                <input 
-                  type="text" required
-                  value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)}
-                  placeholder="(00) 00000-0000" 
-                  className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl py-3.5 pl-11 pr-4 text-white outline-none focus:border-[#F25C38] transition-colors"
-                />
-              </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-bold text-white">E-mail</label>
-              <div className="relative flex items-center">
-                <Mail className="absolute left-4 text-zinc-500" size={18} />
-                <input 
-                  type="email" required
-                  value={email} onChange={(e) => setEmail(e.target.value)}
-                  placeholder="contato@stopcell.com.br" 
-                  className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl py-3.5 pl-11 pr-4 text-white outline-none focus:border-[#F25C38] transition-colors"
-                />
-              </div>
-            </div>
+            <FormInput
+              label="WhatsApp"
+              icon={<Phone size={18} />}
+              type="text" required
+              value={whatsapp}
+              onChange={(e) => setWhatsapp(formatarTelefone(e.target.value))}
+              placeholder="(00) 00000-0000"
+              maxLength={15}
+            />
+            <FormInput
+              label="E-mail"
+              icon={<Mail size={18} />}
+              type="email" required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onBlur={() => setEmailTocado(true)}
+              placeholder="contato@stopcell.com.br"
+              error={erroEmail}
+            />
           </div>
         </section>
 
-        {/* SESSÃO: ACESSO AO SISTEMA */}
+        
         <section className="flex flex-col gap-4">
           <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Acesso ao Sistema</h2>
-          
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-white">Usuário</label>
-            <div className="relative flex items-center">
-              <User className="absolute left-4 text-zinc-500" size={18} />
-              <input 
-                type="text" required
-                value={usuario} onChange={(e) => setUsuario(e.target.value)}
-                placeholder="Ex: diogo" 
-                className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl py-3.5 pl-11 pr-4 text-white outline-none focus:border-[#F25C38] transition-colors"
-              />
-            </div>
-          </div>
+
+          <FormInput
+            label="Usuário"
+            icon={<User size={18} />}
+            type="text" required
+            value={usuario} onChange={(e) => setUsuario(e.target.value)}
+            placeholder="Ex: diogo"
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-bold text-white">Senha</label>
-              <div className="relative flex items-center">
-                <Lock className="absolute left-4 text-zinc-500" size={18} />
-                <input 
-                  type="password" required minLength={6}
-                  value={senha} onChange={(e) => setSenha(e.target.value)}
-                  placeholder="Mínimo 6 caracteres" 
-                  className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl py-3.5 pl-11 pr-4 text-white outline-none focus:border-[#F25C38] transition-colors"
-                />
-              </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-bold text-white">Confirmar senha</label>
-              <div className="relative flex items-center">
-                <Lock className="absolute left-4 text-zinc-500" size={18} />
-                <input 
-                  type="password" required minLength={6}
-                  value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)}
-                  placeholder="Repita a senha" 
-                  className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl py-3.5 pl-11 pr-4 text-white outline-none focus:border-[#F25C38] transition-colors"
-                />
-              </div>
-            </div>
+            <FormInput
+              label="Senha"
+              icon={<Lock size={18} />}
+              type="password" required minLength={6}
+              value={senha} onChange={(e) => setSenha(e.target.value)}
+              placeholder="Mínimo 6 caracteres"
+            />
+            <FormInput
+              label="Confirmar senha"
+              icon={<Lock size={18} />}
+              type="password" required minLength={6}
+              value={confirmarSenha}
+              onChange={(e) => setConfirmarSenha(e.target.value)}
+              onBlur={() => setConfirmarSenhaTocado(true)}
+              placeholder="Repita a senha"
+              error={erroConfirmarSenha}
+            />
           </div>
         </section>
 
-        <button 
-          type="submit" 
-          disabled={carregando}
+        <button
+          type="submit"
+          disabled={carregando || !formularioValido}
           className="w-full bg-[#F25C38] hover:bg-[#e04f2d] text-white font-bold py-4 rounded-xl mt-2 transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
         >
           {carregando ? <Loader2 className="animate-spin" size={20} /> : "Criar conta e entrar"}
