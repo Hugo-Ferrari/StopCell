@@ -1,100 +1,38 @@
-function DadosOrdemServico() {
+interface DadosOrdemServicoProps {
+  relato: string;
+  setRelato: (texto: string) => void;
+  onGerarOs: () => void;
+}
+
+function DadosOrdemServico({ relato, setRelato, onGerarOs }: DadosOrdemServicoProps) {
   return (
-    <div
-      className="space-y-5">
-
-     
-      <div>
-        <label className="mb-2 block text-sm font-medium text-foreground">
-          Técnico responsável
-        </label>
-
-        <input
-          type="text"
-          placeholder="Quem recebeu o aparelho"
-          readOnly
-          className="  w-full  rounded-lg  border  border-border  bg-background px-4  py-3 text-foreground placeholder:text-muted-foreground  outline-none  transition-colors  focus:border-primary focus:ring-2 focus:ring-primary/30"/>
-
-        
-      </div>
-
-
+    <div className="space-y-5 bg-[#141414] border border-[#222222] p-5 md:p-8 rounded-3xl">
       
       <div>
-        <label className="mb-2 block text-sm font-medium text-foreground">
-          Relato do problema
-        </label>
+        <label className="mb-2 block text-sm font-medium text-white">Técnico responsável</label>
+        <input type="text" placeholder="Técnico Logado" readOnly className="w-full rounded-xl border border-[#222222] bg-[#0A0A0A] px-4 py-3 text-zinc-500 outline-none cursor-not-allowed"/>
+      </div>
 
+      <div>
+        <label className="mb-2 block text-sm font-medium text-white">Relato do problema</label>
         <textarea
           rows={5}
-          placeholder="Descreva o problema..."
-          className="
-            w-full
-            resize-none
-            rounded-lg
-            border
-            border-border
-            bg-background
-            px-4
-            py-3
-            text-foreground
-            placeholder:text-muted-foreground
-            outline-none
-            transition-colors
-            focus:border-primary
-            focus:ring-2
-            focus:ring-primary/30
-          "
+          value={relato}
+          onChange={(e) => setRelato(e.target.value)}
+          placeholder="Descreva o problema relatado pelo cliente..."
+          className="w-full resize-none rounded-xl border border-[#222222] bg-[#0A0A0A] px-4 py-3 text-white placeholder:text-zinc-500 outline-none transition-colors focus:border-[#F25C38]"
         />
       </div>
 
-
-      
-      <div
-        className="
-          flex
-          flex-col
-          gap-3
-          sm:flex-row
-        "
-      >
-
-        <button
-          className="
-            flex-1
-            rounded-lg
-            bg-primary
-            py-3
-            font-semibold
-            text-primary-foreground
-            transition
-            hover:opacity-90
-          "
-        >
+      <div className="flex flex-col gap-3 sm:flex-row mt-6">
+        <button type="button" onClick={onGerarOs} className="flex-1 rounded-xl bg-[#F25C38] py-4 font-bold text-white transition hover:opacity-90">
           Gerar OS Digital
         </button>
 
-
-        <button
-          className="
-            flex-1
-            rounded-lg
-            border
-            border-border
-            bg-card
-            py-3
-            font-semibold
-            text-muted-foreground
-            transition
-            hover:bg-accent
-            hover:text-foreground
-          "
-        >
+        <button type="button" className="flex-1 rounded-xl border border-[#222222] bg-[#0A0A0A] py-4 font-bold text-zinc-400 transition hover:bg-[#222222] hover:text-white">
           Cancelar
         </button>
-
       </div>
-
     </div>
   );
 }

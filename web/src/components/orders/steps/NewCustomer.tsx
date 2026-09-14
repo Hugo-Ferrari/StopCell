@@ -1,147 +1,117 @@
-import {
-  criandoCliente,
-  type criarClienteDto,
-} from "@/services/customerService";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Loader2 } from "lucide-react";
+import { criandoCliente, type criarClienteDto } from "@/services/customerService";
 
-function NovoCliente() {
-  const [nmCompleto, setNmCompleto] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [email, setEmail] = useState("");
-  const [endereco, setEndereco] = useState("");
+interface NewCustomerProps {
+  mostrarToast: (msg: string, tipo: "sucesso" | "erro") => void;
+  setAbaAtiva: (aba: "existente" | "novo") => void;
+  setClienteSelecionado: (cliente: criarClienteDto) => void;
+}
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+export default function NewCustomer({ mostrarToast, setAbaAtiva, setClienteSelecionado }: NewCustomerProps) {
+  const [nomeNovo, setNomeNovo] = useState("");
+  const [cpfNovo, setCpfNovo] = useState("");
+  const [whatsAppNovo, setWhatsAppNovo] = useState("");
+  const [emailNovo, setEmailNovo] = useState(""); // Estado do email já existia
+  const [cepNovo, setCepNovo] = useState("");
+  const [enderecoNovo, setEnderecoNovo] = useState("");
+  const [carregando, setCarregando] = useState(false);
+
+  async function handleBuscarCep(cepDigitado: string) {
+    const cepLimpo = cepDigitado.replace(/\D/g, "");
+    setCepNovo(cepLimpo);
+
+    if (cepLimpo.length === 8) {
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+        const data = await response.json();
+        if (!data.erro) {
+          setEnderecoNovo(`${data.logradouro}, Nº  - ${data.bairro}, ${data.localidade} - ${data.uf}`);
+          mostrarToast("Endereço encontrado!", "sucesso");
+        } else {
+          mostrarToast("CEP não encontrado.", "erro");
+        }
+      } catch {
+        mostrarToast("Erro ao buscar CEP.", "erro");
+      }
+    }
+  }
+
+  async function handleCadastrarCliente(e: React.FormEvent) {
     e.preventDefault();
+    const cpfLimpo = cpfNovo.replace(/\D/g, "");
+    const whatsLimpo = whatsAppNovo.replace(/\D/g, "");
 
-    if (
-      !nmCompleto.trim() ||
-      !cpf.trim() ||
-      !telefone.trim() ||
-      !email.trim() ||
-      !endereco.trim()
-    ) {
-      return alert("Preencha todos os campos");
+    // Adicionei validação de e-mail obrigatório
+    if (!nomeNovo.trim() || cpfLimpo.length !== 11 || !whatsLimpo || !emailNovo.trim() || !enderecoNovo) {
+      return mostrarToast("Preencha todos os campos corretamente (incluindo o e-mail).", "erro");
     }
 
     try {
-      const data: criarClienteDto = {
-        nmCompleto,
-        cpf,
-        telefone,
-        email,
-        endereco,
-        aparelhos: [],
+      setCarregando(true);
+      const dadosNovo = {
+        nmCompleto: nomeNovo.trim(),
+        cpf: cpfLimpo,
+        telefone: whatsLimpo,
+        email: emailNovo.trim(), // O E-mail está sendo mandado agora
+        endereco: enderecoNovo.trim(),
       };
 
-      await criandoCliente(data);
-
-      alert("Cliente criado");
-
-      setNmCompleto("");
-      setTelefone("");
-      setEndereco("");
-      setEmail("");
-      setCpf("");
-    } catch (err) {
-      console.log(err);
+      const criado = await criandoCliente(dadosNovo as any);
+      
+      setClienteSelecionado({ ...criado, aparelhos: [] });
+      mostrarToast("Cliente cadastrado com sucesso!", "sucesso");
+      
+      setNomeNovo(""); setCpfNovo(""); setWhatsAppNovo(""); setEmailNovo(""); setCepNovo(""); setEnderecoNovo("");
+      setAbaAtiva("existente");
+    } catch (error: any) {
+      const msg = error.response?.data?.message || "Erro ao cadastrar. Verifique o CPF.";
+      mostrarToast(Array.isArray(msg) ? msg[0] : msg, "erro");
+    } finally {
+      setCarregando(false);
     }
   }
 
   return (
-    <div className=" rounded-2xl border border-border bg-card p-5  sm:p-6">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className=" grid  grid-cols-1  gap-5  md:grid-cols-2">
-          <div className="md:col-span-2">
-            <label className="mb-2 block font-medium text-foreground">
-              Cliente
-            </label>
+    <form onSubmit={handleCadastrarCliente} className="bg-[#141414] border border-[#222222] rounded-3xl p-5 md:p-8 flex flex-col gap-4 md:gap-6 animate-in fade-in slide-in-from-bottom-2">
+      <h2 className="text-white font-bold mb-2">Dados do Novo Cliente</h2>
+      
+      <div className="flex flex-col gap-2">
+        <label className="text-xs md:text-sm font-bold text-white">Nome Completo *</label>
+        <input type="text" value={nomeNovo} onChange={(e) => setNomeNovo(e.target.value)} placeholder="Digite o nome" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
+      </div>
 
-            <input
-              value={nmCompleto}
-              onChange={(e) => setNmCompleto(e.target.value)}
-              type="text"
-              placeholder="Digite o nome completo"
-              className="input-style"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block font-medium text-foreground">
-              CPF
-            </label>
-
-            <input
-              value={cpf}
-              onChange={(e) => setCpf(e.target.value)}
-              type="text"
-              placeholder="000.000.000-00"
-              className="input-style"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block font-medium text-foreground">
-              WhatsApp
-            </label>
-
-            <input
-              value={telefone}
-              onChange={(e) => setTelefone(e.target.value)}
-              type="tel"
-              placeholder="(00) 00000-0000"
-              className="input-style"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block font-medium text-foreground">
-              Email
-            </label>
-
-            <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              placeholder="cliente@email.com"
-              className="input-style"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block font-medium text-foreground">
-              Endereço
-            </label>
-
-            <input
-              value={endereco}
-              onChange={(e) => setEndereco(e.target.value)}
-              type="text"
-              placeholder="rua, número, bairro, cidade"
-              className="input-style"
-            />
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div className="flex flex-col gap-2">
+          <label className="text-xs md:text-sm font-bold text-white">CPF *</label>
+          <input type="text" value={cpfNovo} onChange={(e) => setCpfNovo(e.target.value)} placeholder="000.000.000-00" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
+        </div>
+        
+        <div className="flex flex-col gap-2">
+          <label className="text-xs md:text-sm font-bold text-white">WhatsApp *</label>
+          <input type="text" value={whatsAppNovo} onChange={(e) => setWhatsAppNovo(e.target.value)} placeholder="(00) 00000-0000" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
         </div>
 
-        <div className=" flex flex-col gap-3 sm:flex-row ">
-          <button
-            type="submit"
-            className=" flex-1 rounded-lg bg-primary py-3 font-semibold text-primary-foreground transition hover:opacity-90"
-          >
-            Cadastrar cliente
-          </button>
-
-          <Link
-            to="/ordemServico"
-            className=" flex-1 rounded-lg border border-border bg-background py-3 text-center font-semibold text-muted-foreground transition-all hover:border-primary hover:bg-accent hover:text-primary"
-          >
-            Cancelar
-          </Link>
+        {/* CAMPO DE E-MAIL ADICIONADO AQUI */}
+        <div className="flex flex-col gap-2">
+          <label className="text-xs md:text-sm font-bold text-white">E-mail *</label>
+          <input type="email" value={emailNovo} onChange={(e) => setEmailNovo(e.target.value)} placeholder="cliente@email.com" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
         </div>
-      </form>
-    </div>
+        
+        <div className="flex flex-col gap-2">
+          <label className="text-xs md:text-sm font-bold text-white">CEP</label>
+          <input type="text" maxLength={9} value={cepNovo} onChange={(e) => handleBuscarCep(e.target.value)} placeholder="00000-000" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
+        </div>
+
+        <div className="flex flex-col gap-2 md:col-span-2">
+          <label className="text-xs md:text-sm font-bold text-white">Endereço Completo *</label>
+          <input type="text" value={enderecoNovo} onChange={(e) => setEnderecoNovo(e.target.value)} placeholder="Rua, Número, Bairro" className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-white outline-none focus:border-[#F25C38]" />
+        </div>
+      </div>
+
+      <button type="submit" disabled={carregando} className="w-full md:w-auto mt-4 flex items-center justify-center gap-2 bg-[#F25C38] hover:bg-[#e04f2d] text-white px-10 py-4 rounded-2xl font-bold transition-colors disabled:opacity-50">
+        {carregando ? <Loader2 className="animate-spin" size={20} /> : "Cadastrar Cliente"}
+      </button>
+    </form>
   );
 }
-
-export default NovoCliente;
