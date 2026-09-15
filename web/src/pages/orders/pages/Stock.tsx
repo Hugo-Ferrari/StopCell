@@ -37,6 +37,14 @@ function Estoque() {
 
   return (
     <div className="flex flex-col gap-6">
+      <div>
+        <span className="text-[#F25C38] text-[10px] md:text-xs font-bold uppercase tracking-widest">
+          Stop Cell
+        </span>
+        <h1 className="text-2xl md:text-3xl font-black mt-1 flex items-center gap-3 text-white">
+          Estoque
+        </h1>
+      </div>
       <div className="flex gap-4 flex-wrap">
         <CardStock
           text="ITENS CADASTRADO"

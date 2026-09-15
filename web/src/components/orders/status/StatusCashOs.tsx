@@ -27,7 +27,7 @@ function CaixaStatusOs({ status, quantidade }: Props) {
 
   return (
     <button
-      className=" group w-full rounded-2xl border  border-border bg-cardp-5  text-left  shadow-sm  transition-all  duration-300  hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl">
+      className=" group w-full rounded-2xl border  border-border bg-card p-5  text-left  shadow-sm  transition-all  duration-300  hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl">
       <div className="flex items-center gap-3">
         <div
           className={`h-3 w-3 rounded-full transition-transform duration-300 group-hover:scale-125 ${config.cor}`}

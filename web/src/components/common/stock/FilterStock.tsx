@@ -26,33 +26,24 @@ function FilterStock({ peca }: Props) {
       <div className="mb-5 flex gap-100 rounded-lg bg-muted p-1">
         <button
           onClick={() => setFiltro("todas")}
-          className={`rounded-md px-4 py-2 text-sm font-medium transition ${
-            filtro === "todas"
-              ? "bg-background shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
+          className={`rounded-md px-4 py-2 text-sm font-medium transition 
+            ${filtro === "todas" ? "bg-primary shadow-sm": " hover:bg-background text-muted-foreground hover:text-foreground"}`}
         >
           Todas as peças
         </button>
 
         <button
           onClick={() => setFiltro("baixo")}
-          className={`rounded-md px-4 py-2 text-sm font-medium transition ${
-            filtro === "baixo"
-              ? "bg-background shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
+          className={`rounded-md px-4 py-2 text-sm font-medium transition 
+            ${filtro === "baixo"  ? "bg-primary shadow-sm" : "hover:bg-background text-muted-foreground hover:text-foreground" }`}
         >
           Estoque baixo
         </button>
 
         <button
           onClick={() => setFiltro("falta")}
-          className={`rounded-md px-4 py-2 text-sm font-medium transition ${
-            filtro === "falta"
-              ? "bg-background shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
+          className={`rounded-md px-4 py-2 text-sm font-medium transition 
+            ${filtro === "falta"  ? "bg-primary shadow-sm"  : "hover:bg-background text-muted-foreground hover:text-foreground" }`}
         >
           Em falta
         </button>
