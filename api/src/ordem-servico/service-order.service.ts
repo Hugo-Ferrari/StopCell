@@ -56,12 +56,28 @@ export class OrdemServicoService {
 
     return this.repository.atualizarStatus(numOs, status, cnpjEmpresa);
   }
+
   async listar(cnpjEmpresa: string) {
     return await this.repository.listar(cnpjEmpresa);
   }
 
   async buscarPorNumOs(numOs: number, cnpjEmpresa: string) {
     return await this.repository.buscarPorNumOs(numOs, cnpjEmpresa);
+  }
+
+  // add esse método para busca da ultima O.S pelo IMEI em casa de retrabalho 
+  async buscarUltimaOsPorImei(imei: string, cnpjEmpresa: string) {
+    const ultimaOs = await this.prisma.ordemServico.findFirst({
+      where: { 
+        imeiAparelho: imei,
+        cnpjEmpresa: cnpjEmpresa
+      },
+      orderBy: {
+        numOs: 'desc'
+      }
+    });
+
+    return ultimaOs;
   }
 
   async gerarPdf(numOs: number, cnpjEmpresa: string): Promise<Buffer> {

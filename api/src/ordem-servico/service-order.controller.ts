@@ -41,9 +41,27 @@ export class OrdemServicoController {
 
     return resposta;
   }
+
   @Get()
   listar(@Req() req: any) {
     return this.service.listar(req.userCnpjEmpresa);
+  }
+
+  // ROTA NOVA: Busca a última O.S. vinculada ao IMEI para preencher retrabalho
+  @Get('aparelho/:imei/ultima')
+  async buscarUltimaOsPorImei(@Param('imei') imei: string, @Req() req: any) {
+    const ultimaOs = await this.service.buscarUltimaOsPorImei(
+      imei,
+      req.userCnpjEmpresa,
+    );
+
+    if (!ultimaOs) {
+      throw new NotFoundException(
+        'Nenhuma O.S. anterior encontrada para este aparelho',
+      );
+    }
+
+    return ultimaOs;
   }
 
   @Get(':numOs')

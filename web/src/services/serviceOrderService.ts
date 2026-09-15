@@ -2,10 +2,10 @@ import api from "@/api/api";
 
 export interface OrdemServicoDTO {
     cpfCliente: string;
-    email: string; 
     imeiAparelho: string;
     idUsuario: number;
     diagnostico?: string;
+    numOsAnterior?: number;
 }
 
 export async function criarOrdemServico(dados: OrdemServicoDTO) {
@@ -21,4 +21,14 @@ export async function listarOs() {
 export async function buscarOrdemServicoPorNumero(numOs: number) {
     const response = await api.get(`/ordemServico/${numOs}`);
     return response.data;
+}
+
+
+export async function buscarUltimaOsPorImei(imei: string) {
+    try {
+        const response = await api.get(`/ordemServico/aparelho/${imei}/ultima`);
+        return response.data;
+    } catch (error) {
+        return null;
+    }
 }
