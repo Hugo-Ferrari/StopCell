@@ -6,8 +6,9 @@ import { ItemOsDto } from '@/type/itemOs.dto';
 export class ItenOsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  registrar(dto: ItemOsDto) {
-    return this.prisma.itensOs.create({
+ async registrar(dto: ItemOsDto) {
+  return this.prisma.$transaction(async (tx) => { 
+    const item = await tx.itensOs.create({
       data: {
         numOs: dto.numOs,
         idServico: dto.idServico,
@@ -16,7 +17,23 @@ export class ItenOsRepository {
         valorUnitario: dto.valorUnitario,
       },
     });
-  }
+
+    if (dto.idPeca != null) {
+      await tx.peca.update({
+        where: {
+          idPeca: dto.idPeca,
+        },
+        data: {
+          quantidade: {
+            decrement: dto.quantidade, //decrementando a quantidade de peças
+          },
+        },
+      });
+    }
+
+    return item;
+  });
+}
 
   findOsByNumAndCompany(numOs: number, cnpjEmpresa: string) {
     return this.prisma.ordemServico.findFirst({
