@@ -21,7 +21,7 @@ function DetalhesOrdemServico() {
     try {
       const data: PecaDto = {
         descricao,
-        valorPeca,
+        valor: valorPeca,
         quantidade,
       };
       const dataServico: Servico = {

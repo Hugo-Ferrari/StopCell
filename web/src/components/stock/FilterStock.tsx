@@ -47,6 +47,7 @@ function FilterStock({ peca }: Props) {
         >
           Em falta
         </button>
+        
       </div>
       <div className="grid grid-cols-2 border-b border-border px-4 py-3 text-sm font-medium text-muted-foreground">
         <span>Peça</span>
