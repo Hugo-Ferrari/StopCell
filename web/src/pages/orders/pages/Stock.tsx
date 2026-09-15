@@ -1,10 +1,12 @@
 "use client";
 
-import CardStock from "@/components/common/stock/CardStock";
-import FilterStock from "@/components/common/stock/FilterStock";
+import CardStock from "@/components/stock/CardStock";
+import FilterStock from "@/components/stock/FilterStock";
+import NewPeca from "@/components/stock/NewPeca";
 import { listarPeca, type PecaDTO } from "@/services/pecaService";
 import { AlertTriangle, Boxes, ClipboardList, DollarSign } from "lucide-react";
 import { useEffect, useState } from "react";
+
 
 function Estoque() {
   const [peca, setPeca] = useState<PecaDTO[]>([]);
@@ -69,6 +71,7 @@ function Estoque() {
           icons={DollarSign}
           valor={valorInvestido}
         />
+        <NewPeca/>
       </div>
 
       <FilterStock peca={peca} />

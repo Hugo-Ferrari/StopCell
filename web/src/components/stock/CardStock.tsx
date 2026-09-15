@@ -20,6 +20,9 @@ function CardStock({ text, icons: Icon, valor }: Props) {
       <div>
         <p className="">{valor}</p>
       </div>
+      <div>
+        
+      </div>
     </div>
   );
 }
