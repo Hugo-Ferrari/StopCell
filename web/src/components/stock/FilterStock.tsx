@@ -22,12 +22,11 @@ function FilterStock({ peca }: Props) {
 
   return (
     <div className="w-full rounded-xl bg-card p-5">
-
       <div className="mb-5 flex gap-100 rounded-lg bg-muted p-1">
         <button
           onClick={() => setFiltro("todas")}
           className={`rounded-md px-4 py-2 text-sm font-medium transition 
-            ${filtro === "todas" ? "bg-primary shadow-sm": " hover:bg-background text-muted-foreground hover:text-foreground"}`}
+            ${filtro === "todas" ? "bg-primary shadow-sm" : " hover:bg-background text-muted-foreground hover:text-foreground"}`}
         >
           Todas as peças
         </button>
@@ -35,7 +34,7 @@ function FilterStock({ peca }: Props) {
         <button
           onClick={() => setFiltro("baixo")}
           className={`rounded-md px-4 py-2 text-sm font-medium transition 
-            ${filtro === "baixo"  ? "bg-primary shadow-sm" : "hover:bg-background text-muted-foreground hover:text-foreground" }`}
+            ${filtro === "baixo" ? "bg-primary shadow-sm" : "hover:bg-background text-muted-foreground hover:text-foreground"}`}
         >
           Estoque baixo
         </button>
@@ -43,15 +42,15 @@ function FilterStock({ peca }: Props) {
         <button
           onClick={() => setFiltro("falta")}
           className={`rounded-md px-4 py-2 text-sm font-medium transition 
-            ${filtro === "falta"  ? "bg-primary shadow-sm"  : "hover:bg-background text-muted-foreground hover:text-foreground" }`}
+            ${filtro === "falta" ? "bg-primary shadow-sm" : "hover:bg-background text-muted-foreground hover:text-foreground"}`}
         >
           Em falta
         </button>
-        
       </div>
-      <div className="grid grid-cols-2 border-b border-border px-4 py-3 text-sm font-medium text-muted-foreground">
+      <div className="grid grid-cols-3 border-b border-border px-4 py-3 text-sm font-medium text-muted-foreground">
         <span>Peça</span>
         <span className="text-right">Quantidade</span>
+        <span className="text-right">Valor</span>
       </div>
       <div>
         {pecasFiltradas.length === 0 ? (
@@ -62,12 +61,10 @@ function FilterStock({ peca }: Props) {
           pecasFiltradas.map((peca) => (
             <div
               key={peca.idPeca}
-              className="grid grid-cols-2 items-center border-b border-border px-4 py-4 last:border-0"
+              className="grid grid-cols-3 items-center border-b border-border px-4 py-4 last:border-0"
             >
               <div>
-                <p className="font-medium">
-                  {peca.descricao}
-                </p>
+                <p className="font-medium">{peca.descricao}</p>
 
                 <p className="text-xs text-muted-foreground">
                   Código: {peca.idPeca}
@@ -75,13 +72,18 @@ function FilterStock({ peca }: Props) {
               </div>
 
               <div className="text-right">
-                <span className="font-semibold">
-                  {peca.quantidade}
-                </span>
+                <span className="font-semibold">{peca.quantidade}</span>
 
-                <p className="text-xs text-muted-foreground">
-                  unidades
-                </p>
+                <p className="text-xs text-muted-foreground">unidades</p>
+              </div>
+
+              <div className="text-right">
+                <span className="font-semibold">
+                  {new Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(peca.valor)}
+                </span>
               </div>
             </div>
           ))
