@@ -11,6 +11,7 @@ function Header() {
     "/historico": "Histórico",
     "/fornecedores": "Fornecedores",
     "/configuracoes": "Configurações",
+    "/estoque" : "Estoque",
   };
 
   const titulo = matchPath(
