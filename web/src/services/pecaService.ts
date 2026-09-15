@@ -1,5 +1,6 @@
 import api from "@/api/api";
 export interface PecaDTO {
+    idPeca :number
     descricao: string 
     valor: number
     quantidade:number
