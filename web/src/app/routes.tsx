@@ -9,6 +9,7 @@ import DetalhesOrdemServico from "@/pages/orders/pages/ServiceOrderDetails";
 import MainLayout from "@/layouts/MainLayout";
 import Historico from "@/pages/history/History";
 import Estoque from "@/pages/orders/pages/Stock";
+import Configuracoes from "@/pages/settings/Settings";
 
 export function AppRoutes() {
   return (
@@ -26,6 +27,7 @@ export function AppRoutes() {
         <Route path="/nova-ordem-servico" element={<NovaOrdemServico />} />
         <Route path="/ordemServico/:numOs" element={<DetalhesOrdemServico />} />
         <Route path="/historico" element={<Historico />} />
+        <Route path="/configuracoes" element={<Configuracoes />} />
       </Route>
     </Routes>
   );
