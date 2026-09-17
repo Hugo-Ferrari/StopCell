@@ -51,7 +51,7 @@ export default function DeviceForm({ mostrarToast, clienteSelecionado, onAparelh
           tipoSenha: tipoSenha || "Não informada",
           cpfCliente: clienteSelecionado.cpf,
         });
-      } catch (erroPrisma) {
+      } catch (error) {
         console.warn("Aparelho já existia no banco, liberando fluxo para a OS...");
       }
 

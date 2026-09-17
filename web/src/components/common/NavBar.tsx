@@ -60,12 +60,6 @@ function NavBar() {
       path: "/historico",
     },
     {
-      icon: <Van size={20} />,
-      text: "Fornecedores",
-      subtext: "Cadastre fornecedores",
-      path: "/fornecedores",
-    },
-    {
       icon: <Warehouse size={20} />,
       text: "Estoque",
       subtext: "Gerencie seu Estoque",

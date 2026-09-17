@@ -1,4 +1,4 @@
-import { Store, User, ShieldCheck } from "lucide-react";
+import { Store, User } from "lucide-react";
 import SettingCard from "@/components/settings/SettingCard";
 
 export function Settings() {
@@ -35,13 +35,6 @@ export function Settings() {
           to="/configuracoes/perfil"
         />
 
-        {/* 3. Segurança & Acesso */}
-        <SettingCard
-          title="Segurança & Acesso"
-          description="Alteração de senha e controle de permissões de usuário."
-          icon={ShieldCheck}
-          to="/configuracoes/seguranca"
-        />
       </div>
     </div>
   );

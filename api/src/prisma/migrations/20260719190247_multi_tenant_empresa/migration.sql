@@ -13,7 +13,6 @@
 
 ALTER TABLE "aparelho" ADD COLUMN     "cnpj_empresa" VARCHAR(14) NOT NULL;
 
-
 ALTER TABLE "categoria" ADD COLUMN     "cnpj_empresa" VARCHAR(14) NOT NULL;
 
 
