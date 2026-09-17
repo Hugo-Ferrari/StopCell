@@ -24,9 +24,7 @@ function Header() {
   return (
     <>
 
-      <header
-        className=" sticky top-0 z-10 flex h-20 items-center border-b border-border bg-background/95 px-5 backdrop-blur-sm transition-all duration-300 lg:pl-72
-        ">
+      <header className="sticky top-0 z-10 flex h-20 items-center border-b border-border bg-background/95 px-5 pl-16 backdrop-blur-sm transition-all duration-300 lg:px-8">
         <div className="flex flex-col">
           <span className="text-xs font-extrabold uppercase tracking-widest lg:text-sm">
             <span className="text-foreground">
