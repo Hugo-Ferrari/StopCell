@@ -11,6 +11,7 @@ function Header() {
     "/historico": "Histórico",
     "/fornecedores": "Fornecedores",
     "/configuracoes": "Configurações",
+    "/configuracoes/loja": "Dados da Loja",
     "/estoque" : "Estoque",
   };
 
