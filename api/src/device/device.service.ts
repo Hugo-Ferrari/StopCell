@@ -21,4 +21,9 @@ export class AparelhoService {
 
     return null;
   }
+
+  async remover(imei:string, cnpjEmpresa: string){
+    const removida = await this.repository.remover(imei, cnpjEmpresa)
+    return removida
+  }
 }

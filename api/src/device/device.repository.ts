@@ -65,4 +65,10 @@ export class AparelhoRepository {
       },
     });
   }
+
+  async remover(imei: string, cnpjEmpresa: string) {
+  return this.prisma.aparelho.delete({
+    where: { imei, cliente: { cnpjEmpresa } },
+  });
+}
 }
