@@ -59,7 +59,6 @@ StopCell - TIC/
 │   ├── package.json
 │   └── README.md
 ├── README.md
-└── package.json (se houver no futuro)
 ```
 
 ## Requisitos

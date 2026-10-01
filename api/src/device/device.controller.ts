@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Put, Get, Req } from '@nestjs/common';
+import { Body, Controller, Param, Post, Put, Get, Req, Delete } from '@nestjs/common';
 import { AparelhoService } from './device.service';
 import { AparelhoDto } from '@/type/device.dto';
 
@@ -20,4 +20,9 @@ export class AparelhoController {
   atualizar(@Param('id') id: string, @Body() dto: AparelhoDto, @Req() req) {
     return this.service.atualizar(id, dto, req.userCnpjEmpresa);
   }
+
+  @Delete(':id')
+remover(@Param('id') id: string, @Req() req) {
+  return this.service.remover(id, req.userCnpjEmpresa);
+}
 }
