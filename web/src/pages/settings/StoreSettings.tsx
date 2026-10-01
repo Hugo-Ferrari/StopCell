@@ -3,10 +3,10 @@ import { Loader2 } from "lucide-react";
 import StoreCard from "@/components/settings/StoreCard";
 import StoreForm from "@/components/settings/StoreForm";
 import {
-  buscarEmpresa,
-  atualizarEmpresa,
-  obterCnpjDoToken,
+  buscarPerfilEmpresa,
+  atualizarPerfilEmpresa,
   type EmpresaDTO,
+  type UpdateEmpresaDTO,
 } from "@/services/enterpriseService";
 
 export default function StoreSettings() {
@@ -22,42 +22,13 @@ export default function StoreSettings() {
 
   useEffect(() => {
     async function carregarDados() {
-      const cnpj = obterCnpjDoToken();
-      if (!cnpj) {
-        // Fallback local se não encontrar token decodificado
-        const local = localStorage.getItem("stopcell_empresa");
-        if (local) {
-          try {
-            setStore(JSON.parse(local));
-          } catch {
-            // ignora erro de parse
-          }
-        }
-        setCarregandoInicial(false);
-        return;
-      }
-
       try {
-        const dados = await buscarEmpresa(cnpj);
+        const dados = await buscarPerfilEmpresa();
         if (dados) {
-          setStore({
-            cnpj: dados.cnpj || cnpj,
-            nomeFantasia: dados.nomeFantasia || "",
-            razaoSocial: dados.razaoSocial || "",
-            telefone: dados.telefone || "",
-            endereco: dados.endereco || "",
-          });
+          setStore(dados);
         }
-      } catch {
-        // Fallback se a API falhar ou estiver offline
-        const local = localStorage.getItem("stopcell_empresa");
-        if (local) {
-          try {
-            setStore(JSON.parse(local));
-          } catch {
-            // ignora erro
-          }
-        }
+      } catch (error) {
+        console.error("Erro ao carregar dados da empresa:", error);
       } finally {
         setCarregandoInicial(false);
       }
@@ -66,15 +37,11 @@ export default function StoreSettings() {
     carregarDados();
   }, []);
 
-  async function handleSalvar(novosDados: EmpresaDTO) {
+  async function handleSalvar(novosDados: UpdateEmpresaDTO) {
     setSalvando(true);
     try {
-      localStorage.setItem("stopcell_empresa", JSON.stringify(novosDados));
-
-      if (novosDados.cnpj) {
-        await atualizarEmpresa(novosDados.cnpj, novosDados);
-      }
-      setStore(novosDados);
+      const atualizado = await atualizarPerfilEmpresa(novosDados);
+      setStore(atualizado || { ...store, ...novosDados });
     } finally {
       setSalvando(false);
     }
@@ -100,3 +67,4 @@ export default function StoreSettings() {
     </div>
   );
 }
+
