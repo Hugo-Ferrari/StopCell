@@ -26,3 +26,9 @@ export function formatarTelefone(valor: string): string {
     .replace(/^(\d{2})(\d)/, "($1) $2")
     .replace(/(\d{5})(\d)/, "$1-$2");
 }
+
+// Aplica máscara de CEP: 00000-000
+export function formatarCep(valor: string): string {
+  const numeros = somenteNumeros(valor).slice(0, 8);
+  return numeros.replace(/^(\d{5})(\d)/, "$1-$2");
+}

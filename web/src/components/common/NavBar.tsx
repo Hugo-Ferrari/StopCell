@@ -5,7 +5,6 @@ import {
   Menu,
   RotateCcw,
   Settings,
-  Van,
   Wallet,
   Warehouse,
   X,

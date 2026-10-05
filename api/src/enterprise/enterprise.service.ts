@@ -7,6 +7,10 @@ import { EmpresaDto } from '@/type/enterprise.dto';
 export class EmpresaService {
   constructor(private readonly repository: EmpresaRepository) {}
 
+  buscarPorCnpj(cnpj: string) {
+    return this.repository.findByCnpj(cnpj);
+  }
+
   cadastrar(dto: EmpresaDto) {
     return this.repository.create(dto);
   }

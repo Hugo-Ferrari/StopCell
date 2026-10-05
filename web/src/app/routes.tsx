@@ -10,6 +10,7 @@ import MainLayout from "@/layouts/MainLayout";
 import Historico from "@/pages/history/History";
 import Estoque from "@/pages/orders/pages/Stock";
 import Configuracoes from "@/pages/settings/Settings";
+import StoreSettings from "@/pages/settings/StoreSettings";
 
 export function AppRoutes() {
   return (
@@ -28,6 +29,7 @@ export function AppRoutes() {
         <Route path="/ordemServico/:numOs" element={<DetalhesOrdemServico />} />
         <Route path="/historico" element={<Historico />} />
         <Route path="/configuracoes" element={<Configuracoes />} />
+        <Route path="/configuracoes/loja" element={<StoreSettings />} />
       </Route>
     </Routes>
   );

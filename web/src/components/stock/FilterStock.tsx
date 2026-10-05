@@ -1,6 +1,6 @@
 "use client ";
 import type { PecaDTO } from "@/services/pecaService";
-import React, { useState } from "react";
+import { useState } from "react";
 
 type Props = {
   peca: PecaDTO[];
