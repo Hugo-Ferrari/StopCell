@@ -6,7 +6,6 @@ datasource db {
   provider = "postgresql"
 }
 
-// O Enum customizado
 enum FormaPagamento {
   PIX
   CARTAO
@@ -29,6 +28,7 @@ model Empresa {
   servicos      Servico[]
   pecas         Peca[]
   checklists    Checklist[]
+  despesas      Despesa[]
 
   @@map("empresa")
 }
@@ -84,7 +84,6 @@ model Peca {
   cnpjEmpresa String   @map("cnpj_empresa") @db.VarChar(14)
   descricao   String?  @db.VarChar(150)
   valor       Decimal? @db.Decimal(10, 2)
-  quantidade  Int?
 
   empresa Empresa   @relation(fields: [cnpjEmpresa], references: [cnpj])
   itensOs ItensOs[]
@@ -108,12 +107,16 @@ model Usuario {
   cnpjEmpresa  String? @map("cnpj_empresa") @db.VarChar(14)
   nome         String? @db.VarChar(100)
   login        String? @db.VarChar(50)
-  emailUsuario String? @unique @map("email_usuario") @db.VarChar(100) // O Unique dele!
+  emailUsuario String? @unique @map("email_usuario") @db.VarChar(100)
   senha        String? @db.VarChar(255)
   nivelAcesso  String? @map("nivel_acesso") @db.VarChar(20)
 
   empresa       Empresa?       @relation(fields: [cnpjEmpresa], references: [cnpj])
   ordensServico OrdemServico[]
+
+  logsLogin         LogLogin[]
+  tokensRecuperacao TokenRecuperacaoSenha[]
+  despesas          Despesa[]
 
   @@map("usuario")
 }
@@ -212,12 +215,10 @@ model Pagamento {
   dtPagamento    DateTime?       @map("dt_pagamento")
   formaPagamento FormaPagamento? @map("forma_pagamento")
 
-  // Campos de PIX 
   chavePix String? @map("chave_pix") @db.VarChar(100)
   txid     String? @db.VarChar(100)
   qrCode   String? @map("qr_code") @db.Text
 
-  // Campos de Cartão 
   numParcelas    Int?    @map("num_parcelas")
   bandeira       String? @db.VarChar(50)
   tipoCartao     String? @map("tipo_cartao") @db.VarChar(20)
@@ -241,4 +242,45 @@ model LogNotificacao {
   cliente      Cliente      @relation(fields: [cpfCliente], references: [cpf])
 
   @@map("log_notificacao")
+}
+
+model TokenRecuperacaoSenha {
+  idToken   String   @id @default(uuid()) @map("id_token")
+  idUsuario Int      @map("id_usuario")
+  token     String   @db.VarChar(6)
+  expiraEm  DateTime @map("expira_em")
+  usado     Boolean  @default(false)
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  usuario Usuario @relation(fields: [idUsuario], references: [idUsuario])
+
+  @@index([idUsuario, token])
+  @@map("token_recuperacao_senha")
+}
+
+model LogLogin {
+  idLogLogin   Int      @id @default(autoincrement()) @map("id_log_login")
+  idUsuario    Int?     @map("id_usuario")
+  emailTentado String   @map("email_tentado") @db.VarChar(100)
+  sucesso      Boolean
+  dataHora     DateTime @default(now()) @map("data_hora")
+  ipOrigem     String?  @map("ip_origem") @db.VarChar(45)
+
+  usuario Usuario? @relation(fields: [idUsuario], references: [idUsuario])
+
+  @@map("log_login")
+}
+
+model Despesa {
+  idDespesa   Int      @id @default(autoincrement()) @map("id_despesa")
+  cnpjEmpresa String   @map("cnpj_empresa") @db.VarChar(14)
+  descricao   String   @db.VarChar(150)
+  valor       Decimal  @db.Decimal(10, 2)
+  dataDespesa DateTime @default(now()) @map("data_despesa")
+  idUsuario   Int?     @map("id_usuario")
+
+  empresa Empresa  @relation(fields: [cnpjEmpresa], references: [cnpj])
+  usuario Usuario? @relation(fields: [idUsuario], references: [idUsuario])
+
+  @@map("despesa")
 }
