@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Req, Get, Query, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Req,
+  Get,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { PagamentoService } from './payment.service';
 import { PagamentoDto } from '@/type/payment.dto';
 
@@ -12,24 +20,23 @@ export class PagamentoController {
   }
 
   @Get()
-  buscaPagamento(@Query() @Req() req:any){
-    return this.service
+  buscaPagamento(@Req() req: any) {
+    return this.service.listarPagamento(req.userCnpjEmpresa);
   }
+
   @Get(':idPagamento')
-  buscarDetalhesDoPagamento(@Param('idPagamento') idPagamento:string, @Req() req:any){
-    return this.service.
+  buscarDetalhesDoPagamento(
+    @Param('idPagamento', ParseIntPipe) idPagamento: number,
+    @Req() req: any,
+  ) {
+    return this.service.buscarPorId(idPagamento, req.userCnpjEmpresa);
   }
 
   @Get('os/:numOs')
- listarPagamentoOs(@Param('numOs') numOs:string, @Req() req:any){
-  return this.service
- }
-
- @Get('os/:numOs/resumo')
- consultaTotalPagoESaldo(@Param('numOs') numOs:string, @Req() req: any){
-
- }
- 
-
-
+  listarPagamentoOs(
+    @Param('numOs', ParseIntPipe) numOs: number,
+    @Req() req: any,
+  ) {
+    return this.service.listarPorOs(numOs, req.userCnpjEmpresa);
+  }
 }
