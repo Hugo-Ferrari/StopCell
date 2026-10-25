@@ -1,37 +1,39 @@
+import { Link } from "react-router-dom";
 import { Smartphone } from "lucide-react";
-import type { OrdemServicoInterface } from "@/pages/history/History";
+import type { GrupoHistorico } from "@/utils/groupHistory";
+import { getStatusStyle } from "@/utils/statusStyle";
 
 interface DeviceBoxProps {
-  ordens: OrdemServicoInterface[];
+  aparelhos: GrupoHistorico[];
 }
 
-export default function DeviceBox({ ordens }: DeviceBoxProps) {
-  const getStatusStyle = (status: string) => {
-    if (status === "DIAGNOSTICO") return { bg: "bg-[#2A2215] border-yellow-700/50", text: "text-yellow-500", dot: "bg-yellow-500", label: "Em Diag." };
-    if (status === "FINALIZADO") return { bg: "bg-[#152A1A] border-green-700/50", text: "text-green-500", dot: "bg-green-500", label: "Finalizado" };
-    return { bg: "bg-[#1A1A1A] border-[#333333]", text: "text-zinc-300", dot: "bg-zinc-400", label: "Aguard. Peça" };
-  };
-
+export default function DeviceBox({ aparelhos }: DeviceBoxProps) {
   return (
     <div className="flex flex-col gap-4">
-      {ordens.map((os) => {
-        const style = getStatusStyle(os.status);
+      {aparelhos.map(({ chave, ultimaOs, totalServicos }) => {
+        const style = getStatusStyle(ultimaOs.status);
         return (
-          <div key={`aparelho-${os.numOs}`} className="flex items-center justify-between bg-[#0F0F0F] border border-[#222222] rounded-[24px] p-5 md:p-6 hover:border-[#333333] transition-colors cursor-pointer group">
-            <div className="flex items-center gap-5">
-              <div className="w-12 h-12 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center shrink-0 group-hover:border-[#F25C38]/50 transition-colors">
-                <Smartphone size={22} className="text-zinc-400" />
+          <Link
+            key={`aparelho-${chave}`}
+            to={`/ordemServico/${ultimaOs.numOs}`}
+            className="flex items-center justify-between gap-4 bg-card border border-border rounded-2xl p-4 sm:p-5 md:p-6 hover:border-primary/30 hover:bg-accent transition-colors group"
+          >
+            <div className="flex min-w-0 items-center gap-4 sm:gap-5">
+              <div className="w-12 h-12 rounded-full bg-muted border border-border flex items-center justify-center shrink-0 group-hover:border-primary/50 transition-colors">
+                <Smartphone size={22} className="text-muted-foreground" />
               </div>
-              <div className="flex flex-col">
-                <span className="text-white font-bold text-base md:text-lg leading-none mb-1.5">{os.aparelho.modelo}</span>
-                <span className="text-zinc-400 text-xs md:text-sm">{os.cliente.nmCompleto} • {new Date(os.dtEntrada).toLocaleDateString("pt-BR")}</span>
+              <div className="flex min-w-0 flex-col">
+                <span className="truncate text-foreground font-bold text-base md:text-lg leading-none mb-1.5">{ultimaOs.aparelho?.modelo || "Aparelho não informado"}</span>
+                <span className="truncate text-muted-foreground text-xs md:text-sm">
+                  {ultimaOs.cliente?.nmCompleto || "Cliente não informado"} • {totalServicos} {totalServicos === 1 ? "serviço" : "serviços"}
+                </span>
               </div>
             </div>
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-bold tracking-wide ${style.bg} ${style.text}`}>
+            <div className={`flex shrink-0 items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-full border text-[10px] sm:text-xs font-bold tracking-wide ${style.bg} ${style.text}`}>
               <div className={`w-1.5 h-1.5 rounded-full ${style.dot}`}></div>
-              {style.label}
+              <span className="hidden sm:inline">{style.label}</span>
             </div>
-          </div>
+          </Link>
         );
       })}
     </div>
