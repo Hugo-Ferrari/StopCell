@@ -50,6 +50,7 @@ export class OrdemServicoService {
       idUsuario: dto.idUsuario,
       diagnostico: dto.diagnostico,
       dtEntrada: new Date(),
+      vlTotal: new Prisma.Decimal(dto.vlTotal),
       status: 'ABERTA',
     });
   }

@@ -16,7 +16,7 @@ export class OrdemServicoRepository {
     atualizarStatus(numOs: number, status: string, cnpjEmpresa: string) {
         return this.prisma.ordemServico.update({
             where: { numOs, cnpjEmpresa },
-            data: { status },
+            data: { status, dtSaida: status === 'FINALIZADO' ? new Date() : undefined,},
         });
     }
     listar(cnpjEmpresa:string){
