@@ -1,19 +1,36 @@
-import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, IsDateString } from 'class-validator';
+import {
+  IsInt,
+  IsNumber,
+  IsEnum,
+  Min,
+  IsNotEmpty,
+  IsArray,
+  ValidateNested,
+  ArrayMinSize,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { FormaPagamento } from '@prisma/client';
+
+export class ItemPagamentoDto {
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0.01)
+  valorPago!: number;
+
+  @IsNotEmpty()
+  @IsEnum(FormaPagamento)
+  formaPagamento!: FormaPagamento;
+}
 
 export class PagamentoDto {
-    @IsInt()
-    @IsNotEmpty()
-    numOs: number =0
+  @IsInt()
+  @Min(1)
+  numOs!: number;
 
-    @IsNumber()
-    @IsNotEmpty()
-    valorPago: number =0
-
-    @IsString()
-    @IsOptional()
-    formaPagamento?: string;
-
-    @IsDateString()
-    @IsOptional()
-    dtPagamento?: Date;
+  @IsArray()
+  @ArrayMinSize(1, {
+    message: 'Informe pelo menos uma forma de pagamento',
+  })
+  @ValidateNested({ each: true })
+  @Type(() => ItemPagamentoDto)
+  pagamentos!: ItemPagamentoDto[];
 }

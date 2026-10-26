@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { OrdemServicoDto } from '@/type/service-order.dto';
 import { OrdemServicoRepository } from './service-order.repository';
 
 import * as puppeteer from 'puppeteer';
 import { gerarHtmlOrdemServico } from './service-order.template';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class OrdemServicoService {
@@ -45,16 +50,63 @@ export class OrdemServicoService {
       idUsuario: dto.idUsuario,
       diagnostico: dto.diagnostico,
       dtEntrada: new Date(),
+      vlTotal: new Prisma.Decimal(dto.vlTotal),
       status: 'ABERTA',
     });
   }
 
   async atualizarStatus(numOs: number, status: string, cnpjEmpresa: string) {
-    const os = await this.repository.findByNumOs(numOs, cnpjEmpresa);
+    if (!cnpjEmpresa) {
+      throw new BadRequestException('Empresa não identificada');
+    }
 
-    if (!os) return null;
+    return this.repository.executarTransacao(async (tx) => {
+      await this.repository.bloquearOs(tx, numOs, cnpjEmpresa);
 
-    return this.repository.atualizarStatus(numOs, status, cnpjEmpresa);
+      const os = await tx.ordemServico.findFirst({
+        where: { numOs, cnpjEmpresa },
+        select: {
+          numOs: true,
+          vlTotal: true,
+          status: true,
+          pagamentos: {
+            select: { valorPago: true },
+          },
+        },
+      });
+
+      if (!os) {
+        throw new NotFoundException('Ordem de serviço não encontrada');
+      }
+
+      if (status === 'FINALIZADO') {
+        if (os.status === 'FINALIZADO') {
+          throw new BadRequestException('Ordem de serviço já finalizada');
+        }
+
+        if (os.vlTotal === null || os.vlTotal.lessThanOrEqualTo(0)) {
+          throw new BadRequestException(
+            'A OS não possui um valor válido para finalização',
+          );
+        }
+
+        const totalPago = os.pagamentos.reduce(
+          (total, pagamento) =>
+            total.plus(pagamento.valorPago ?? new Prisma.Decimal(0)),
+          new Prisma.Decimal(0),
+        );
+
+        if (totalPago.lessThan(os.vlTotal)) {
+          const saldoRestante = os.vlTotal.minus(totalPago);
+
+          throw new BadRequestException(
+            `Não é possível finalizar a OS. Saldo pendente: R$ ${saldoRestante.toFixed(2)}`,
+          );
+        }
+      }
+
+      return this.repository.atualizarStatus(tx, numOs, status, cnpjEmpresa);
+    });
   }
 
   async listar(cnpjEmpresa: string) {
@@ -65,16 +117,16 @@ export class OrdemServicoService {
     return await this.repository.buscarPorNumOs(numOs, cnpjEmpresa);
   }
 
-  // add esse método para busca da ultima O.S pelo IMEI em casa de retrabalho 
+  // add esse método para busca da ultima O.S pelo IMEI em casa de retrabalho
   async buscarUltimaOsPorImei(imei: string, cnpjEmpresa: string) {
     const ultimaOs = await this.prisma.ordemServico.findFirst({
-      where: { 
+      where: {
         imeiAparelho: imei,
-        cnpjEmpresa: cnpjEmpresa
+        cnpjEmpresa: cnpjEmpresa,
       },
       orderBy: {
-        numOs: 'desc'
-      }
+        numOs: 'desc',
+      },
     });
 
     return ultimaOs;
