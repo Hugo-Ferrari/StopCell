@@ -1,3 +1,4 @@
+
 import {
   BadRequestException,
   Injectable,
@@ -16,46 +17,72 @@ export class PagamentoService {
       throw new BadRequestException('Empresa não identificada');
     }
 
-    const ordemServico = await this.repository.buscarOsParaPagamento(
-      dto.numOs,
-      cnpjEmpresa,
-    );
+    return this.repository.executarTransacao(async (tx) => {
+      // Bloqueia a OS enquanto validamos e registramos os pagamentos.
+      await this.repository.bloquearOs(tx, dto.numOs, cnpjEmpresa);
 
-    if (!ordemServico) {
-      throw new NotFoundException('Ordem de serviço não encontrada');
-    }
-
-    const totalOs = ordemServico.vlTotal;
-
-    if (totalOs === null || totalOs.lessThanOrEqualTo(0)) {
-      throw new BadRequestException(
-        'A ordem de serviço não possui um valor total válido',
+      const ordemServico = await this.repository.buscarOsParaPagamento(
+        tx,
+        dto.numOs,
+        cnpjEmpresa,
       );
-    }
 
-    const totalPago = ordemServico.pagamentos.reduce(
-      (acumulado, pagamento) =>
-        acumulado.plus(pagamento.valorPago ?? new Prisma.Decimal(0)),
-      new Prisma.Decimal(0),
-    );
+      if (!ordemServico) {
+        throw new NotFoundException('Ordem de serviço não encontrada');
+      }
 
-    const saldo = totalOs.minus(totalPago);
-    const valorSolicitado = new Prisma.Decimal(dto.valorPago);
+      if (ordemServico.status === 'FINALIZADO') {
+        throw new BadRequestException('Ordem de serviço finalizada');
+      }
 
-    if (saldo.lessThanOrEqualTo(0)) {
-      throw new BadRequestException('A ordem de serviço já está quitada');
-    }
+      const totalOs = ordemServico.vlTotal;
 
-    if (valorSolicitado.greaterThan(saldo)) {
-      throw new BadRequestException('O pagamento ultrapassa o saldo restante');
-    }
+      if (totalOs === null || totalOs.lessThanOrEqualTo(0)) {
+        throw new BadRequestException(
+          'A ordem de serviço não possui um valor total válido',
+        );
+      }
 
-    return this.repository.registrar(dto);
+      const totalPago = ordemServico.pagamentos.reduce(
+        (acumulado, pagamento) =>
+          acumulado.plus(
+            pagamento.valorPago ?? new Prisma.Decimal(0),
+          ),
+        new Prisma.Decimal(0),
+      );
+
+      const saldo = totalOs.minus(totalPago);
+
+      if (saldo.lessThanOrEqualTo(0)) {
+        throw new BadRequestException(
+          'A ordem de serviço já está quitada',
+        );
+      }
+
+      const totalSolicitado = dto.pagamentos.reduce(
+        (acumulado, pagamento) =>
+          acumulado.plus(new Prisma.Decimal(pagamento.valorPago)),
+        new Prisma.Decimal(0),
+      );
+
+      if (totalSolicitado.greaterThan(saldo)) {
+        throw new BadRequestException(
+          'A soma dos pagamentos ultrapassa o saldo restante',
+        );
+      }
+
+      return this.repository.registrarVarios(
+        tx,
+        dto.numOs,
+        dto.pagamentos,
+      );
+    });
   }
 
   async listarPagamento(cnpjEmpresa: string) {
     return this.repository.listarPagamentos(cnpjEmpresa);
   }
+
   async buscarPorId(idPagamento: number, cnpjEmpresa: string) {
     if (idPagamento <= 0) {
       throw new BadRequestException('ID de pagamento inválido');
@@ -72,6 +99,7 @@ export class PagamentoService {
 
     return pagamento;
   }
+
   async listarPorOs(numOs: number, cnpjEmpresa: string) {
     if (numOs <= 0) {
       throw new BadRequestException('Número da OS inválido');

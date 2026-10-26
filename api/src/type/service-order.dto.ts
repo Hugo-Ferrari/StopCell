@@ -16,6 +16,7 @@ export class OrdemServicoDto {
 
     @IsInt()
     @IsNotEmpty()
+    @Min(1)
     idUsuario: number=0
 
     @IsString()

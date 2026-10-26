@@ -56,49 +56,57 @@ export class OrdemServicoService {
   }
 
   async atualizarStatus(numOs: number, status: string, cnpjEmpresa: string) {
-    const os = await this.repository.findByNumOs(numOs, cnpjEmpresa);
+    if (!cnpjEmpresa) {
+      throw new BadRequestException('Empresa não identificada');
+    }
 
-    if (!os) return null;
+    return this.repository.executarTransacao(async (tx) => {
+      await this.repository.bloquearOs(tx, numOs, cnpjEmpresa);
 
-    if (status === 'FINALIZADO') {
-      const osComPagamentos = await this.prisma.ordemServico.findFirst({
-        where: {
-          numOs,
-          cnpjEmpresa,
-        },
+      const os = await tx.ordemServico.findFirst({
+        where: { numOs, cnpjEmpresa },
         select: {
+          numOs: true,
           vlTotal: true,
+          status: true,
           pagamentos: {
-            select: {
-              valorPago: true,
-            },
+            select: { valorPago: true },
           },
         },
       });
-      if (
-        !osComPagamentos ||
-        osComPagamentos.vlTotal === null ||
-        osComPagamentos.vlTotal.lessThanOrEqualTo(0)
-      ) {
-        throw new BadRequestException(
-          'A OS não possui um valor válido para finalização',
-        );
-      }
-      const totalPago = osComPagamentos.pagamentos.reduce(
-        (total, pagamento) =>
-          total.plus(pagamento.valorPago ?? new Prisma.Decimal(0)),
-        new Prisma.Decimal(0),
-      );
 
-      if (totalPago.lessThan(osComPagamentos.vlTotal)) {
-        const saldorestante = osComPagamentos.vlTotal.minus(totalPago);
-
-        throw new BadRequestException(
-          `não é possivel finalizar a OS. Saldo pendente: R$ ${saldorestante.toFixed(2)}`,
-        );
+      if (!os) {
+        throw new NotFoundException('Ordem de serviço não encontrada');
       }
-    }
-    return this.repository.atualizarStatus(numOs, status, cnpjEmpresa);
+
+      if (status === 'FINALIZADO') {
+        if (os.status === 'FINALIZADO') {
+          throw new BadRequestException('Ordem de serviço já finalizada');
+        }
+
+        if (os.vlTotal === null || os.vlTotal.lessThanOrEqualTo(0)) {
+          throw new BadRequestException(
+            'A OS não possui um valor válido para finalização',
+          );
+        }
+
+        const totalPago = os.pagamentos.reduce(
+          (total, pagamento) =>
+            total.plus(pagamento.valorPago ?? new Prisma.Decimal(0)),
+          new Prisma.Decimal(0),
+        );
+
+        if (totalPago.lessThan(os.vlTotal)) {
+          const saldoRestante = os.vlTotal.minus(totalPago);
+
+          throw new BadRequestException(
+            `Não é possível finalizar a OS. Saldo pendente: R$ ${saldoRestante.toFixed(2)}`,
+          );
+        }
+      }
+
+      return this.repository.atualizarStatus(tx, numOs, status, cnpjEmpresa);
+    });
   }
 
   async listar(cnpjEmpresa: string) {

@@ -1,28 +1,84 @@
+
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PagamentoDto } from '@/type/payment.dto';
+import { ItemPagamentoDto } from '@/type/payment.dto';
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PagamentoRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  registrar(dto: PagamentoDto) {
-    return this.prisma.pagamento.create({
-      data: {
-        numOs: dto.numOs,
-        valorPago: dto.valorPago,
-        formaPagamento: dto.formaPagamento,
-        dtPagamento: new Date(),
-      },
-    });
+  async executarTransacao<T>(
+    operacao: (tx: Prisma.TransactionClient) => Promise<T>,
+  ): Promise<T> {
+    const maxTentativas = 3;
+
+    for (let tentativa = 1; tentativa <= maxTentativas; tentativa++) {
+      try {
+        return await this.prisma.$transaction(
+          async (tx) => operacao(tx),
+          {
+            isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+          },
+        );
+      } catch (erro) {
+        const conflitoDeConcorrencia =
+          erro instanceof Prisma.PrismaClientKnownRequestError &&
+          erro.code === 'P2034';
+
+        if (!conflitoDeConcorrencia || tentativa === maxTentativas) {
+          throw erro;
+        }
+      }
+    }
+
+    throw new Error('Não foi possível concluir a transação.');
   }
 
-  buscarOsParaPagamento(numOs: number, cnpjEmpresa: string) {
-    return this.prisma.ordemServico.findFirst({
+  async bloquearOs(
+    tx: Prisma.TransactionClient,
+    numOs: number,
+    cnpjEmpresa: string,
+  ): Promise<void> {
+    await tx.$queryRaw`
+      SELECT num_os
+      FROM ordem_servico
+      WHERE num_os = ${numOs}
+        AND cnpj_empresa = ${cnpjEmpresa}
+      FOR UPDATE
+    `;
+  }
+
+  registrarVarios(
+    tx: Prisma.TransactionClient,
+    numOs: number,
+    pagamentos: ItemPagamentoDto[],
+  ) {
+    return Promise.all(
+      pagamentos.map((pagamento) =>
+        tx.pagamento.create({
+          data: {
+            numOs,
+            valorPago: pagamento.valorPago,
+            formaPagamento: pagamento.formaPagamento,
+            dtPagamento: new Date(),
+          },
+        }),
+      ),
+    );
+  }
+
+  buscarOsParaPagamento(
+    tx: Prisma.TransactionClient,
+    numOs: number,
+    cnpjEmpresa: string,
+  ) {
+    return tx.ordemServico.findFirst({
       where: { numOs, cnpjEmpresa },
       select: {
         numOs: true,
         vlTotal: true,
+        status: true,
         pagamentos: {
           select: {
             valorPago: true,
@@ -35,16 +91,17 @@ export class PagamentoRepository {
   listarPagamentos(cnpjEmpresa: string) {
     return this.prisma.pagamento.findMany({
       where: {
-        ordemServico: {
-          cnpjEmpresa,
-        },
+        ordemServico: { cnpjEmpresa },
       },
     });
   }
 
   buscarPorId(idPagamento: number, cnpjEmpresa: string) {
     return this.prisma.pagamento.findFirst({
-      where: { idPagamento, ordemServico: { cnpjEmpresa } },
+      where: {
+        idPagamento,
+        ordemServico: { cnpjEmpresa },
+      },
     });
   }
 
@@ -52,9 +109,7 @@ export class PagamentoRepository {
     return this.prisma.pagamento.findMany({
       where: {
         numOs,
-        ordemServico: {
-          cnpjEmpresa,
-        },
+        ordemServico: { cnpjEmpresa },
       },
       orderBy: {
         dtPagamento: 'desc',
