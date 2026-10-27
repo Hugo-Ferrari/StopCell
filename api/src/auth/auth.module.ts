@@ -5,10 +5,12 @@ import { AuthService } from './auth.service';
 import { EmpresaRepository } from '@/enterprise/enterprise.repository';
 import { UsuarioRepository } from '@/user/user.repository';
 import { PrismaService } from '@/prisma/prisma.service';
+import { MailModule } from '@/mail/mail.module';
 
 
 @Module({
   imports: [
+    MailModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: {

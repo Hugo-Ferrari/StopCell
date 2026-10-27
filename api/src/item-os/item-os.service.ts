@@ -49,9 +49,6 @@ export class ItemOsService {
       if (!peca) {
         throw new NotFoundException('Peça não encontrada para esta empresa');
       }
-      if ((peca.quantidade ?? 0) < dto.quantidade) {
-        throw new BadRequestException('Estoque insuficiente para esta peça'); // a peça precisa subtrair no estoque quando for colocada no itens-os
-      }
     }
 
     return await this.repository.registrar(dto);

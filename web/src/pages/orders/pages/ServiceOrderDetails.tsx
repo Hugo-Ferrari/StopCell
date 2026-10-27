@@ -14,7 +14,6 @@ function DetalhesOrdemServico() {
   // colocar quantidade para os valores dasa peças se multiplicarem e colocar o valor total, acho que a descrição da peça e da mão de obra vai ser irrelevante(caso nn for, adicionar)
   const [descricao] = useState("");
   const [valorPeca, setValorPeca] = useState(0);
-  const [quantidade] = useState(1);
 
   const [valorServico, setValorServico] = useState(0);
   async function HandleSubmit() {
@@ -22,7 +21,6 @@ function DetalhesOrdemServico() {
       const data: PecaDto = {
         descricao,
         valor: valorPeca,
-        quantidade,
       };
       const dataServico: Servico = {
         descricao,

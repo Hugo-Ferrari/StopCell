@@ -17,7 +17,7 @@ export class PecaController {
   }
 
   @Get()
-  verificarEstoque(@Req() req: any) {
-    return this.service.verificarEstoque(req.userCnpjEmpresa);
+  listar(@Req() req: any) {
+    return this.service.listar(req.userCnpjEmpresa);
   }
 }

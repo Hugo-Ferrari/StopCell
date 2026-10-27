@@ -8,7 +8,6 @@ function NewPeca() {
 
   const [valor, setValor] = useState(0);
   const [descricao, setDescricao] = useState("");
-  const [quantidade, setQuantidade] = useState(0);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -17,13 +16,11 @@ function NewPeca() {
       await criandoPeca({
         descricao,
         valor,
-        quantidade,
       });
 
       setOpenModal(false);
       setDescricao("");
       setValor(0);
-      setQuantidade(0);
     } catch (error) {
       console.error("Erro ao criar peça:", error);
     }
@@ -89,22 +86,6 @@ function NewPeca() {
                   step="0.01"
                   min=""
                   placeholder="0,00"
-                  className="rounded-lg border border-border bg-background px-3 py-2 outline-none focus:ring-2"
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label htmlFor="quantidade" className="text-sm font-medium">
-                  Quantidade
-                </label>
-
-                <input
-                  id="quantidade"
-                  value={quantidade}
-                  onChange={(e) => setQuantidade(Number(e.target.value))}
-                  type="number"
-                  min="0"
-                  placeholder="0"
                   className="rounded-lg border border-border bg-background px-3 py-2 outline-none focus:ring-2"
                 />
               </div>

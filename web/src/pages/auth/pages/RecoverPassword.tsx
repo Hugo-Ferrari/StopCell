@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
+import { isAxiosError } from 'axios'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Mail, KeyRound, Lock, Loader2 } from 'lucide-react'
 import Marca from '@/components/common/Mark'
@@ -6,6 +7,14 @@ import FormInput from '@/components/common/FormInput'
 import { esqueceuSenha, redefinirSenha } from '../authService'
 
 type Etapa = 'email' | 'codigo'
+
+const ESPERA_REENVIO_SEG = 60
+
+function mensagemDeErro(error: unknown, padrao: string) {
+    if (!isAxiosError(error)) return padrao
+    const message = error.response?.data?.message
+    return Array.isArray(message) ? message.join('\n') : message || padrao
+}
 
 function RecuperarSenha() {
     const navigate = useNavigate()
@@ -17,6 +26,13 @@ function RecuperarSenha() {
     const [novaSenha, setNovaSenha] = useState('')
     const [confirmarNovaSenha, setConfirmarNovaSenha] = useState('')
     const [confirmarTocado, setConfirmarTocado] = useState(false)
+    const [espera, setEspera] = useState(0)
+
+    useEffect(() => {
+        if (espera <= 0) return
+        const timer = setTimeout(() => setEspera((s) => s - 1), 1000)
+        return () => clearTimeout(timer)
+    }, [espera])
 
     const erroConfirmar = confirmarTocado && confirmarNovaSenha.length > 0 && novaSenha !== confirmarNovaSenha
         ? 'As senhas não coincidem'
@@ -28,8 +44,23 @@ function RecuperarSenha() {
         try {
             await esqueceuSenha(email)
             setEtapa('codigo')
-        } catch (error: any) {
-            alert(error.response?.data?.message || 'Erro ao enviar o código. Tente novamente.')
+            setEspera(ESPERA_REENVIO_SEG)
+        } catch (error) {
+            alert(mensagemDeErro(error, 'Erro ao enviar o código. Tente novamente.'))
+        } finally {
+            setCarregando(false)
+        }
+    }
+
+    async function handleReenviar() {
+        if (espera > 0 || carregando) return
+        setCarregando(true)
+        try {
+            await esqueceuSenha(email)
+            setEspera(ESPERA_REENVIO_SEG)
+            alert('Código reenviado! Verifique seu e-mail.')
+        } catch (error) {
+            alert(mensagemDeErro(error, 'Erro ao reenviar o código. Tente novamente.'))
         } finally {
             setCarregando(false)
         }
@@ -48,8 +79,8 @@ function RecuperarSenha() {
             await redefinirSenha({ email, codigo, novaSenha })
             alert('Senha redefinida com sucesso! Faça login com a nova senha.')
             navigate('/')
-        } catch (error: any) {
-            alert(error.response?.data?.message || 'Código inválido ou expirado.')
+        } catch (error) {
+            alert(mensagemDeErro(error, 'Código inválido ou expirado.'))
         } finally {
             setCarregando(false)
         }
@@ -145,10 +176,11 @@ function RecuperarSenha() {
                     </button>
                     <button
                         type="button"
-                        onClick={() => setEtapa('email')}
-                        className="text-sm text-zinc-400 hover:text-white transition-colors"
+                        onClick={handleReenviar}
+                        disabled={espera > 0 || carregando}
+                        className="text-sm text-zinc-400 hover:text-white transition-colors disabled:opacity-50 disabled:hover:text-zinc-400"
                     >
-                        Não recebeu o código? Reenviar
+                        {espera > 0 ? `Reenviar código em ${espera}s` : 'Não recebeu o código? Reenviar'}
                     </button>
                 </form>
             )}

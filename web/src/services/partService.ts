@@ -3,7 +3,6 @@ import api from "@/api/api";
 export interface PecaDto {
   valor: number;
   descricao?: string;
-  quantidade?: number;
 }
 
 export async function criandoPeca(data: PecaDto) {

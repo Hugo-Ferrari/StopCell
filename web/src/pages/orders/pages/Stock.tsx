@@ -4,7 +4,7 @@ import CardStock from "@/components/stock/CardStock";
 import FilterStock from "@/components/stock/FilterStock";
 import NewPeca from "@/components/stock/NewPeca";
 import { listarPeca, type PecaDTO } from "@/services/pecaService";
-import { AlertTriangle, Boxes, ClipboardList, DollarSign } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 import { useEffect, useState } from "react";
 
 
@@ -25,17 +25,6 @@ function Estoque() {
     carregarPecas();
   }, []);
 
-  const unidadesEstoque = peca.reduce(
-    (total, item) => total + item.quantidade,
-    0,
-  );
-  const estoqueBaixo = peca.filter(
-    (item) => item.quantidade > 0 && item.quantidade <= 5,
-  );
-  const valorInvestido = peca.reduce(
-    (total, item) => total + item.quantidade * item.valor,
-    0,
-  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -52,24 +41,6 @@ function Estoque() {
           text="ITENS CADASTRADO"
           icons={ClipboardList}
           valor={peca.length}
-        />
-
-        <CardStock
-          text="UNIDADE EM ESTOQUE"
-          icons={Boxes}
-          valor={unidadesEstoque}
-        />
-
-        <CardStock
-          text="ESTOQUE BAIXO"
-          icons={AlertTriangle}
-          valor={estoqueBaixo.length}
-        />
-
-        <CardStock
-          text="VALOR INVESTIDO"
-          icons={DollarSign}
-          valor={valorInvestido}
         />
         <NewPeca/>
       </div>

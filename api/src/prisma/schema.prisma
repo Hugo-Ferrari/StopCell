@@ -245,12 +245,13 @@ model LogNotificacao {
 }
 
 model TokenRecuperacaoSenha {
-  idToken   String   @id @default(uuid()) @map("id_token")
-  idUsuario Int      @map("id_usuario")
-  token     String   @db.VarChar(6)
-  expiraEm  DateTime @map("expira_em")
-  usado     Boolean  @default(false)
-  criadoEm  DateTime @default(now()) @map("criado_em")
+  idToken    String   @id @default(uuid()) @map("id_token")
+  idUsuario  Int      @map("id_usuario")
+  token      String   @db.VarChar(255)
+  tentativas Int      @default(0)
+  expiraEm   DateTime @map("expira_em")
+  usado      Boolean  @default(false)
+  criadoEm   DateTime @default(now()) @map("criado_em")
 
   usuario Usuario @relation(fields: [idUsuario], references: [idUsuario])
 
