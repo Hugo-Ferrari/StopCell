@@ -1,24 +1,25 @@
 // empresa/empresa.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EmpresaRepository } from './enterprise.repository';
-import { EmpresaDto } from '@/type/enterprise.dto';
+import { EmpresaDto, UpdateEmpresaDTO } from '@/type/enterprise.dto';
 
 @Injectable()
 export class EmpresaService {
   constructor(private readonly repository: EmpresaRepository) {}
 
-  buscarPorCnpj(cnpj: string) {
-    return this.repository.findByCnpj(cnpj);
-  }
+  async buscarPorCnpj(cnpj: string) {
+  const empresa = await this.repository.findByCnpj(cnpj);
+  if (!empresa)
+    throw new NotFoundException(`Empresa com CNPJ ${cnpj} não encontrada`);
+  return empresa;
+}
 
   cadastrar(dto: EmpresaDto) {
     return this.repository.create(dto);
   }
 
-  async atualizar(cnpj: string, dto: EmpresaDto, cnpjEmpresa: string) {
-    const empresa = await this.repository.findByCnpj(cnpj);
-    if (!empresa)
-      throw new NotFoundException(`Empresa com CNPJ ${cnpj} não encontrada`);
-    return this.repository.update(cnpj, dto, cnpjEmpresa);
-  }
+  async atualizar(cnpj: string, dto: UpdateEmpresaDTO) {
+  await this.buscarPorCnpj(cnpj);
+  return this.repository.update(cnpj, dto);
+}
 }
