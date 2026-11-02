@@ -1,37 +1,66 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { User, Lock, Loader2, Sun, Moon } from "lucide-react";
+import { User, Lock, Loader2, Sun, Moon, Eye, EyeOff } from "lucide-react";
+import { isAxiosError } from "axios";
 
 import Marca from "@/components/common/Mark";
+import LoginErrorMessage, { type ErroLogin } from "@/components/auth/LoginErrorMessage";
 import { login, salvarToken } from "../authService";
+
+// depois de quantas senhas erradas aparece o link de "Esqueceu a senha"
+const TENTATIVAS_ATE_SUGERIR_RECUPERACAO = 3;
 
 function Login() {
   const navigate = useNavigate();
 
   const [emailUsuario, setEmailUsuario] = useState("");
   const [senha, setSenha] = useState("");
+  const [mostrarSenha, setMostrarSenha] = useState(false);
   const [lembrar, setLembrar] = useState(false);
   const [carregando, setCarregando] = useState(false);
-  const [erro, setErro] = useState("");
+  const [erro, setErro] = useState<ErroLogin | null>(null);
+  // conta as senhas erradas seguidas pro mesmo e-mail
+  const [senhasErradas, setSenhasErradas] = useState(0);
   const [tema, setTema] = useState<"claro" | "escuro">("escuro");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setErro("");
+    setErro(null);
+
+    if (!emailUsuario.trim() || !senha) {
+      setErro({ tipo: "outro", mensagem: "Preencha o e-mail e a senha." });
+      return;
+    }
+
     setCarregando(true);
 
     try {
-      const data = await login(emailUsuario, senha);
+      const data = await login(emailUsuario.trim(), senha);
 
       salvarToken(data.token, lembrar);
+      setSenhasErradas(0);
 
       navigate("/ordemServico");
     } catch (err: unknown) {
-      const status = (err as { response?: { status?: number } })?.response?.status;
-      if (status === 401) {
-        setErro("Usuário ou senha inválidos.");
+      // o back manda um "codigo" dizendo exatamente o que deu errado
+      const codigo = isAxiosError(err) ? err.response?.data?.codigo : undefined;
+
+      if (codigo === "EMAIL_NAO_CADASTRADO") {
+        setSenhasErradas(0);
+        setErro({ tipo: "emailNaoCadastrado" });
+      } else if (codigo === "SENHA_INCORRETA") {
+        const total = senhasErradas + 1;
+        setSenhasErradas(total);
+        setErro({
+          tipo: total >= TENTATIVAS_ATE_SUGERIR_RECUPERACAO ? "senhaIncorretaRepetida" : "senhaIncorreta",
+        });
       } else {
-        setErro("Não foi possível logar. Tente novamente.");
+        // usuário desativado, api fora do ar, etc.
+        const mensagemApi = isAxiosError(err) ? err.response?.data?.message : undefined;
+        setErro({
+          tipo: "outro",
+          mensagem: typeof mensagemApi === "string" ? mensagemApi : "Não foi possível entrar. Tente novamente.",
+        });
       }
     } finally {
       setCarregando(false);
@@ -104,7 +133,11 @@ function Login() {
                 autoComplete="username"
                 placeholder="Digite seu e-mail"
                 value={emailUsuario}
-                onChange={(e) => setEmailUsuario(e.target.value)}
+                onChange={(e) => {
+                  setEmailUsuario(e.target.value);
+                  // trocou de e-mail, começa a contar de novo
+                  setSenhasErradas(0);
+                }}
                 required
                 className=" w-full rounded-full border border-border bg-card py-3 pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/30"
               />
@@ -124,15 +157,27 @@ function Login() {
 
               <input
                 id="senha"
-                type="password"
+                // alterna entre bolinhas e texto quando clica no olho
+                type={mostrarSenha ? "text" : "password"}
                 name="senha"
                 autoComplete="current-password"
                 placeholder="••••••••"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
                 required
-                className="w-full rounded-full border border-border bg-card py-3 pl-11 pr-4 text-sm text-foregro placeholder:text-muted-foregroun outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/30"
+                className="w-full rounded-full border border-border bg-card py-3 pl-11 pr-12 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/30"
               />
+
+              <button
+                // type="button" pra não enviar o formulário quando clicar no olho
+                type="button"
+                onClick={() => setMostrarSenha((m) => !m)}
+                aria-label={mostrarSenha ? "Esconder senha" : "Mostrar senha"}
+                title={mostrarSenha ? "Esconder senha" : "Mostrar senha"}
+                className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary"
+              >
+                {mostrarSenha ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
             </div>
           </div>
 
@@ -153,13 +198,7 @@ function Login() {
             </span>
           </label>
 
-          {erro && (
-            <div
-              role="alert"
-              className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-              {erro}
-            </div>
-          )}
+          <LoginErrorMessage erro={erro} />
 
           <button
             type="submit"

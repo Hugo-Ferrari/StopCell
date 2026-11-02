@@ -13,16 +13,20 @@ import {
 import type { Response } from 'express';
 import { OrdemServicoService } from './service-order.service';
 import { OrdemServicoDto } from '@/type/service-order.dto';
+import { Permissao } from '@/common/decorators/permissao.decorator'; // <- novo
+import { PERMISSOES } from '@/common/permissoes/catalogo'; // <- novo
 
 @Controller('ordemServico')
 export class OrdemServicoController {
   constructor(private readonly service: OrdemServicoService) {}
 
+  @Permissao(PERMISSOES.ORDENS_EDITAR) // <- novo
   @Post()
   abrir(@Body() dto: OrdemServicoDto, @Req() req: any) {
     return this.service.abrir(dto, req.userCnpjEmpresa);
   }
 
+  @Permissao(PERMISSOES.ORDENS_EDITAR) // <- novo
   @Patch(':numOs/status')
   async atualizarStatus(
     @Param('numOs') numOs: string,
@@ -42,12 +46,14 @@ export class OrdemServicoController {
     return resposta;
   }
 
+  @Permissao(PERMISSOES.ORDENS_VER, PERMISSOES.HISTORICO_VER) // <- novo
   @Get()
   listar(@Req() req: any) {
     return this.service.listar(req.userCnpjEmpresa);
   }
 
   // ROTA NOVA: Busca a última O.S. vinculada ao IMEI para preencher retrabalho
+  @Permissao(PERMISSOES.ORDENS_VER, PERMISSOES.HISTORICO_VER) // <- novo
   @Get('aparelho/:imei/ultima')
   async buscarUltimaOsPorImei(@Param('imei') imei: string, @Req() req: any) {
     const ultimaOs = await this.service.buscarUltimaOsPorImei(
@@ -64,6 +70,7 @@ export class OrdemServicoController {
     return ultimaOs;
   }
 
+  @Permissao(PERMISSOES.ORDENS_VER, PERMISSOES.HISTORICO_VER) // <- novo
   @Get(':numOs')
   async buscarPorNumOs(@Param('numOs') numOs: string, @Req() req: any) {
     const os = await this.service.buscarPorNumOs(+numOs, req.userCnpjEmpresa);
@@ -75,6 +82,7 @@ export class OrdemServicoController {
     return os;
   }
 
+  @Permissao(PERMISSOES.ORDENS_VER, PERMISSOES.HISTORICO_VER) // <- novo
   @Get(':numOs/pdf')
   async gerarPdf(
     @Param('numOs') numOs: string,

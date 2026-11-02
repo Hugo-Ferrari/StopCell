@@ -12,6 +12,7 @@ function Header() {
     "/fornecedores": "Fornecedores",
     "/configuracoes": "Configurações",
     "/configuracoes/loja": "Dados da Loja",
+    "/configuracoes/usuarios": "Usuários e Permissões", // <- novo
     "/estoque" : "Estoque",
   };
 

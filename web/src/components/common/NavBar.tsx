@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import {
-  ClipboardList,
-  Menu,
-  RotateCcw,
-  Settings,
-  Wallet,
-  Warehouse,
-  X,
-} from "lucide-react";
+import { Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
+import { MENU_ITENS } from "@/config/menuItens";
+import { useUsuario } from "@/hooks/useUsuario";
 
+interface NavBarProps {
+  /** só vale no desktop: menu fininho, só com os ícones */
+  recolhido: boolean;
+  onAlternar: () => void;
+}
 
-function NavBar() {
+function NavBar({ recolhido, onAlternar }: NavBarProps) {
   const location = useLocation();
+  const { pode, carregando } = useUsuario();
 
   const [aberta, setAberta] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
@@ -39,44 +39,22 @@ function NavBar() {
 
   const sidebarAberta = isDesktop || aberta;
 
+  // no celular o menu é a gaveta que abre por cima, então nunca fica recolhido
+  const compacto = isDesktop && recolhido;
+
   const fecharMenu = () => {
     if (!isDesktop) {
       setAberta(false);
     }
   };
 
-  const menuItens = [
-    {
-      icon: <ClipboardList size={20} />,
-      text: "Ordens de Serviço",
-      subtext: "Cadastre e acompanhe serviços",
-      path: "/ordemServico",
-    },
-    {
-      icon: <RotateCcw size={20} />,
-      text: "Histórico",
-      subtext: "Visualize serviços anteriores",
-      path: "/historico",
-    },
-    {
-      icon: <Warehouse size={20} />,
-      text: "Estoque",
-      subtext: "Gerencie seu Estoque",
-      path: "/estoque",
-    },
-    {
-      icon: <Wallet size={20} />,
-      text: "Financeiro",
-      subtext: "Receitas e despesas",
-      path: "/financeiro",
-    },
-    {
-      icon: <Settings size={20} />,
-      text: "Configurações",
-      subtext: "Personalize o sistema",
-      path: "/configuracoes",
-    },
-  ];
+  // esconde o que o perfil do usuário não libera
+  // (enquanto carrega o usuário, não mostra nada pra não "piscar" itens proibidos)
+  const menuItens = carregando
+    ? []
+    : MENU_ITENS.filter((item) => !item.permissoes || pode(...item.permissoes));
+
+  const larguraAside = !sidebarAberta ? "w-0 overflow-hidden" : compacto ? "w-20" : "w-64";
 
   return (
     <>
@@ -92,6 +70,7 @@ function NavBar() {
       {!isDesktop && (
         <button
           onClick={() => setAberta(true)}
+          aria-label="Abrir menu"
           className="fixed left-4 top-5 z-50 rounded-lg bg-card p-2 shadow-md"
         >
           <Menu size={22} />
@@ -99,15 +78,27 @@ function NavBar() {
       )}
 
       <aside
-        className={`fixed top-0 left-0 z-50 flex h-screen flex-col border-r border-border bg-card shadow-xl transition-all duration-300 ${sidebarAberta ? "w-64" : "w-0 overflow-hidden"} `}
+        className={`fixed top-0 left-0 z-50 flex h-screen flex-col border-r border-border bg-card shadow-xl transition-all duration-300 ${larguraAside}`}
       >
 
-        <div className="flex items-center justify-between border-b border-border p-5">
-
-
-          {!isDesktop && (
+        <div
+          className={`flex h-20 shrink-0 items-center border-b border-border px-5 ${
+            compacto ? "justify-center" : "justify-end"
+          }`}
+        >
+          {isDesktop ? (
+            <button
+              onClick={onAlternar}
+              aria-label={recolhido ? "Expandir menu" : "Recolher menu"}
+              title={recolhido ? "Expandir menu" : "Recolher menu"}
+              className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              {recolhido ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
+            </button>
+          ) : (
             <button
               onClick={() => setAberta(false)}
+              aria-label="Fechar menu"
               className="rounded-lg p-2 hover:bg-accent"
             >
               <X size={20} />
@@ -115,7 +106,7 @@ function NavBar() {
           )}
         </div>
 
-        <nav className="flex-1 overflow-y-auto p-3">
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden p-3">
           {menuItens.map((item) => {
             const ativo = location.pathname === item.path;
 
@@ -124,7 +115,11 @@ function NavBar() {
                 key={item.path}
                 to={item.path}
                 onClick={fecharMenu}
-                className={` mb-2 flex items-center gap-4 rounded-xl p-3 transition-all
+                // recolhido, o nome aparece quando passa o mouse
+                title={compacto ? item.text : undefined}
+                aria-label={compacto ? item.text : undefined}
+                className={` mb-2 flex items-center rounded-xl p-3 transition-all
+                  ${compacto ? "justify-center" : "gap-4"}
                   ${ativo
                     ? "bg-primary text-primary-foreground"
                     : "hover:bg-accent"
@@ -141,18 +136,20 @@ function NavBar() {
                   {item.icon}
                 </div>
 
-                <div>
-                  <p className="font-semibold">{item.text}</p>
+                {!compacto && (
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold">{item.text}</p>
 
-                  <p
-                    className={`text-xs ${ativo
-                      ? "text-primary-foreground/80"
-                      : "text-muted-foreground"
-                      }`}
-                  >
-                    {item.subtext}
-                  </p>
-                </div>
+                    <p
+                      className={`text-xs ${ativo
+                        ? "text-primary-foreground/80"
+                        : "text-muted-foreground"
+                        }`}
+                    >
+                      {item.subtext}
+                    </p>
+                  </div>
+                )}
               </Link>
             );
           })}

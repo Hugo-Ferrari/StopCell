@@ -11,6 +11,11 @@ import Historico from "@/pages/history/History";
 import Estoque from "@/pages/orders/pages/Stock";
 import Configuracoes from "@/pages/settings/Settings";
 import StoreSettings from "@/pages/settings/StoreSettings";
+import UsersSettings from "@/components/settings/UsersSettings";
+import RequirePermissao from "@/components/common/RequirePermissao";
+import { PERMISSOES } from "@/utils/permissoes";
+
+const { ORDENS_VER, ORDENS_EDITAR, HISTORICO_VER, ESTOQUE_VER, FINANCEIRO_VER, LOJA_EDITAR } = PERMISSOES;
 
 export function AppRoutes() {
   return (
@@ -22,14 +27,74 @@ export function AppRoutes() {
 
       {/* rotas priv */}
       <Route element={<MainLayout />}>
-        <Route path="/ordemServico" element={<OrdemServico />} />
-        <Route path="/estoque" element={<Estoque />} />
-        <Route path="/financeiro" element={<Financeiro />} />
-        <Route path="/nova-ordem-servico" element={<NovaOrdemServico />} />
-        <Route path="/ordemServico/:numOs" element={<DetalhesOrdemServico />} />
-        <Route path="/historico" element={<Historico />} />
+        {/* o login sempre cai aqui, então quem não tem acesso é levado pra outra tela */}
+        <Route
+          path="/ordemServico"
+          element={
+            <RequirePermissao permissoes={[ORDENS_VER]} redirecionar>
+              <OrdemServico />
+            </RequirePermissao>
+          }
+        />
+        <Route
+          path="/nova-ordem-servico"
+          element={
+            <RequirePermissao permissoes={[ORDENS_EDITAR]}>
+              <NovaOrdemServico />
+            </RequirePermissao>
+          }
+        />
+        <Route
+          path="/ordemServico/:numOs"
+          element={
+            <RequirePermissao permissoes={[ORDENS_VER, HISTORICO_VER]}>
+              <DetalhesOrdemServico />
+            </RequirePermissao>
+          }
+        />
+        <Route
+          path="/historico"
+          element={
+            <RequirePermissao permissoes={[HISTORICO_VER]}>
+              <Historico />
+            </RequirePermissao>
+          }
+        />
+        <Route
+          path="/estoque"
+          element={
+            <RequirePermissao permissoes={[ESTOQUE_VER]}>
+              <Estoque />
+            </RequirePermissao>
+          }
+        />
+        <Route
+          path="/financeiro"
+          element={
+            <RequirePermissao permissoes={[FINANCEIRO_VER]}>
+              <Financeiro />
+            </RequirePermissao>
+          }
+        />
+
+        {/* configurações: qualquer um entra, cada card decide se aparece */}
         <Route path="/configuracoes" element={<Configuracoes />} />
-        <Route path="/configuracoes/loja" element={<StoreSettings />} />
+        <Route
+          path="/configuracoes/loja"
+          element={
+            <RequirePermissao permissoes={[LOJA_EDITAR]}>
+              <StoreSettings />
+            </RequirePermissao>
+          }
+        />
+        <Route
+          path="/configuracoes/usuarios"
+          element={
+            <RequirePermissao somenteDono>
+              <UsersSettings />
+            </RequirePermissao>
+          }
+        />
       </Route>
     </Routes>
   );

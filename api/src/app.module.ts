@@ -1,11 +1,16 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ClientesModule } from './customer/costumer.module';
 import { PrismaService } from './prisma/prisma.service';
+import { JwtAuthGuard } from './auth/jwt.guards';
+import { PermissoesGuard } from './auth/permissoes.guard';
+import { AuthModule } from './auth/auth.module';
+import { ClientesModule } from './customer/costumer.module';
 import { EmpresaModule } from './enterprise/enterprise.module';
 import { UsuarioModule } from './user/user.module';
-import { JwtModule } from '@nestjs/jwt';
+import { PerfilModule } from './perfil/perfil.module';
 import { PecaModule } from './peca/peca.module';
 import { OsChecklistModule } from './os-checklist/os-checklist.module';
 import { MarcaModule } from './marca/mark.module';
@@ -17,14 +22,34 @@ import { PagamentoModule } from './payment/payment.module';
 import { OrdemServicoModule } from './ordem-servico/service-order.module';
 import { ServicoModule } from './service/service.module';
 import { ItensOsModule } from './item-os/item-os.module';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/jwt.guards';
-import { AuthModule } from './auth/auth.module';
-@Module({
-  imports: [ClientesModule, EmpresaModule, UsuarioModule, JwtModule.register({global: true, secret: process.env.JWT_SECRET}), PecaModule, OsChecklistModule, MarcaModule, DiagnosticoModule, ChecklistModule, CategoriaModule, AparelhoModule, PagamentoModule,  OrdemServicoModule,ServicoModule, ItensOsModule, AuthModule],
-  controllers: [AppController],
-  providers: [AppService, PrismaService,{provide: APP_GUARD, useClass:JwtAuthGuard}],
-  exports: [PrismaService],
 
+@Module({
+  imports: [
+    JwtModule.register({ global: true, secret: process.env.JWT_SECRET }),
+    AuthModule,
+    ClientesModule,
+    EmpresaModule,
+    UsuarioModule,
+    PerfilModule,
+    PecaModule,
+    OsChecklistModule,
+    MarcaModule,
+    DiagnosticoModule,
+    ChecklistModule,
+    CategoriaModule,
+    AparelhoModule,
+    PagamentoModule,
+    OrdemServicoModule,
+    ServicoModule,
+    ItensOsModule,
+  ],
+  controllers: [AppController],
+  providers: [
+    AppService,
+    PrismaService,
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: PermissoesGuard },
+  ],
+  exports: [PrismaService],
 })
 export class AppModule {}
