@@ -78,12 +78,29 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const usuario = await this.usuarioRepository.findByEmail(dto.emailUsuario);
-    const senhaCorreta = usuario
-      ? await bcrypt.compare(dto.senha, usuario.senha ?? '')
-      : false;
 
-    if (!usuario || !senhaCorreta) {
-      throw new UnauthorizedException('Email ou senha inválidos');
+    // o "codigo" é o que o front usa pra decidir qual aviso mostrar
+    // (e se mostra o link pra criar conta ou pra recuperar a senha)
+    if (!usuario) {
+      throw new UnauthorizedException({
+        codigo: 'EMAIL_NAO_CADASTRADO',
+        message: 'E-mail não cadastrado. Crie uma conta.',
+      });
+    }
+
+    const senhaCorreta = await bcrypt.compare(dto.senha, usuario.senha ?? '');
+    if (!senhaCorreta) {
+      throw new UnauthorizedException({
+        codigo: 'SENHA_INCORRETA',
+        message: 'Senha incorreta.',
+      });
+    }
+
+    if (!usuario.ativo) {
+      throw new UnauthorizedException({
+        codigo: 'USUARIO_DESATIVADO',
+        message: 'Usuário desativado. Fale com o administrador da loja.',
+      });
     }
 
     const token = this.jwt.sign(
