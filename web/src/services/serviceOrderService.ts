@@ -24,6 +24,13 @@ export async function buscarOrdemServicoPorNumero(numOs: number) {
 }
 
 
+export async function baixarPdfOs(numOs: number) {
+    const response = await api.get<Blob>(`/ordemServico/${numOs}/pdf`, {
+        responseType: "blob",
+    });
+    return response.data;
+}
+
 export async function buscarUltimaOsPorImei(imei: string) {
     try {
         const response = await api.get(`/ordemServico/aparelho/${imei}/ultima`);
