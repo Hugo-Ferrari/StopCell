@@ -19,7 +19,7 @@ export default function StoreCard({ store }: StoreCardProps) {
               <h3 className="text-lg font-bold text-foreground">
                 {store.nomeFantasia || "Nome da Loja"}
               </h3>
-              <span className="rounded-full border border-green-500/30 bg-green-500/10 px-2.5 py-0.5 text-xs font-semibold text-green-400">
+              <span className="rounded-full border border-green-500/30 bg-green-500/10 px-2.5 py-0.5 text-xs font-semibold text-green-700 dark:text-green-400">
                 Ativa
               </span>
             </div>

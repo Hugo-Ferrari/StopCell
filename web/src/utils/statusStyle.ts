@@ -4,21 +4,21 @@ export function getStatusStyle(status: OrdemServicoInterface["status"]) {
   if (status === "DIAGNOSTICO")
     return {
       bg: "bg-yellow-500/10 border-yellow-500/30",
-      text: "text-yellow-500",
+      text: "text-yellow-700 dark:text-yellow-500",
       dot: "bg-yellow-500",
       label: "Em Diag.",
     };
   if (status === "EM_REPARO")
     return {
       bg: "bg-blue-400/10 border-blue-400/30",
-      text: "text-blue-400",
+      text: "text-blue-700 dark:text-blue-400",
       dot: "bg-blue-400",
       label: "Em Reparo",
     };
   if (status === "FINALIZADO")
     return {
       bg: "bg-green-500/10 border-green-500/30",
-      text: "text-green-500",
+      text: "text-green-700 dark:text-green-500",
       dot: "bg-green-500",
       label: "Finalizado",
     };
