@@ -1,17 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { Search, Calendar as CalendarIcon, Loader2, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import type { DateRange } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 import BoxOs from "@/components/history/BoxOs";
 import CustomerBox from "@/components/history/CustomerBox";
 import DeviceBox from "@/components/history/DeviceBox";
 import EmptyHistory from "@/components/history/EmptyHistory";
+import FilterHistory from "@/components/history/FilterHistory";
+import { filtrarOrdens } from "@/utils/filterHistory";
 import { agruparPorAparelho, agruparPorCliente } from "@/utils/groupHistory";
 import { listarOs } from "@/services/serviceOrderService";
 
@@ -26,24 +24,6 @@ export interface OrdemServicoInterface {
 }
 
 type Aba = "os" | "clientes" | "aparelhos";
-
-// Deixa a busca sem diferenciar maiúsculas nem acentos ("joao" encontra "João")
-function normalizar(texto: string) {
-  return texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-}
-
-function dentroDoPeriodo(dtEntrada: string | null, periodo: DateRange | undefined) {
-  if (!periodo?.from) return true;
-  if (!dtEntrada) return false;
-
-  const data = new Date(dtEntrada);
-  const inicio = new Date(periodo.from);
-  inicio.setHours(0, 0, 0, 0);
-  const fim = new Date(periodo.to ?? periodo.from);
-  fim.setHours(23, 59, 59, 999);
-
-  return data >= inicio && data <= fim;
-}
 
 export default function History() {
   const [abaAtiva, setAbaAtiva] = useState<Aba>("os");
@@ -67,17 +47,7 @@ export default function History() {
     carregarOs();
   }, []);
 
-  const ordensFiltradas = useMemo(() => {
-    const termo = normalizar(busca.trim());
-
-    return ordens.filter((os) => {
-      if (!dentroDoPeriodo(os.dtEntrada, date)) return false;
-      if (!termo) return true;
-
-      return [String(os.numOs), os.cliente?.nmCompleto ?? "", os.aparelho?.modelo ?? ""]
-        .some((campo) => normalizar(campo).includes(termo));
-    });
-  }, [ordens, busca, date]);
+  const ordensFiltradas = useMemo(() => filtrarOrdens(ordens, busca, date), [ordens, busca, date]);
 
   const clientes = useMemo(() => agruparPorCliente(ordensFiltradas), [ordensFiltradas]);
   const aparelhos = useMemo(() => agruparPorAparelho(ordensFiltradas), [ordensFiltradas]);
@@ -90,11 +60,6 @@ export default function History() {
 
   const temFiltro = busca.trim() !== "" || !!date?.from;
   const totalAbaAtiva = abas.find((aba) => aba.id === abaAtiva)?.total ?? 0;
-
-  function limparFiltros() {
-    setBusca("");
-    setDate(undefined);
-  }
 
   function renderConteudo() {
     if (carregando) {
@@ -150,60 +115,7 @@ export default function History() {
       </div>
 
       {/* Busca e filtro por período */}
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex flex-1 items-center bg-card border border-border rounded-2xl px-4 py-1.5 focus-within:border-primary transition-colors">
-          <Search size={20} className="text-muted-foreground mr-3 shrink-0" />
-          <input
-            type="text"
-            placeholder="Buscar O.S., Cliente ou Aparelho..."
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            className="w-full bg-transparent p-2 text-sm md:text-base text-foreground placeholder:text-muted-foreground outline-none"
-          />
-        </div>
-
-        <Popover>
-          <PopoverTrigger
-            className={cn(
-              "w-full md:w-[280px] flex items-center justify-start px-4 text-left font-normal bg-card border border-border text-foreground hover:bg-accent rounded-2xl h-[52px] transition-colors",
-              !date && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
-            {date?.from ? (
-              date.to ? (
-                <>{format(date.from, "dd/MM/yyyy")} - {format(date.to, "dd/MM/yyyy")}</>
-              ) : (
-                format(date.from, "dd/MM/yyyy")
-              )
-            ) : (
-              <span>Filtrar por período</span>
-            )}
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 border-border bg-popover text-popover-foreground rounded-2xl" align="end">
-            <Calendar
-              mode="range"
-              defaultMonth={date?.from}
-              selected={date}
-              onSelect={setDate}
-              numberOfMonths={2}
-              locale={ptBR}
-              className="bg-popover text-popover-foreground"
-            />
-          </PopoverContent>
-        </Popover>
-
-        {temFiltro && (
-          <button
-            type="button"
-            onClick={limparFiltros}
-            className="flex items-center justify-center gap-2 h-[52px] px-4 rounded-2xl border border-border bg-card text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors shrink-0"
-          >
-            <X className="h-4 w-4" />
-            Limpar filtros
-          </button>
-        )}
-      </div>
+      <FilterHistory busca={busca} onBuscaChange={setBusca} date={date} onDateChange={setDate} />
 
       {/* Abas */}
       <div className="flex w-full bg-card border border-border rounded-full p-1">
