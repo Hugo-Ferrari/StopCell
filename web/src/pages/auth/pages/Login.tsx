@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { User, Lock, Loader2, Sun, Moon, Eye, EyeOff } from "lucide-react";
+import { User, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 import { isAxiosError } from "axios";
 
 import Marca from "@/components/common/Mark";
 import LoginErrorMessage, { type ErroLogin } from "@/components/auth/LoginErrorMessage";
+import ThemeToggle from "@/components/common/ThemeToggle";
 import { login, salvarToken } from "../authService";
 
 // depois de quantas senhas erradas aparece o link de "Esqueceu a senha"
@@ -21,7 +22,6 @@ function Login() {
   const [erro, setErro] = useState<ErroLogin | null>(null);
   // conta as senhas erradas seguidas pro mesmo e-mail
   const [senhasErradas, setSenhasErradas] = useState(0);
-  const [tema, setTema] = useState<"claro" | "escuro">("escuro");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -72,32 +72,8 @@ function Login() {
       
       <div className="absolute top-0 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
       
-      <div className="absolute right-6 top-6 flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-lg">
-        <button
-          type="button"
-          onClick={() => setTema("claro")}
-          aria-label="Tema claro"
-          className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
-            tema === "claro"
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <Sun className="h-4 w-4" />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setTema("escuro")}
-          aria-label="Tema escuro"
-          className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
-            tema === "escuro"
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <Moon className="h-4 w-4" />
-        </button>
+      <div className="absolute right-6 top-6">
+        <ThemeToggle />
       </div>
 
       <div className="relative w-full max-w-sm">
