@@ -83,10 +83,10 @@ function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white p-4 md:p-8 flex flex-col items-center relative overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground p-4 md:p-8 flex flex-col items-center relative overflow-x-hidden">
 
       <div className="w-full max-w-2xl flex justify-start mb-6 md:mb-8">
-        <Link to="/" className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
+        <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft size={20} />
           <span>Voltar para o login</span>
         </Link>
@@ -95,16 +95,16 @@ function Register() {
       <div className="w-full max-w-2xl flex flex-col items-center text-center mb-8">
         <Marca size={120} />
         <h1 className="text-2xl md:text-3xl font-bold mt-6 mb-2">Criar conta do dono</h1>
-        <p className="text-zinc-400 text-sm md:text-base max-w-md">
+        <p className="text-muted-foreground text-sm md:text-base max-w-md">
           Cadastre a sua assistência técnica. O acesso ao sistema é exclusivo do dono da empresa.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-[#141414] border border-[#222222] rounded-3xl p-6 md:p-10 flex flex-col gap-10">
+      <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-card border border-border rounded-3xl p-6 md:p-10 flex flex-col gap-10">
 
         
         <section className="flex flex-col gap-4">
-          <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Empresa</h2>
+          <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Empresa</h2>
 
           <FormInput
             label="Nome da empresa"
@@ -135,7 +135,7 @@ function Register() {
 
         
         <section className="flex flex-col gap-4">
-          <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Dono da Empresa</h2>
+          <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Dono da Empresa</h2>
 
           <FormInput
             label="Nome completo"
@@ -170,7 +170,7 @@ function Register() {
 
         
         <section className="flex flex-col gap-4">
-          <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Acesso ao Sistema</h2>
+          <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Acesso ao Sistema</h2>
 
           <FormInput
             label="Usuário"
@@ -204,7 +204,7 @@ function Register() {
         <button
           type="submit"
           disabled={carregando || !formularioValido}
-          className="w-full bg-[#F25C38] hover:bg-[#e04f2d] text-white font-bold py-4 rounded-xl mt-2 transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 rounded-xl mt-2 transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
         >
           {carregando ? <Loader2 className="animate-spin" size={20} /> : "Criar conta e entrar"}
         </button>

@@ -33,25 +33,25 @@ export default function CustomerSearch({ mostrarToast, clienteSelecionado, setCl
   }
 
   return (
-    <div className="bg-[#141414] border border-[#222222] rounded-3xl p-5 md:p-8">
-      <h2 className="text-white font-bold mb-4">1. Buscar Cliente</h2>
+    <div className="bg-card border border-border rounded-3xl p-5 md:p-8">
+      <h2 className="text-foreground font-bold mb-4">1. Buscar Cliente</h2>
       <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="flex flex-1 items-center bg-[#0A0A0A] border border-[#222222] rounded-xl px-4 py-1 focus-within:border-[#F25C38] transition-colors">
-          <Search size={20} className="text-zinc-500 mr-2" />
+        <div className="flex flex-1 items-center bg-background border border-border rounded-xl px-4 py-1 focus-within:border-primary transition-colors">
+          <Search size={20} className="text-muted-foreground mr-2" />
           <input
             type="text"
             placeholder="Digite apenas os números do CPF"
             value={cpfBusca}
             onChange={(e) => setCpfBusca(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleBuscarCliente()}
-            className="w-full bg-transparent p-2 text-white outline-none"
+            className="w-full bg-transparent p-2 text-foreground outline-none"
           />
         </div>
         <button
           type="button"
           onClick={handleBuscarCliente}
           disabled={buscandoCliente}
-          className="bg-[#F25C38] hover:bg-[#e04f2d] text-white px-8 py-3 rounded-xl font-bold transition-colors flex justify-center items-center"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-xl font-bold transition-colors flex justify-center items-center"
         >
           {buscandoCliente ? <Loader2 className="animate-spin" size={20} /> : "Buscar"}
         </button>
@@ -59,16 +59,16 @@ export default function CustomerSearch({ mostrarToast, clienteSelecionado, setCl
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         <div className="flex flex-col gap-2">
-          <label className="text-xs md:text-sm font-bold text-white">Nome</label>
-          <input type="text" readOnly value={clienteSelecionado.nmCompleto} className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-zinc-400 outline-none cursor-not-allowed" />
+          <label className="text-xs md:text-sm font-bold text-foreground">Nome</label>
+          <input type="text" readOnly value={clienteSelecionado.nmCompleto} className="w-full bg-background border border-border rounded-xl p-3.5 text-muted-foreground outline-none cursor-not-allowed" />
         </div>
         <div className="flex flex-col gap-2">
-          <label className="text-xs md:text-sm font-bold text-white">CPF</label>
-          <input type="text" readOnly value={clienteSelecionado.cpf} className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-zinc-400 outline-none cursor-not-allowed" />
+          <label className="text-xs md:text-sm font-bold text-foreground">CPF</label>
+          <input type="text" readOnly value={clienteSelecionado.cpf} className="w-full bg-background border border-border rounded-xl p-3.5 text-muted-foreground outline-none cursor-not-allowed" />
         </div>
         <div className="flex flex-col gap-2 md:col-span-2">
-          <label className="text-xs md:text-sm font-bold text-white">Endereço Atual</label>
-          <input type="text" readOnly value={clienteSelecionado.endereco} className="w-full bg-[#0A0A0A] border border-[#222222] rounded-xl p-3.5 text-zinc-400 outline-none cursor-not-allowed" />
+          <label className="text-xs md:text-sm font-bold text-foreground">Endereço Atual</label>
+          <input type="text" readOnly value={clienteSelecionado.endereco} className="w-full bg-background border border-border rounded-xl p-3.5 text-muted-foreground outline-none cursor-not-allowed" />
         </div>
       </div>
     </div>

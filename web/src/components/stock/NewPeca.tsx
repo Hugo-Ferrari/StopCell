@@ -31,7 +31,7 @@ function NewPeca() {
       <button
         type="button"
         onClick={() => setOpenModal(true)}
-        className="rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:opacity-90"
+        className="rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground transition hover:opacity-90"
       >
         Nova Peça
       </button>
@@ -101,7 +101,7 @@ function NewPeca() {
 
                 <button
                   type="submit"
-                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white"
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
                 >
                   Adicionar peça
                 </button>

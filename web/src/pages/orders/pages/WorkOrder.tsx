@@ -58,21 +58,21 @@ function OrdemServico() {
   const chips = ["Todas", "Em Diagn.", "Aguard. Peça", "Em Reparo", "Finalizado"];
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-[#0A0A0A] text-white p-4 md:p-8">
+    <div className="flex flex-col w-full min-h-screen bg-background text-foreground p-4 md:p-8">
       
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6 md:mb-8">
         <div>
-          <span className="text-[#F25C38] text-[10px] md:text-xs font-bold uppercase tracking-widest">Stop Cell</span>
-          <h1 className="text-2xl md:text-3xl font-bold mt-1 text-white">Ordens de Serviço</h1>
+          <span className="text-primary text-[10px] md:text-xs font-bold uppercase tracking-widest">Stop Cell</span>
+          <h1 className="text-2xl md:text-3xl font-bold mt-1 text-foreground">Ordens de Serviço</h1>
         </div>
         <div className="flex items-center gap-4 md:gap-6 w-full sm:w-auto justify-between sm:justify-end">
           <Link
             to="/nova-ordem-servico"
-            className="flex items-center justify-center gap-2 rounded-full bg-[#F25C38] px-4 md:px-5 py-2 md:py-2.5 text-sm font-semibold text-black hover:bg-[#e04f2d] transition-colors flex-1 sm:flex-none"
+            className="flex items-center justify-center gap-2 rounded-full bg-primary px-4 md:px-5 py-2 md:py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors flex-1 sm:flex-none"
           >
             <Plus size={18} strokeWidth={2.5} /> Nova O.S.
           </Link>
-          <button className="text-zinc-300 hover:text-white transition-colors p-2 bg-[#141414] sm:bg-transparent rounded-full sm:rounded-none">
+          <button className="text-foreground hover:text-foreground transition-colors p-2 bg-card sm:bg-transparent rounded-full sm:rounded-none">
             <Bell size={22} />
           </button>
         </div>
@@ -80,49 +80,49 @@ function OrdemServico() {
 
       {/* busca e filtro da OS */}
       <div className="flex gap-2 md:gap-4 mb-6 md:mb-8">
-        <div className="flex flex-1 items-center rounded-2xl bg-[#141414] border border-[#222222] px-3 md:px-4 py-1 md:py-1.5 focus-within:border-[#F25C38] transition-colors">
-          <Search size={18} className="mr-2 md:mr-3 text-zinc-500" />
+        <div className="flex flex-1 items-center rounded-2xl bg-card border border-border px-3 md:px-4 py-1 md:py-1.5 focus-within:border-primary transition-colors">
+          <Search size={18} className="mr-2 md:mr-3 text-muted-foreground" />
           <input
             type="text"
             placeholder="Buscar O.S., Cliente..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            className="w-full bg-transparent p-2 text-sm md:text-base text-zinc-200 placeholder:text-zinc-500 outline-none"
+            className="w-full bg-transparent p-2 text-sm md:text-base text-foreground placeholder:text-muted-foreground outline-none"
           />
         </div>
-        <button className="flex items-center justify-center rounded-2xl border border-[#F25C38] bg-[#141414] p-3 text-[#F25C38] hover:bg-[#F25C38]/10 transition-colors shrink-0">
+        <button className="flex items-center justify-center rounded-2xl border border-primary bg-card p-3 text-primary hover:bg-primary/10 transition-colors shrink-0">
           <SlidersHorizontal size={18} className="md:w-5 md:h-5" />
         </button>
       </div>
 
       {/* status da os   */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
-        <div className="bg-[#141414] border border-[#222222] rounded-2xl p-4 md:p-5 flex flex-col justify-between min-h-[90px] md:min-h-[110px]">
-          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px] font-bold text-zinc-400 tracking-wider">
+        <div className="bg-card border border-border rounded-2xl p-4 md:p-5 flex flex-col justify-between min-h-[90px] md:min-h-[110px]">
+          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px] font-bold text-muted-foreground tracking-wider">
             <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-yellow-500"></div> EM DIAGN.
           </div>
-          <div className="text-2xl md:text-3xl font-bold text-white mt-2">{metricas.diagnostico}</div>
+          <div className="text-2xl md:text-3xl font-bold text-foreground mt-2">{metricas.diagnostico}</div>
         </div>
 
-        <div className="bg-[#141414] border border-[#222222] rounded-2xl p-4 md:p-5 flex flex-col justify-between min-h-[90px] md:min-h-[110px]">
-          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px] font-bold text-zinc-400 tracking-wider">
-            <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-zinc-400"></div> AGUARD. PEÇA
+        <div className="bg-card border border-border rounded-2xl p-4 md:p-5 flex flex-col justify-between min-h-[90px] md:min-h-[110px]">
+          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px] font-bold text-muted-foreground tracking-wider">
+            <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-muted-foreground"></div> AGUARD. PEÇA
           </div>
-          <div className="text-2xl md:text-3xl font-bold text-white mt-2">{metricas.aguardandoPeca}</div>
+          <div className="text-2xl md:text-3xl font-bold text-foreground mt-2">{metricas.aguardandoPeca}</div>
         </div>
 
-        <div className="bg-[#141414] border border-[#222222] rounded-2xl p-4 md:p-5 flex flex-col justify-between min-h-[90px] md:min-h-[110px]">
-          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px] font-bold text-zinc-400 tracking-wider">
+        <div className="bg-card border border-border rounded-2xl p-4 md:p-5 flex flex-col justify-between min-h-[90px] md:min-h-[110px]">
+          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px] font-bold text-muted-foreground tracking-wider">
             <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-blue-500"></div> EM REPARO
           </div>
-          <div className="text-2xl md:text-3xl font-bold text-white mt-2">{metricas.emReparo}</div>
+          <div className="text-2xl md:text-3xl font-bold text-foreground mt-2">{metricas.emReparo}</div>
         </div>
 
-        <div className="bg-[#141414] border border-[#222222] rounded-2xl p-4 md:p-5 flex flex-col justify-between min-h-[90px] md:min-h-[110px]">
-          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px] font-bold text-zinc-400 tracking-wider">
+        <div className="bg-card border border-border rounded-2xl p-4 md:p-5 flex flex-col justify-between min-h-[90px] md:min-h-[110px]">
+          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px] font-bold text-muted-foreground tracking-wider">
             <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500"></div> FINALIZADO
           </div>
-          <div className="text-2xl md:text-3xl font-bold text-white mt-2">{metricas.finalizado}</div>
+          <div className="text-2xl md:text-3xl font-bold text-foreground mt-2">{metricas.finalizado}</div>
         </div>
       </div>
 
@@ -134,8 +134,8 @@ function OrdemServico() {
             onClick={() => setFiltroStatus(chip)}
             className={`snap-start whitespace-nowrap px-4 md:px-5 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all border ${
               filtroStatus === chip
-                ? "bg-[#F25C38] border-[#F25C38] text-black"
-                : "bg-[#141414] border-[#222222] text-zinc-400 hover:text-white"
+                ? "bg-primary border-primary text-primary-foreground"
+                : "bg-card border-border text-muted-foreground hover:text-foreground"
             }`}
           >
             {chip}

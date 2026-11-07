@@ -29,10 +29,10 @@ function Estoque() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <span className="text-[#F25C38] text-[10px] md:text-xs font-bold uppercase tracking-widest">
+        <span className="text-primary text-[10px] md:text-xs font-bold uppercase tracking-widest">
           Stop Cell
         </span>
-        <h1 className="text-2xl md:text-3xl font-black mt-1 flex items-center gap-3 text-white">
+        <h1 className="text-2xl md:text-3xl font-black mt-1 flex items-center gap-3 text-foreground">
           Estoque
         </h1>
       </div>

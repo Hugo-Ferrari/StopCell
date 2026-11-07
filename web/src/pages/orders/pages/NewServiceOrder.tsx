@@ -27,7 +27,7 @@ export default function NewServiceOrder() {
       
       {/* Pop-up de Toast */}
       {toast.visivel && (
-        <div className={`fixed top-10 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl transition-all animate-in slide-in-from-top-5 ${toast.tipo === "sucesso" ? "bg-green-500/10 border border-green-500/50 text-green-500" : "bg-red-500/10 border border-red-500/50 text-red-500"}`}>
+        <div className={`fixed top-10 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl transition-all animate-in slide-in-from-top-5 ${toast.tipo === "sucesso" ? "bg-green-500/10 border border-green-500/50 text-green-700 dark:text-green-500" : "bg-red-500/10 border border-red-500/50 text-red-600 dark:text-red-500"}`}>
           {toast.tipo === "sucesso" ? <CheckCircle2 size={24} /> : <XCircle size={24} />}
           <span className="font-bold text-sm">{toast.msg}</span>
         </div>
@@ -35,10 +35,10 @@ export default function NewServiceOrder() {
 
       {/* Navegação das Abas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <button type="button" onClick={() => setAbaAtiva("existente")} className={`flex items-center justify-center gap-2 py-4 rounded-2xl font-medium transition-all ${abaAtiva === "existente" ? "bg-[#F25C38] text-white" : "bg-[#141414] border border-[#222222] text-zinc-400 hover:text-white"}`}>
+        <button type="button" onClick={() => setAbaAtiva("existente")} className={`flex items-center justify-center gap-2 py-4 rounded-2xl font-medium transition-all ${abaAtiva === "existente" ? "bg-primary text-primary-foreground" : "bg-card border border-border text-muted-foreground hover:text-foreground"}`}>
           <User size={20} /> Cliente Existente
         </button>
-        <button type="button" onClick={() => setAbaAtiva("novo")} className={`flex items-center justify-center gap-2 py-4 rounded-2xl font-medium transition-all ${abaAtiva === "novo" ? "bg-[#F25C38] text-white" : "bg-[#141414] border border-[#222222] text-zinc-400 hover:text-white"}`}>
+        <button type="button" onClick={() => setAbaAtiva("novo")} className={`flex items-center justify-center gap-2 py-4 rounded-2xl font-medium transition-all ${abaAtiva === "novo" ? "bg-primary text-primary-foreground" : "bg-card border border-border text-muted-foreground hover:text-foreground"}`}>
           <UserPlus size={20} /> Cadastrar novo cliente
         </button>
       </div>

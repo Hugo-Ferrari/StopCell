@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Smartphone } from "lucide-react";
+import PrintOsButton from "@/components/orders/PrintOsButton";
 import { buscarOrdemServicoPorNumero } from "@/services/serviceOrderService";
 import { criandoPeca, type PecaDto } from "@/services/partService";
 import { criarServico, type Servico } from "@/services/servicoService";
@@ -65,12 +66,16 @@ function DetalhesOrdemServico() {
 
   return (
     <div className="flex flex-col">
-      <Link
-        to="/ordemServico"
-        className="flex items-center  text-sm text-primary "
-      >
-        <ArrowLeft size={25} />
-      </Link>
+      <div className="flex items-start justify-between gap-4 p-2">
+        <Link
+          to="/ordemServico"
+          className="flex items-center  text-sm text-primary "
+        >
+          <ArrowLeft size={25} />
+        </Link>
+
+        <PrintOsButton numOs={ordem.numOs} />
+      </div>
 
       <div className="   p-2 shadow-sm">
         <div className="flex items-center justify-between bg-card p-3 rounded-2xl">

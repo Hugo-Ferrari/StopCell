@@ -132,7 +132,7 @@ export default function ExistingCustomer({ mostrarToast, clienteSelecionado, set
           type="button" 
           onClick={handleGerarOSFinal} 
           disabled={gerandoOs} 
-          className="w-full mt-2 flex justify-center items-center gap-2 bg-[#F25C38] hover:bg-[#e04f2d] text-white px-10 py-4 rounded-2xl font-bold transition-colors disabled:opacity-50"
+          className="w-full mt-2 flex justify-center items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-4 rounded-2xl font-bold transition-colors disabled:opacity-50"
         >
           {gerandoOs ? <Loader2 className="animate-spin" size={20} /> : "Finalizar: Gerar Ordem de Servico"}
         </button>

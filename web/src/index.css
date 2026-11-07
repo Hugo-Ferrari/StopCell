@@ -61,10 +61,62 @@
     --brand-gradient-end: #E54533;
     --brand-muted: rgb(245 99 51 / 14%);
 
-    /* Tema Escuro Forçado no Padrão */
+    --background: #F5F5F5;
+    --foreground: #141110;
+
+    --surface: #FFFFFF;
+    --surface-2: #F0EEED;
+
+    --card: #FFFFFF;
+    --card-foreground: #141110;
+
+    --popover: #FFFFFF;
+    --popover-foreground: #141110;
+
+    --sidebar: #FFFFFF;
+    --sidebar-foreground: #141110;
+    --sidebar-primary: #D9480F;
+    --sidebar-primary-foreground: #FFFFFF;
+    --sidebar-accent: #F0EEED;
+    --sidebar-accent-foreground: #141110;
+    --sidebar-border: #E4E1DF;
+    --sidebar-ring: #D9480F;
+
+    --border: #E4E1DF;
+    --input: #E4E1DF;
+    --ring: #D9480F;
+
+    --muted: #F0EEED;
+    --muted-foreground: #5F5A57;
+
+    --primary: #D9480F;
+    --primary-foreground: #FFFFFF;
+
+    --secondary: #F0EEED;
+    --secondary-foreground: #141110;
+
+    --accent: #F0EEED;
+    --accent-foreground: #141110;
+
+    --success: #067A46;
+    --warning: #A16207;
+    --info: #1D6FB8;
+    --danger: #D92D20;
+    --destructive: #D92D20;
+
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+
+    --radius: 0.625rem;
+}
+
+.dark {
     --background: #0A0A0A;
     --foreground: #FFFFFF;
-    
+
     --surface: #141110;
     --surface-2: #1E1918;
 
@@ -104,14 +156,6 @@
     --info: #339FEE;
     --danger: #F94144;
     --destructive: #F94144;
-
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-
-    --radius: 0.625rem;
 }
 
 @layer base {
@@ -121,6 +165,10 @@
 
     html {
         @apply font-sans;
+        color-scheme: light;
+    }
+
+    html.dark {
         color-scheme: dark;
     }
 
@@ -157,7 +205,7 @@
     }
 
     ::-webkit-scrollbar-thumb:hover {
-        background: #444;
+        background: var(--muted-foreground);
     }
 
     input, textarea, select {

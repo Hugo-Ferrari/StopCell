@@ -21,7 +21,7 @@ function AuthSubmitButton({
       // trava enquanto carrega pra não mandar a requisição duas vezes
       disabled={disabled || carregando}
       aria-busy={carregando}
-      className="flex h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary text-base font-bold text-background transition-colors hover:bg-[#e04f2d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60"
+      className="flex h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary text-base font-bold text-background transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60"
       {...props}
     >
       {carregando ? (

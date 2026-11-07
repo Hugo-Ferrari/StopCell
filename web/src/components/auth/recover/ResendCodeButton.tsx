@@ -13,7 +13,7 @@ function ResendCodeButton({ onClick, segundosRestantes, desabilitado }: ResendCo
       type="button"
       onClick={onClick}
       disabled={aguardando || desabilitado}
-      className="cursor-pointer rounded-md text-sm font-semibold text-primary transition-colors hover:text-[#e04f2d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:text-muted-foreground"
+      className="cursor-pointer rounded-md text-sm font-semibold text-primary transition-colors hover:text-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:text-muted-foreground"
     >
       {aguardando ? `Reenviar código em ${segundosRestantes}s` : "Reenviar código"}
     </button>
