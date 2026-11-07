@@ -30,7 +30,7 @@ export class PecaRepository {
 
   findAll(cnpjEmpresa: string) {
     return this.prisma.peca.findMany({
-      where: { cnpjEmpresa, AND: { quantidade: { gt: 0 } } },
+      where: { cnpjEmpresa },
     });
   }
 }

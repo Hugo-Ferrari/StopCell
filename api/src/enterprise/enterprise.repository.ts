@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { EmpresaDto } from '@/type/enterprise.dto';
+import { EmpresaDto, UpdateEmpresaDTO } from '@/type/enterprise.dto';
 
 @Injectable()
 export class EmpresaRepository {
@@ -14,10 +14,7 @@ export class EmpresaRepository {
     return this.prisma.empresa.create({ data: dto });
   }
 
-  update(cnpj: string, dto: EmpresaDto, cnpjEmpresa: string) {
-    return this.prisma.empresa.update({
-      where: { cnpj, AND: { cnpj: cnpjEmpresa } },
-      data: dto,
-    });
-  }
+  update(cnpj: string, dto: UpdateEmpresaDTO) {
+  return this.prisma.empresa.update({ where: { cnpj }, data: dto });
+}
 }

@@ -91,7 +91,7 @@ export default function StoreForm({ initialData, onSave, loading }: StoreFormPro
         <div
           className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
             toast.type === "success"
-              ? "bg-green-500/10 border border-green-500/30 text-green-400"
+              ? "bg-green-500/10 border border-green-500/30 text-green-700 dark:text-green-400"
               : "bg-destructive/10 border border-destructive/30 text-destructive"
           }`}
         >

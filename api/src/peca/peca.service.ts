@@ -16,7 +16,7 @@ export class PecaService {
     return this.repository.atualizar(id, dto, cnpjEmpresa);
   }
 
-  async verificarEstoque(cnpjEmpresa: string) {
+  async listar(cnpjEmpresa: string) {
     return await this.repository.findAll(cnpjEmpresa);
   }
 }

@@ -8,7 +8,6 @@ function NewPeca() {
 
   const [valor, setValor] = useState(0);
   const [descricao, setDescricao] = useState("");
-  const [quantidade, setQuantidade] = useState(0);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -17,13 +16,11 @@ function NewPeca() {
       await criandoPeca({
         descricao,
         valor,
-        quantidade,
       });
 
       setOpenModal(false);
       setDescricao("");
       setValor(0);
-      setQuantidade(0);
     } catch (error) {
       console.error("Erro ao criar peça:", error);
     }
@@ -34,7 +31,7 @@ function NewPeca() {
       <button
         type="button"
         onClick={() => setOpenModal(true)}
-        className="rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:opacity-90"
+        className="rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground transition hover:opacity-90"
       >
         Nova Peça
       </button>
@@ -93,22 +90,6 @@ function NewPeca() {
                 />
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label htmlFor="quantidade" className="text-sm font-medium">
-                  Quantidade
-                </label>
-
-                <input
-                  id="quantidade"
-                  value={quantidade}
-                  onChange={(e) => setQuantidade(Number(e.target.value))}
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  className="rounded-lg border border-border bg-background px-3 py-2 outline-none focus:ring-2"
-                />
-              </div>
-
               <div className="flex justify-end gap-3 pt-4">
                 <button
                   type="button"
@@ -120,7 +101,7 @@ function NewPeca() {
 
                 <button
                   type="submit"
-                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white"
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
                 >
                   Adicionar peça
                 </button>

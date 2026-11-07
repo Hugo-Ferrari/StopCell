@@ -1,5 +1,5 @@
 import { matchPath, useLocation } from "react-router-dom";
-
+import ThemeToggle from "@/components/common/ThemeToggle";
 
 function Header() {
   const location = useLocation();
@@ -12,6 +12,7 @@ function Header() {
     "/fornecedores": "Fornecedores",
     "/configuracoes": "Configurações",
     "/configuracoes/loja": "Dados da Loja",
+    "/configuracoes/usuarios": "Usuários e Permissões", // <- novo
     "/estoque" : "Estoque",
   };
 
@@ -25,7 +26,7 @@ function Header() {
   return (
     <>
 
-      <header className="sticky top-0 z-10 flex h-20 items-center border-b border-border bg-background/95 px-5 pl-16 backdrop-blur-sm transition-all duration-300 lg:px-8">
+      <header className="sticky top-0 z-10 flex h-20 items-center justify-between gap-4 border-b border-border bg-background/95 px-5 pl-16 backdrop-blur-sm transition-all duration-300 lg:px-8">
         <div className="flex flex-col">
           <span className="text-xs font-extrabold uppercase tracking-widest lg:text-sm">
             <span className="text-foreground">
@@ -39,6 +40,8 @@ function Header() {
             {titulo}
           </h1>
         </div>
+
+        <ThemeToggle />
       </header>
     </>
   );

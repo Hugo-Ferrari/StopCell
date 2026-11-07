@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class OrdemServicoDto {
 
@@ -16,9 +16,14 @@ export class OrdemServicoDto {
 
     @IsInt()
     @IsNotEmpty()
+    @Min(1)
     idUsuario: number=0
 
     @IsString()
     @IsOptional()
     diagnostico?: string;
+
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @Min(0.01)
+    vlTotal!: number
 }

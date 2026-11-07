@@ -1,10 +1,6 @@
 import { type LucideIcon } from "lucide-react";
 type Props = {
-  text:
-    | "ITENS CADASTRADO"
-    | "UNIDADE EM ESTOQUE"
-    | "ESTOQUE BAIXO"
-    | "VALOR INVESTIDO";
+  text: "ITENS CADASTRADO";
   icons: LucideIcon;
   valor: number;
 };
