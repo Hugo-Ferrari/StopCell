@@ -3,6 +3,7 @@ import { AtSign, Lock, Mail, User } from "lucide-react";
 import Modal from "@/components/common/Modal";
 import Alert from "@/components/common/Alert";
 import FormInput from "@/components/common/FormInput";
+import CampoSelect from "@/components/common/CampoSelect";
 import type { PerfilAcesso } from "@/services/perfilService";
 import type { AtualizarUsuarioDTO, UsuarioDaLoja } from "@/services/userService";
 import { emailValido } from "@/utils/validartors";
@@ -119,19 +120,14 @@ function UserFormModal({ usuario, perfis, onFechar, onSalvar }: UserFormModalPro
           <label htmlFor="idPerfil" className="text-xs font-medium text-foreground sm:text-sm">
             Perfil de acesso
           </label>
-          <select
+          <CampoSelect
             id="idPerfil"
-            value={idPerfil}
-            onChange={(e) => setIdPerfil(e.target.value ? Number(e.target.value) : "")}
-            className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary"
-          >
-            <option value="">Selecione um perfil</option>
-            {perfis.map((p) => (
-              <option key={p.idPerfil} value={p.idPerfil}>
-                {p.nome}
-              </option>
-            ))}
-          </select>
+            value={idPerfil === "" ? null : idPerfil}
+            onChange={setIdPerfil}
+            opcoes={perfis.map((p) => ({ value: p.idPerfil, label: p.nome }))}
+            placeholder="Selecione um perfil"
+            className="px-3.5 py-2.5 text-sm"
+          />
         </div>
 
         {editando && (

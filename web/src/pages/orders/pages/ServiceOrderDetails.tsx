@@ -1,154 +1,147 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Smartphone } from "lucide-react";
+import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { ArrowLeft, ClipboardCheck, Package, Stethoscope, Wrench } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { buttonVariants } from "@/components/ui/button";
+import Alert from "@/components/common/Alert";
 import PrintOsButton from "@/components/orders/PrintOsButton";
-import { buscarOrdemServicoPorNumero } from "@/services/serviceOrderService";
-import { criandoPeca, type PecaDto } from "@/services/partService";
-import { criarServico, type Servico } from "@/services/servicoService";
-import type { OrdemDetalheInterface } from "../models/ServiceOrderDetailsModels";
+import OsResumoCard from "@/components/orders/details/OsResumoCard";
+import DiagnosticoTab from "@/components/orders/details/DiagnosticoTab";
+import MaoDeObraTab from "@/components/orders/details/MaoDeObraTab";
+import PecasTab from "@/components/orders/details/PecasTab";
+import ChecklistTab from "@/components/orders/details/ChecklistTab";
+import OrcamentoResumo from "@/components/orders/details/OrcamentoResumo";
+import AcoesStatus from "@/components/orders/details/AcoesStatus";
+import AvisosCliente from "@/components/orders/details/AvisosCliente";
+import DetalhesSkeleton from "@/components/orders/details/DetalhesSkeleton";
+import { useOrdemServico } from "@/hooks/useOrdemServico";
+import { removerItemOs } from "@/services/itemOsService";
+import { mensagemDeErro } from "@/utils/apiError";
+import { calcularOrcamento } from "@/utils/orcamento";
+import { estaEncerrada } from "@/utils/statusOs";
+import { cn } from "@/lib/utils";
+
+type Aba = "diagnostico" | "reparo" | "pecas" | "checklist";
+
+function Contador({ valor }: { valor: number }) {
+  if (valor === 0) return null;
+  return (
+    <span className="rounded-full bg-primary/15 px-1.5 text-[11px] font-bold text-primary tabular-nums">{valor}</span>
+  );
+}
 
 function DetalhesOrdemServico() {
   const { numOs } = useParams();
-  const [ordem, setOrdem] = useState<OrdemDetalheInterface | null>(null);
-  const [carregando, setCarregando] = useState(true);
+  const numero = Number(numOs);
 
-  // colocar quantidade para os valores dasa peças se multiplicarem e colocar o valor total, acho que a descrição da peça e da mão de obra vai ser irrelevante(caso nn for, adicionar)
-  const [descricao] = useState("");
-  const [valorPeca, setValorPeca] = useState(0);
+  const { ordem, carregando, erro, recarregar } = useOrdemServico(numero);
+  const [aba, setAba] = useState<Aba>("diagnostico");
+  const [erroRemocao, setErroRemocao] = useState<string | null>(null);
 
-  const [valorServico, setValorServico] = useState(0);
-  async function HandleSubmit() {
+  async function handleRemoverItem(idItemOs: number) {
+    setErroRemocao(null);
     try {
-      const data: PecaDto = {
-        descricao,
-        valor: valorPeca,
-      };
-      const dataServico: Servico = {
-        descricao,
-        valorServico,
-      };
-      const responsePeca = await criandoPeca(data);
-      const responseServico = await criarServico(dataServico);
-
-      return {
-        responsePeca,
-        responseServico,
-      };
-    } catch (err) {
-      console.log(err);
+      await removerItemOs(idItemOs);
+      await recarregar();
+    } catch (error) {
+      setErroRemocao(mensagemDeErro(error, "Não foi possível remover o item."));
     }
   }
 
-  useEffect(() => {
-    async function carregarOrdem() {
-      if (!numOs) return;
-
-      try {
-        const dados = await buscarOrdemServicoPorNumero(Number(numOs));
-        setOrdem(dados);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setCarregando(false);
-      }
-    }
-
-    carregarOrdem();
-  }, [numOs]);
-
-  if (carregando) {
-    return <p className="text-muted-foreground">Carregando ordem...</p>;
-  }
+  if (carregando) return <DetalhesSkeleton />;
 
   if (!ordem) {
-    return <p className="text-muted-foreground">Ordem não encontrada.</p>;
+    return (
+      <div className="flex flex-col items-start gap-4">
+        <Alert mensagem={erro ?? "Ordem de serviço não encontrada."} />
+        <Link to="/ordemServico" className={cn(buttonVariants({ variant: "outline" }), "h-10 rounded-xl px-4")}>
+          <ArrowLeft /> Voltar para as ordens
+        </Link>
+      </div>
+    );
   }
 
+  const orcamento = calcularOrcamento(ordem.itensOs);
+  // finalizada ou cancelada: só leitura
+  const encerrada = estaEncerrada(ordem.status);
+
   return (
-    <div className="flex flex-col">
-      <div className="flex items-start justify-between gap-4 p-2">
+    <div className="flex flex-col gap-6 animate-in fade-in-0">
+      <div className="flex items-center justify-between gap-4">
         <Link
           to="/ordemServico"
-          className="flex items-center  text-sm text-primary "
+          className={cn(buttonVariants({ variant: "ghost" }), "h-10 rounded-xl px-3 text-muted-foreground")}
         >
-          <ArrowLeft size={25} />
+          <ArrowLeft /> Ordens de serviço
         </Link>
-
         <PrintOsButton numOs={ordem.numOs} />
       </div>
 
-      <div className="   p-2 shadow-sm">
-        <div className="flex items-center justify-between bg-card p-3 rounded-2xl">
-          <div className="border text-primary px-3 py-5 rounded-2xl">
-            <Smartphone size={30} />
-          </div>
-          <div className="flex flex-col gap-2">
-            <h1 className="text-2xl font-semibold">#{ordem.numOs}</h1>
-            <h2 className="text-sm">Cliente: {ordem.cliente?.nmCompleto}</h2>
-            <h2 className="text-sm">Modelo: {ordem.aparelho?.modelo}</h2>
-          </div>
-          <span className="rounded-full bg-primary/10 px-3 mr-2 py-1 text-sm font-medium text-primary mb-14">
-            {ordem.status}
-          </span>
-        </div>
+      <OsResumoCard ordem={ordem} />
 
-        <div className="mt-6 rounded-xl">
-          <h2 className="mb-4 text-lg font-semibold text-foreground">
-            Diagnóstico Técnico
-          </h2>
-          <div className="">
-            <textarea
-              readOnly
-              value={
-                ordem.diagnostico ||
-                ordem.diagnosticos?.[0]?.relatoTecnico ||
-                "Sem diagnóstico registrado."
-              }
-              className="bg-card min-h-36 w-full resize-none rounded-lg border border-border  p-4 text-sm text-foreground outline-none"
-            ></textarea>
-          </div>
-        </div>
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <Tabs value={aba} onValueChange={(valor) => setAba(valor as Aba)}>
+          <TabsList className="overflow-x-auto">
+            <TabsTrigger value="diagnostico">
+              <Stethoscope /> Diagnóstico
+            </TabsTrigger>
+            <TabsTrigger value="reparo">
+              <Wrench /> Reparo <Contador valor={orcamento.servicos.length} />
+            </TabsTrigger>
+            <TabsTrigger value="pecas">
+              <Package /> Peças <Contador valor={orcamento.pecas.length} />
+            </TabsTrigger>
+            <TabsTrigger value="checklist">
+              <ClipboardCheck /> Checklist
+            </TabsTrigger>
+          </TabsList>
 
-        <div className="mt-6 rounded-xl ">
-          <h2 className="mb-4 text-lg font-semibold text-foreground">
-            Orçamento
-          </h2>
-          <div className="bg-card">
-            <div className="grid p-4 text-sm text-muted-foreground sm:grid-cols-3 bg-card gap-2">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void HandleSubmit();
-                }}
-              >
-                <div className="p-2 flex gap-2 text-sm font-bold">
-                  {/** preciso retornar as descrições de Servico e da peça caso necessario, se nn for necessario pode se excuir ela */}
-                  <label className="">Peça:</label>
-                  <input
-                    type="number"
-                    value={valorPeca === 0 ? "" : valorPeca}
-                    onChange={(e) => setValorPeca(Number(e.target.value))}
-                    className="border"
-                  />
-                </div>
-                <div className="p-2 flex gap-2 text-sm font-bold">
-                  <label>Serviço:</label>
-                  <input
-                    type="number"
-                    value={valorServico === 0 ? "" : valorServico}
-                    onChange={(e) => setValorServico(Number(e.target.value))}
-                    className="border"
-                  />
-                </div>
-                <div></div>
-              </form>
-            </div>
-          </div>
-          <div>
-            <label>TOTAL</label>
-            <p>{/** valor total */}</p>
-          </div>
-        </div>
+          <Alert mensagem={erroRemocao} />
+
+          <TabsContent value="diagnostico">
+            <DiagnosticoTab
+              numOs={ordem.numOs}
+              relatoCliente={ordem.diagnostico}
+              diagnosticos={ordem.diagnosticos ?? []}
+              onSalvo={recarregar}
+            />
+          </TabsContent>
+
+          <TabsContent value="reparo">
+            <MaoDeObraTab
+              numOs={ordem.numOs}
+              servicos={orcamento.servicos}
+              bloqueado={encerrada}
+              onAlterado={recarregar}
+              onRemover={handleRemoverItem}
+            />
+          </TabsContent>
+
+          <TabsContent value="pecas">
+            <PecasTab
+              numOs={ordem.numOs}
+              pecas={orcamento.pecas}
+              bloqueado={encerrada}
+              onAlterado={recarregar}
+              onRemover={handleRemoverItem}
+            />
+          </TabsContent>
+
+          <TabsContent value="checklist">
+            <ChecklistTab numOs={ordem.numOs} />
+          </TabsContent>
+        </Tabs>
+
+        {/* no desktop o orçamento fica parado do lado enquanto o técnico troca de aba */}
+        <aside className="flex flex-col gap-4 lg:sticky lg:top-28">
+          <OrcamentoResumo
+            totalPecas={orcamento.totalPecas}
+            totalMaoDeObra={orcamento.totalMaoDeObra}
+            total={orcamento.total}
+          />
+          <AcoesStatus numOs={ordem.numOs} status={ordem.status} total={orcamento.total} onAlterado={recarregar} />
+          <AvisosCliente avisos={ordem.logNotificacoes ?? []} />
+        </aside>
       </div>
     </div>
   );

@@ -36,18 +36,8 @@ export const CATALOGO_PERMISSOES = [
     nome: 'Visualizar histórico',
     descricao: 'Consultar serviços já realizados',
   },
-  {
-    chave: PERMISSOES.ESTOQUE_VER,
-    grupo: 'Estoque',
-    nome: 'Visualizar estoque',
-    descricao: 'Ver peças e quantidades',
-  },
-  {
-    chave: PERMISSOES.ESTOQUE_EDITAR,
-    grupo: 'Estoque',
-    nome: 'Gerenciar estoque',
-    descricao: 'Cadastrar e alterar peças e serviços',
-  },
+    // estoque saiu do catálogo: a loja não controla estoque. as chaves ESTOQUE_*
+  // continuam em PERMISSOES porque as rotas antigas de peça/serviço ainda usam
   {
     chave: PERMISSOES.FINANCEIRO_VER,
     grupo: 'Financeiro',

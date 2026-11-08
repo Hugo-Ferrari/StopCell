@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { Smartphone } from "lucide-react";
-import type { OrdemServicoInterface } from "@/pages/history/History";
-import { getStatusStyle } from "@/utils/statusStyle";
+import type { OrdemServicoResumo } from "@/types/ordemServico";
+import { estiloStatus } from "@/utils/statusOs";
 import EmptyHistory from "@/components/history/EmptyHistory";
 
 interface BoxOsProps {
-  ordens: OrdemServicoInterface[];
+  ordens: OrdemServicoResumo[];
 }
 
 export default function BoxOs({ ordens }: BoxOsProps) {
@@ -18,7 +18,7 @@ export default function BoxOs({ ordens }: BoxOsProps) {
         />
       )}
       {ordens.map((os) => {
-        const style = getStatusStyle(os.status);
+        const style = estiloStatus(os.status);
         return (
           <Link
             key={os.numOs}

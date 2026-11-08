@@ -6,6 +6,7 @@ import OrdemServico from "@/pages/orders/pages/WorkOrder";
 import Financeiro from "@/pages/finance/Financial";
 import NovaOrdemServico from "@/pages/orders/pages/NewServiceOrder";
 import DetalhesOrdemServico from "@/pages/orders/pages/ServiceOrderDetails";
+import ChecklistEntrada from "@/pages/orders/pages/EntryChecklist";
 import MainLayout from "@/layouts/MainLayout";
 import Historico from "@/pages/history/History";
 import Configuracoes from "@/pages/settings/Settings";
@@ -48,6 +49,14 @@ export function AppRoutes() {
           element={
             <RequirePermissao permissoes={[ORDENS_VER, HISTORICO_VER]}>
               <DetalhesOrdemServico />
+            </RequirePermissao>
+          }
+        />
+        <Route
+          path="/ordemServico/:numOs/checklist"
+          element={
+            <RequirePermissao permissoes={[ORDENS_EDITAR]}>
+              <ChecklistEntrada />
             </RequirePermissao>
           }
         />
