@@ -8,7 +8,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ClientesService } from './costumer.service';
+import { ClientesService } from './customer.service';
 import { CreateClienteDto } from '@/type/create-customer.dto';
 import { JwtAuthGuard } from 'src/auth/jwt.guards';
 import { Permissao } from '@/common/decorators/permissao.decorator'; // <- novo

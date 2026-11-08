@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "http://localhost:3000",
+        // em produção define VITE_API_URL no .env do web; sem ele usa a API local
+    baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:3000",
 });
 
 api.interceptors.request.use((config) => {

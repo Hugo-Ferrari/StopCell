@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PecaRepository } from './peca.reposiotory';
+import { PecaRepository } from './peca.repository';
 import { PecaDto } from '@/type/peca.dto';
 
 @Injectable()

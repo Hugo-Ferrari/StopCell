@@ -7,7 +7,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { JwtAuthGuard } from './auth/jwt.guards';
 import { PermissoesGuard } from './auth/permissoes.guard';
 import { AuthModule } from './auth/auth.module';
-import { ClientesModule } from './customer/costumer.module';
+import { ClientesModule } from './customer/customer.module';
 import { EmpresaModule } from './enterprise/enterprise.module';
 import { UsuarioModule } from './user/user.module';
 import { PerfilModule } from './perfil/perfil.module';

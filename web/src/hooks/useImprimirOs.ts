@@ -1,10 +1,24 @@
 import { useEffect, useRef, useState } from "react";
+import { isAxiosError } from "axios";
 import { baixarPdfOs } from "@/services/serviceOrderService";
 import { mensagemDeErro } from "@/utils/apiError";
 
 function removerIframe(iframe: HTMLIFrameElement) {
   URL.revokeObjectURL(iframe.src);
   iframe.remove();
+}
+
+// como a requisição pede blob, o erro do back também chega como blob
+// e o mensagemDeErro não consegue ler. aqui converte pra json antes
+async function lerErroDoPdf(error: unknown) {
+  if (isAxiosError(error) && error.response?.data instanceof Blob) {
+    try {
+      error.response.data = JSON.parse(await error.response.data.text());
+    } catch {
+      // não era json, fica a mensagem padrão mesmo
+    }
+  }
+  return mensagemDeErro(error, "Não foi possível gerar o PDF da O.S.");
 }
 
 export function useImprimirOs(numOs: number) {
@@ -40,7 +54,7 @@ export function useImprimirOs(numOs: number) {
       document.body.appendChild(iframe);
       iframeRef.current = iframe;
     } catch (error) {
-      setErro(mensagemDeErro(error, "Não foi possível gerar o PDF da O.S."));
+      setErro(await lerErroDoPdf(error));
     } finally {
       setImprimindo(false);
     }

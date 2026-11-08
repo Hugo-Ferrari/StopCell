@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Smartphone } from "lucide-react";
 import type { GrupoHistorico } from "@/utils/groupHistory";
-import { getStatusStyle } from "@/utils/statusStyle";
+import { estiloStatus } from "@/utils/statusOs";
 
 interface DeviceBoxProps {
   aparelhos: GrupoHistorico[];
@@ -11,7 +11,7 @@ export default function DeviceBox({ aparelhos }: DeviceBoxProps) {
   return (
     <div className="flex flex-col gap-4">
       {aparelhos.map(({ chave, ultimaOs, totalServicos }) => {
-        const style = getStatusStyle(ultimaOs.status);
+        const style = estiloStatus(ultimaOs.status);
         return (
           <Link
             key={`aparelho-${chave}`}

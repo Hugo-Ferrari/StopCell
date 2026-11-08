@@ -1,6 +1,5 @@
 import type { DateRange } from "react-day-picker";
-import type { OrdemServicoInterface } from "@/pages/history/History";
-
+import type { OrdemServicoResumo } from "@/types/ordemServico";
 // Deixa a busca sem diferenciar maiúsculas nem acentos ("joao" encontra "João")
 function normalizar(texto: string) {
   return texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -20,7 +19,7 @@ function dentroDoPeriodo(dtEntrada: string | null, periodo: DateRange | undefine
 }
 
 export function filtrarOrdens(
-  ordens: OrdemServicoInterface[],
+  ordens: OrdemServicoResumo[],
   busca: string,
   periodo: DateRange | undefined
 ) {

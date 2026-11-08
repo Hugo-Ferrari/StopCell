@@ -12,16 +12,9 @@ import FilterHistory from "@/components/history/FilterHistory";
 import { filtrarOrdens } from "@/utils/filterHistory";
 import { agruparPorAparelho, agruparPorCliente } from "@/utils/groupHistory";
 import { listarOs } from "@/services/serviceOrderService";
+import type { OrdemServicoResumo } from "@/types/ordemServico";
 
-export interface OrdemServicoInterface {
-  numOs: number;
-  cpfCliente: string;
-  imeiAparelho: string;
-  dtEntrada: string | null;
-  status: "ABERTA" | "DIAGNOSTICO" | "EM_REPARO" | "FINALIZADO";
-  cliente: { nmCompleto: string; };
-  aparelho: { modelo: string; };
-}
+
 
 type Aba = "os" | "clientes" | "aparelhos";
 
@@ -29,7 +22,7 @@ export default function History() {
   const [abaAtiva, setAbaAtiva] = useState<Aba>("os");
   const [busca, setBusca] = useState("");
   const [date, setDate] = useState<DateRange | undefined>();
-  const [ordens, setOrdens] = useState<OrdemServicoInterface[]>([]);
+  const [ordens, setOrdens] = useState<OrdemServicoResumo[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(false);
 
