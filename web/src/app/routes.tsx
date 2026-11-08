@@ -8,14 +8,13 @@ import NovaOrdemServico from "@/pages/orders/pages/NewServiceOrder";
 import DetalhesOrdemServico from "@/pages/orders/pages/ServiceOrderDetails";
 import MainLayout from "@/layouts/MainLayout";
 import Historico from "@/pages/history/History";
-import Estoque from "@/pages/orders/pages/Stock";
 import Configuracoes from "@/pages/settings/Settings";
 import StoreSettings from "@/pages/settings/StoreSettings";
 import UsersSettings from "@/components/settings/UsersSettings";
 import RequirePermissao from "@/components/common/RequirePermissao";
 import { PERMISSOES } from "@/utils/permissoes";
 
-const { ORDENS_VER, ORDENS_EDITAR, HISTORICO_VER, ESTOQUE_VER, FINANCEIRO_VER, LOJA_EDITAR } = PERMISSOES;
+const { ORDENS_VER, ORDENS_EDITAR, HISTORICO_VER, FINANCEIRO_VER, LOJA_EDITAR } = PERMISSOES;
 
 export function AppRoutes() {
   return (
@@ -57,14 +56,6 @@ export function AppRoutes() {
           element={
             <RequirePermissao permissoes={[HISTORICO_VER]}>
               <Historico />
-            </RequirePermissao>
-          }
-        />
-        <Route
-          path="/estoque"
-          element={
-            <RequirePermissao permissoes={[ESTOQUE_VER]}>
-              <Estoque />
             </RequirePermissao>
           }
         />

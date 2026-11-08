@@ -13,7 +13,6 @@ function Header() {
     "/configuracoes": "Configurações",
     "/configuracoes/loja": "Dados da Loja",
     "/configuracoes/usuarios": "Usuários e Permissões", // <- novo
-    "/estoque" : "Estoque",
   };
 
   const titulo = matchPath(

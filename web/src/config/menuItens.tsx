@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ClipboardList, RotateCcw, Settings, Wallet, Warehouse } from "lucide-react";
+import { ClipboardList, RotateCcw, Settings, Wallet } from "lucide-react";
 import { PERMISSOES, type Permissao } from "@/utils/permissoes";
 
 export interface MenuItem {
@@ -26,13 +26,6 @@ export const MENU_ITENS: MenuItem[] = [
     subtext: "Visualize serviços anteriores",
     path: "/historico",
     permissoes: [PERMISSOES.HISTORICO_VER],
-  },
-  {
-    icon: <Warehouse size={20} />,
-    text: "Estoque",
-    subtext: "Gerencie seu Estoque",
-    path: "/estoque",
-    permissoes: [PERMISSOES.ESTOQUE_VER],
   },
   {
     icon: <Wallet size={20} />,

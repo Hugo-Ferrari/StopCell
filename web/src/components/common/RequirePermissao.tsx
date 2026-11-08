@@ -41,7 +41,7 @@ function RequirePermissao({
   );
 
   // ex: o login sempre manda pra /ordemServico, mas o funcionário pode só ter
-  // acesso ao estoque. aí em vez de mostrar o aviso, já leva ele pra lá
+  // acesso ao histórico. aí em vez de mostrar o aviso, já leva ele pra lá
   if (redirecionar && primeiraPermitida) {
     return <Navigate to={primeiraPermitida.path} replace />;
   }

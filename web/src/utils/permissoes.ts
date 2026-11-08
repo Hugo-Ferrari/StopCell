@@ -4,8 +4,6 @@ export const PERMISSOES = {
   ORDENS_VER: "ordens.ver",
   ORDENS_EDITAR: "ordens.editar",
   HISTORICO_VER: "historico.ver",
-  ESTOQUE_VER: "estoque.ver",
-  ESTOQUE_EDITAR: "estoque.editar",
   FINANCEIRO_VER: "financeiro.ver",
   LOJA_EDITAR: "loja.editar",
 } as const;
@@ -15,7 +13,6 @@ export type Permissao = (typeof PERMISSOES)[keyof typeof PERMISSOES];
 // marcar "editar" marca "ver" junto (o back faz a mesma coisa)
 export const DEPENDENCIAS: Record<string, string> = {
   [PERMISSOES.ORDENS_EDITAR]: PERMISSOES.ORDENS_VER,
-  [PERMISSOES.ESTOQUE_EDITAR]: PERMISSOES.ESTOQUE_VER,
 };
 
 export function alternarPermissao(atuais: string[], chave: string): string[] {
