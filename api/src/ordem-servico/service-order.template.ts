@@ -35,19 +35,6 @@ function moeda(value: unknown): string {
   });
 }
 
-function dataHora(value: unknown): string {
-  if (!value) return '';
-
-  const data = new Date(String(value));
-
-  if (Number.isNaN(data.getTime())) return '';
-
-  return data.toLocaleString('pt-BR', {
-    dateStyle: 'short',
-    timeStyle: 'short',
-  });
-}
-
 function formatarCpf(value?: string | null): string {
   return (value ?? '').replace(
     /^(\d{3})(\d{3})(\d{3})(\d{2})$/,
@@ -75,6 +62,40 @@ function campo(rotulo: string, valor: unknown, classe = ''): string {
     <div class="campo ${classe}">
       <span class="rotulo-campo">${rotulo}:</span>
       <span class="valor-campo">${escapeHtml(valor)}</span>
+    </div>
+  `;
+}
+
+// a tela de aparelho grava o desenho como a sequência das bolinhas, de 1 a 9 (ex: 14789)
+function padraoDesenho(senha?: string | null): string {
+  const posicao = (bolinha: number) => ({
+    x: 10 + ((bolinha - 1) % 3) * 20,
+    y: 10 + Math.floor((bolinha - 1) / 3) * 20,
+  });
+
+  const sequencia = (senha ?? '').replace(/[^1-9]/g, '').split('').map(Number);
+
+  const caminho = sequencia
+    .map((bolinha) => `${posicao(bolinha).x},${posicao(bolinha).y}`)
+    .join(' ');
+
+  const bolinhas = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    .map((bolinha) => {
+      const { x, y } = posicao(bolinha);
+      const usada = sequencia.includes(bolinha);
+      const raio = bolinha === sequencia[0] ? 6 : 4;
+
+      return `<circle cx="${x}" cy="${y}" r="${raio}" fill="${usada ? '#D9480F' : '#fff'}" stroke="${usada ? '#D9480F' : '#A8A3A0'}" />`;
+    })
+    .join('');
+
+  return `
+    <div class="padrao-senha">
+      <span class="rotulo-campo">Desenho:</span>
+      <svg viewBox="0 0 60 60" width="54" height="54">
+        <polyline points="${caminho}" fill="none" stroke="#D9480F" stroke-width="2" />
+        ${bolinhas}
+      </svg>
     </div>
   `;
 }
@@ -396,6 +417,12 @@ export function gerarHtmlOrdemServico(os: any): string {
       padding: 9px 4px 0;
     }
 
+    .padrao-senha {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .pergunta {
       display: flex;
       justify-content: space-between;
@@ -591,9 +618,6 @@ export function gerarHtmlOrdemServico(os: any): string {
       ${campo('Telefone', formatarTelefone(os.cliente?.telefone), 'terco')}
       ${campo('E-mail', os.cliente?.email, 'terco')}
       ${campo('Endereço', os.cliente?.endereco)}
-      ${campo('Entrada', dataHora(os.dtEntrada), 'terco')}
-      ${campo('Saída', dataHora(os.dtSaida), 'terco')}
-      ${campo('Status', os.status, 'terco')}
     </section>
 
     <div class="bloco colunas">
@@ -610,6 +634,7 @@ export function gerarHtmlOrdemServico(os: any): string {
           ${campo('Cor', os.aparelho?.cor)}
           ${campo('IMEI', os.aparelho?.imei)}
           ${campo('Tipo de senha', os.aparelho?.tipoSenha)}
+          ${os.aparelho?.tipoSenha === 'Padrão (Desenho)' ? padraoDesenho(os.aparelho?.senhaAparelho) : ''}
 
           <div class="pergunta">
             Apresentou nota fiscal?
