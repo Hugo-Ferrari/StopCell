@@ -12,6 +12,27 @@ export class MailService {
     auth: { user: process.env.MAIL_USER, pass: process.env.MAIL_PASS },
   });
 
+    estaConfigurado() {
+    return Boolean(process.env.MAIL_USER && process.env.MAIL_PASS);
+  }
+
+  // envio genérico, usado pelos avisos de status da O.S.
+  async enviar(mensagem: { para: string; assunto: string; html: string; texto: string; nomeRemetente?: string }) {
+    // com o nome da loja no remetente o cliente reconhece de quem é o e-mail.
+    // o endereço continua sendo o MAIL_USER, que é o que o Gmail aceita
+    const remetente = mensagem.nomeRemetente
+      ? { name: mensagem.nomeRemetente, address: process.env.MAIL_USER! }
+      : (process.env.MAIL_FROM ?? process.env.MAIL_USER);
+
+    await this.transporter.sendMail({
+      from: remetente,
+      to: mensagem.para,
+      subject: mensagem.assunto,
+      text: mensagem.texto,
+      html: mensagem.html,
+    });
+  }
+
   async enviarCodigoRecuperacao(destinatario: string, codigo: string, validadeMin: number) {
     if (!process.env.MAIL_USER || !process.env.MAIL_PASS) {
       this.logger.warn('MAIL_USER/MAIL_PASS não configurados: e-mail não enviado.');

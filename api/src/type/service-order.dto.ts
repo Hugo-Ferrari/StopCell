@@ -1,29 +1,27 @@
-import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { StatusOs } from '@prisma/client';
 
+// o atendente e o valor total não vêm mais daqui:
+// o atendente sai do token e o total é calculado pelos itens lançados
 export class OrdemServicoDto {
-
     @IsInt()
     @IsOptional()
     numOsAnterior?: number | null;
 
     @IsString()
     @IsNotEmpty()
-    cpfCliente: string=''
+    cpfCliente: string = ''
 
     @IsString()
     @IsNotEmpty()
-    imeiAparelho: string =''
-
-    @IsInt()
-    @IsNotEmpty()
-    @Min(1)
-    idUsuario: number=0
+    imeiAparelho: string = ''
 
     @IsString()
     @IsOptional()
     diagnostico?: string;
+}
 
-    @IsNumber({ maxDecimalPlaces: 2 })
-    @Min(0.01)
-    vlTotal!: number
+export class AtualizarStatusOsDto {
+    @IsEnum(StatusOs, { message: 'Status inválido' })
+    status!: StatusOs;
 }

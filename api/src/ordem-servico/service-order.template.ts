@@ -1,4 +1,7 @@
-// mesmos itens do checklist de entrada da tela de nova OS (ChecklistForm.tsx)
+import { ROTULO_STATUS } from './status-os';
+
+// mesmos itens do checklist de entrada da tela de nova OS (ChecklistForm.tsx).
+// se a O.S. não tiver checklist salvo, imprime essa lista em branco pra marcar à mão
 const ITENS_CHECKLIST = [
   'Tela / Touch',
   'Botões',
@@ -14,8 +17,15 @@ const ITENS_CHECKLIST = [
   'Chip / SIM',
 ];
 
+const ROTULO_FORMA_PAGAMENTO: Record<string, string> = {
+  PIX: 'Pix',
+  CARTAO: 'Cartão',
+  DINHEIRO: 'Dinheiro',
+  BOLETO: 'Boleto',
+};
+
 // a tabela sempre tem pelo menos essas linhas, pra dar espaço de anotar à mão
-const MINIMO_LINHAS_ITENS = 4;
+const MINIMO_LINHAS_ITENS = 3;
 
 function escapeHtml(value: unknown): string {
   return String(value ?? '')
@@ -26,47 +36,41 @@ function escapeHtml(value: unknown): string {
     .replace(/'/g, '&#039;');
 }
 
-function moeda(value: unknown): string {
-  const numero = Number(value ?? 0);
+function numero(value: unknown): number {
+  const convertido = Number(value ?? 0);
+  return Number.isFinite(convertido) ? convertido : 0;
+}
 
-  return (Number.isFinite(numero) ? numero : 0).toLocaleString('pt-BR', {
+function moeda(value: unknown): string {
+  return numero(value).toLocaleString('pt-BR', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 }
 
-function dataHora(value: unknown): string {
+function data(value: unknown, comHora = true): string {
   if (!value) return '';
 
-  const data = new Date(String(value));
+  const convertida = new Date(String(value));
+  if (Number.isNaN(convertida.getTime())) return '';
 
-  if (Number.isNaN(data.getTime())) return '';
-
-  return data.toLocaleString('pt-BR', {
+  return convertida.toLocaleString('pt-BR', {
     dateStyle: 'short',
-    timeStyle: 'short',
+    timeStyle: comHora ? 'short' : undefined,
+    timeZone: 'America/Sao_Paulo',
   });
 }
 
 function formatarCpf(value?: string | null): string {
-  return (value ?? '').replace(
-    /^(\d{3})(\d{3})(\d{3})(\d{2})$/,
-    '$1.$2.$3-$4',
-  );
+  return (value ?? '').replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
 }
 
 function formatarCnpj(value?: string | null): string {
-  return (value ?? '').replace(
-    /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
-    '$1.$2.$3/$4-$5',
-  );
+  return (value ?? '').replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
 }
 
 function formatarTelefone(value?: string | null): string {
-  return (value ?? '').replace(
-    /^(\d{2})(\d{4,5})(\d{4})$/,
-    '($1) $2-$3',
-  );
+  return (value ?? '').replace(/^(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3');
 }
 
 // campo sem valor fica com a linha em branco, pra ser preenchido à mão
@@ -79,90 +83,133 @@ function campo(rotulo: string, valor: unknown, classe = ''): string {
   `;
 }
 
-function opcoes(rotulos: string[]): string {
+// desenha as caixinhas e marca a que bate com o valor salvo
+function opcoes(rotulos: string[], marcado?: string | null): string {
   return rotulos
     .map(
       (rotulo) =>
-        `<span class="opcao"><span class="caixa"></span>${rotulo}</span>`,
+        `<span class="opcao"><span class="caixa ${rotulo === marcado ? 'marcada' : ''}"></span>${rotulo}</span>`,
     )
     .join('');
 }
 
-export function gerarHtmlOrdemServico(os: any): string {
-  const nomeEmpresa =
-    os.empresa?.nomeFantasia ??
-    os.empresa?.razaoSocial ??
-    'StopCell';
+function montarChecklist(osChecklists: any[]): string {
+  // no banco fica "NA", no papel aparece "N/A"
+  const salvos = osChecklists.map((item) => ({
+    descricao: item.checklist?.descricao ?? 'Item',
+    status: item.status === 'NA' ? 'N/A' : item.status,
+    observacao: item.observacao,
+  }));
 
-  const itens = Array.isArray(os.itensOs) ? os.itensOs : [];
-  const diagnosticos = Array.isArray(os.diagnosticos)
-    ? os.diagnosticos
-    : [];
+  // mantém a ordem da tela de entrada; o que for diferente vai pro final
+  const ordem = (descricao: string) => {
+    const posicao = ITENS_CHECKLIST.indexOf(descricao);
+    return posicao === -1 ? ITENS_CHECKLIST.length : posicao;
+  };
+  salvos.sort((a, b) => ordem(a.descricao) - ordem(b.descricao));
 
-  const totalCalculado = itens.reduce(
-    (total: number, item: any) => {
-      const quantidade = Number(item.quantidade ?? 1);
-      const valorUnitario = Number(item.valorUnitario ?? 0);
+  const linhas = salvos.length
+    ? salvos
+    : ITENS_CHECKLIST.map((descricao) => ({ descricao, status: null, observacao: null }));
 
-      if (
-        !Number.isFinite(quantidade) ||
-        !Number.isFinite(valorUnitario)
-      ) {
-        return total;
-      }
+  return linhas
+    .map(
+      (item) => `
+      <div class="item-checklist">
+        <div class="linha-checklist">
+          <span>${escapeHtml(item.descricao)}</span>
+          <span class="opcoes">${opcoes(['OK', 'NOK', 'N/A'], item.status)}</span>
+        </div>
+        ${item.observacao ? `<div class="obs-checklist">${escapeHtml(item.observacao)}</div>` : ''}
+      </div>
+    `,
+    )
+    .join('');
+}
 
-      return total + quantidade * valorUnitario;
-    },
-    0,
-  );
+function montarLaudo(diagnosticos: any[]): string {
+  const registros = diagnosticos.filter((d) => d.relatoTecnico?.trim());
 
-  const total =
-    os.vlTotal == null ? totalCalculado : Number(os.vlTotal);
+  if (!registros.length) {
+    return '<div class="linha-escrita"></div><div class="linha-escrita"></div>';
+  }
 
-  const descricaoDiagnostico =
-    os.diagnostico ||
-    diagnosticos
-      .map((diagnostico: any) => diagnostico.relatoTecnico)
-      .filter(Boolean)
-      .join(' | ');
+  return `
+    <div class="laudo">
+      ${registros
+        .map(
+          (d) => `
+          <div class="laudo-item">
+            <span class="laudo-data">${data(d.dataHora)}</span>
+            <span>${escapeHtml(d.relatoTecnico)}</span>
+          </div>
+        `,
+        )
+        .join('')}
+    </div>
+  `;
+}
 
-  const linhasItens = itens
-    .map((item: any) => {
-      const descricao =
-        item.servico?.descricao ??
-        item.peca?.descricao ??
-        'Item não identificado';
-
-      const quantidade = Number(item.quantidade ?? 1) || 0;
-      const valorUnitario = Number(item.valorUnitario ?? 0) || 0;
-      const valorItem = quantidade * valorUnitario;
+function montarItens(itens: any[]): string {
+  const linhas = itens
+    .map((item) => {
+      const quantidade = numero(item.quantidade ?? 1);
+      const valorUnitario = numero(item.valorUnitario);
 
       return `
         <tr>
           <td class="centro">${quantidade}</td>
-          <td>${escapeHtml(descricao)}</td>
-          <td class="direita">R$ ${moeda(valorItem)}</td>
+          <td>
+            <span class="tipo-item">${item.tipo === 'PECA' ? 'Peça' : 'Serviço'}</span>
+            ${escapeHtml(item.descricao)}
+          </td>
+          <td class="direita">R$ ${moeda(valorUnitario)}</td>
+          <td class="direita">R$ ${moeda(quantidade * valorUnitario)}</td>
         </tr>
       `;
     })
     .join('');
 
-  const linhasEmBranco = `
-    <tr>
-      <td>&nbsp;</td>
-      <td></td>
-      <td></td>
-    </tr>
+  const emBranco = `
+    <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
   `.repeat(Math.max(0, MINIMO_LINHAS_ITENS - itens.length));
 
-  const linhasChecklist = ITENS_CHECKLIST.map(
-    (item) => `
-      <div class="linha-checklist">
-        <span>${item}</span>
-        <span class="opcoes">${opcoes(['OK', 'NOK', 'N/A'])}</span>
-      </div>
-    `,
-  ).join('');
+  return linhas + emBranco;
+}
+
+// cabe numa linha só: "05/11/2026 · Pix · R$ 200,00"
+function montarPagamentos(pagamentos: any[]): string {
+  if (!pagamentos.length) {
+    return '<span class="pagamento">Nenhum pagamento registrado</span>';
+  }
+
+  return pagamentos
+    .map((p) => {
+      const forma = ROTULO_FORMA_PAGAMENTO[p.formaPagamento] ?? p.formaPagamento ?? '';
+      return `<span class="pagamento">${data(p.dtPagamento, false)} · ${escapeHtml(forma)} · <strong>R$ ${moeda(p.valorPago)}</strong></span>`;
+    })
+    .join('');
+}
+
+export function gerarHtmlOrdemServico(os: any): string {
+  const nomeEmpresa = os.empresa?.nomeFantasia ?? os.empresa?.razaoSocial ?? 'StopCell';
+
+  const itens: any[] = os.itensOs ?? [];
+  const pagamentos: any[] = os.pagamentos ?? [];
+
+  const totalPecas = itens
+    .filter((item) => item.tipo === 'PECA')
+    .reduce((soma, item) => soma + numero(item.quantidade ?? 1) * numero(item.valorUnitario), 0);
+  const totalServicos = itens
+    .filter((item) => item.tipo !== 'PECA')
+    .reduce((soma, item) => soma + numero(item.quantidade ?? 1) * numero(item.valorUnitario), 0);
+
+  const total = os.vlTotal == null ? totalPecas + totalServicos : numero(os.vlTotal);
+  const totalPago = pagamentos.reduce((soma, p) => soma + numero(p.valorPago), 0);
+  const saldo = Math.max(Math.round((total - totalPago) * 100) / 100, 0);
+
+  const aparelho = os.aparelho ?? {};
+  const modelo = [aparelho.marca?.nmMarca, aparelho.modelo].filter(Boolean).join(' ');
 
   const contatoEmpresa = [
     nomeEmpresa,
@@ -220,7 +267,7 @@ export function gerarHtmlOrdemServico(os: any): string {
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
       gap: 16px;
-      padding: 16px 22px;
+      padding: 12px 22px;
       color: #fff;
       background: var(--fundo-escuro);
       border-bottom: 4px solid var(--primaria);
@@ -263,8 +310,8 @@ export function gerarHtmlOrdemServico(os: any): string {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      width: 72px;
-      height: 72px;
+      width: 62px;
+      height: 62px;
       font-size: 11px;
       font-weight: 800;
       line-height: 1;
@@ -292,14 +339,14 @@ export function gerarHtmlOrdemServico(os: any): string {
     }
 
     .bloco {
-      margin-top: 11px;
+      margin-top: 9px;
       break-inside: avoid;
     }
 
     .campos {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px 16px;
+      gap: 6px 16px;
     }
 
     .campo {
@@ -340,7 +387,7 @@ export function gerarHtmlOrdemServico(os: any): string {
     }
 
     .titulo-secao {
-      padding: 6px 12px;
+      padding: 5px 12px;
       color: #fff;
       background: var(--primaria);
       border-radius: 6px;
@@ -353,11 +400,6 @@ export function gerarHtmlOrdemServico(os: any): string {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 4.5px 8px;
-    }
-
-    .linha-checklist:nth-child(even) {
-      background: var(--fundo-secao);
     }
 
     .corpo-checklist {
@@ -392,8 +434,8 @@ export function gerarHtmlOrdemServico(os: any): string {
     .corpo-aparelho {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      padding: 9px 4px 0;
+      gap: 7px;
+      padding: 8px 4px 0;
     }
 
     .pergunta {
@@ -408,8 +450,8 @@ export function gerarHtmlOrdemServico(os: any): string {
     }
 
     .relato {
-      min-height: 44px;
-      padding: 7px 10px;
+      min-height: 30px;
+      padding: 6px 10px;
       background: var(--fundo-secao);
       border-radius: 6px;
       white-space: pre-wrap;
@@ -444,7 +486,7 @@ export function gerarHtmlOrdemServico(os: any): string {
 
     th,
     td {
-      padding: 5px 8px;
+      padding: 4px 8px;
       border: 1px solid var(--linha);
       overflow-wrap: anywhere;
     }
@@ -468,12 +510,13 @@ export function gerarHtmlOrdemServico(os: any): string {
       background: var(--fundo-secao);
     }
 
-    th:nth-child(1) {
-      width: 11%;
+    .tabela-itens th:nth-child(1) {
+      width: 9%;
     }
 
-    th:nth-child(3) {
-      width: 20%;
+    .tabela-itens th:nth-child(3),
+    .tabela-itens th:nth-child(4) {
+      width: 17%;
     }
 
     tr {
@@ -494,7 +537,7 @@ export function gerarHtmlOrdemServico(os: any): string {
       justify-content: space-between;
       align-items: stretch;
       gap: 16px;
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     .fechamento .campo {
@@ -519,20 +562,20 @@ export function gerarHtmlOrdemServico(os: any): string {
     }
 
     .garantia {
-      padding: 8px 12px;
+      padding: 6px 12px;
       color: #fff;
       background: var(--fundo-escuro);
       border-left: 4px solid var(--primaria);
       border-radius: 6px;
-      font-size: 9.5px;
-      line-height: 1.45;
+      font-size: 9px;
+      line-height: 1.4;
     }
 
     .assinaturas {
       display: grid;
       grid-template-columns: 2fr 2fr 1fr;
       gap: 16px;
-      margin-top: 30px;
+      margin-top: 18px;
       font-size: 10px;
       text-align: center;
       break-inside: avoid;
@@ -544,14 +587,120 @@ export function gerarHtmlOrdemServico(os: any): string {
     }
 
     .rodape {
-      margin-top: 12px;
-      padding: 7px 14px;
+      margin-top: 10px;
+      padding: 6px 14px;
       color: #fff;
       background: var(--fundo-escuro);
       border-radius: 0 0 10px 10px;
       font-size: 9.5px;
       text-align: center;
       break-inside: avoid;
+    }
+
+    .caixa.marcada {
+      position: relative;
+      background: var(--primaria);
+      border-color: var(--primaria);
+    }
+
+    .caixa.marcada::after {
+      content: '';
+      position: absolute;
+      left: 3.5px;
+      top: 0.5px;
+      width: 3px;
+      height: 7px;
+      border: solid #fff;
+      border-width: 0 1.5px 1.5px 0;
+      transform: rotate(45deg);
+    }
+
+    .item-checklist {
+      padding: 3px 8px;
+    }
+
+    .item-checklist:nth-child(even) {
+      background: var(--fundo-secao);
+    }
+
+    .obs-checklist {
+      margin-top: 1px;
+      color: var(--texto-secundario);
+      font-size: 9px;
+      font-style: italic;
+    }
+
+    .sem-quebra {
+      white-space: normal;
+    }
+
+    .laudo-item span:last-child {
+      white-space: pre-wrap;
+    }
+
+    .laudo {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .laudo-item {
+      display: flex;
+      gap: 8px;
+    }
+
+    .laudo-data {
+      flex-shrink: 0;
+      color: var(--texto-secundario);
+      font-size: 9.5px;
+    }
+
+    .tipo-item {
+      color: var(--texto-secundario);
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .subtotais {
+      display: flex;
+      justify-content: flex-end;
+      gap: 18px;
+      margin-top: 6px;
+      color: var(--texto-secundario);
+      font-size: 10px;
+    }
+
+    .pagamentos {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 7px 12px;
+      border: 1px solid var(--borda);
+      border-radius: 6px;
+    }
+
+    .lista-pagamentos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 14px;
+      font-size: 10px;
+    }
+
+    .resumo-pagamento {
+      display: flex;
+      flex-shrink: 0;
+      gap: 14px;
+      font-size: 10.5px;
+    }
+
+    .resumo-pagamento strong {
+      color: var(--texto);
+    }
+
+    .saldo-pendente strong {
+      color: var(--primaria);
     }
   </style>
 </head>
@@ -591,25 +740,27 @@ export function gerarHtmlOrdemServico(os: any): string {
       ${campo('Telefone', formatarTelefone(os.cliente?.telefone), 'terco')}
       ${campo('E-mail', os.cliente?.email, 'terco')}
       ${campo('Endereço', os.cliente?.endereco)}
-      ${campo('Entrada', dataHora(os.dtEntrada), 'terco')}
-      ${campo('Saída', dataHora(os.dtSaida), 'terco')}
-      ${campo('Status', os.status, 'terco')}
+      ${campo('Entrada', data(os.dtEntrada), 'terco')}
+      ${campo('Saída', data(os.dtSaida), 'terco')}
+      ${campo('Status', ROTULO_STATUS[os.status as keyof typeof ROTULO_STATUS] ?? os.status, 'terco')}
+      ${campo('Atendente', os.usuario?.nome, 'metade')}
+      ${campo('Retrabalho da O.S.', os.numOsAnterior ? `Nº ${os.numOsAnterior}` : 'Não', 'metade')}
     </section>
 
     <div class="bloco colunas">
       <section>
-        <div class="titulo-secao">Checklist</div>
-        <div class="corpo-checklist">${linhasChecklist}</div>
+        <div class="titulo-secao">Checklist de entrada</div>
+        <div class="corpo-checklist">${montarChecklist(os.osChecklists ?? [])}</div>
       </section>
 
       <section>
         <div class="titulo-secao">Informações do aparelho</div>
 
         <div class="corpo-aparelho">
-          ${campo('Modelo', os.aparelho?.modelo)}
-          ${campo('Cor', os.aparelho?.cor)}
-          ${campo('IMEI', os.aparelho?.imei)}
-          ${campo('Tipo de senha', os.aparelho?.tipoSenha)}
+          ${campo('Modelo', modelo)}
+          ${campo('Cor', aparelho.cor)}
+          ${campo('IMEI', aparelho.imei)}
+          ${campo('Tipo de senha', aparelho.tipoSenha)}
 
           <div class="pergunta">
             Apresentou nota fiscal?
@@ -623,31 +774,37 @@ export function gerarHtmlOrdemServico(os: any): string {
 
           ${campo('Observações', '')}
           <div class="linha-escrita"></div>
-          <div class="linha-escrita"></div>
         </div>
       </section>
     </div>
 
-    <section class="bloco relato"><span class="rotulo-campo">Problema relatado:</span>${escapeHtml(descricaoDiagnostico)}</section>
+    <section class="bloco relato"><span class="rotulo-campo">Problema relatado pelo cliente:</span>${escapeHtml(os.diagnostico)}</section>
+
+    <section class="bloco relato sem-quebra"><span class="rotulo-campo">Laudo técnico:</span>${montarLaudo(os.diagnosticos ?? [])}</section>
 
     <section class="bloco">
       <div class="tabela">
-        <div class="titulo-tabela">Laudo técnico / diagnóstico</div>
+        <div class="titulo-tabela">Peças e serviços</div>
 
-        <table>
+        <table class="tabela-itens">
           <thead>
             <tr>
-              <th>Quant.</th>
-              <th>Descrição dos serviços</th>
-              <th>Valor</th>
+              <th>Qtd.</th>
+              <th>Descrição</th>
+              <th>Valor unit.</th>
+              <th>Subtotal</th>
             </tr>
           </thead>
 
           <tbody>
-            ${linhasItens}
-            ${linhasEmBranco}
+            ${montarItens(itens)}
           </tbody>
         </table>
+      </div>
+
+      <div class="subtotais">
+        <span>Peças: <strong>R$ ${moeda(totalPecas)}</strong></span>
+        <span>Mão de obra: <strong>R$ ${moeda(totalServicos)}</strong></span>
       </div>
 
       <div class="fechamento">
@@ -657,6 +814,18 @@ export function gerarHtmlOrdemServico(os: any): string {
           Total
           <span class="valor-total">R$ ${moeda(total)}</span>
         </div>
+      </div>
+    </section>
+
+    <section class="bloco pagamentos">
+      <div class="lista-pagamentos">
+        <span class="rotulo-campo">Pagamentos:</span>
+        ${montarPagamentos(pagamentos)}
+      </div>
+
+      <div class="resumo-pagamento">
+        <span>Pago: <strong>R$ ${moeda(totalPago)}</strong></span>
+        <span class="saldo-pendente">Falta pagar: <strong>R$ ${moeda(saldo)}</strong></span>
       </div>
     </section>
 

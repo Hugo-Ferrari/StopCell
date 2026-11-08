@@ -1,18 +1,39 @@
 import {
+  Body,
   Controller,
-  Patch,
+  Get,
+  NotFoundException,
   Param,
+  ParseIntPipe,
+  Patch,
+  Put,
   Query,
   Req,
-  NotFoundException,
 } from '@nestjs/common';
 import { OsChecklistService } from './os-checklist.service';
+import { SalvarChecklistOsDto } from '@/type/os-checklist.dto';
 import { Permissao } from '@/common/decorators/permissao.decorator'; // <- novo
 import { PERMISSOES } from '@/common/permissoes/catalogo'; // <- novo
 
 @Controller('os-checklist')
 export class OsChecklistController {
   constructor(private readonly service: OsChecklistService) {}
+
+  @Permissao(PERMISSOES.ORDENS_VER, PERMISSOES.HISTORICO_VER)
+  @Get(':numOs')
+  listarPorOs(@Param('numOs', ParseIntPipe) numOs: number, @Req() req: any) {
+    return this.service.listarPorOs(numOs, req.userCnpjEmpresa);
+  }
+
+  @Permissao(PERMISSOES.ORDENS_EDITAR)
+  @Put(':numOs')
+  salvar(
+    @Param('numOs', ParseIntPipe) numOs: number,
+    @Body() dto: SalvarChecklistOsDto,
+    @Req() req: any,
+  ) {
+    return this.service.salvar(numOs, dto, req.userCnpjEmpresa);
+  }
 
   @Permissao(PERMISSOES.ORDENS_EDITAR) // <- novo
   @Patch(':ordemServicoId/:checklistId/status')

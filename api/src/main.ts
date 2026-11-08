@@ -7,8 +7,14 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+    // em produção coloca o endereço do site no CORS_ORIGIN (dá pra separar vários por vírgula)
+  const origens = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
+    .split(',')
+    .map((origem) => origem.trim())
+    .filter(Boolean);
+
   app.enableCors({
-    origin: ['http://localhost:5173'],
+    origin: origens,
     credentials: true,
   });
 

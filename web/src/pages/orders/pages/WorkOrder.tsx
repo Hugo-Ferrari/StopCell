@@ -1,151 +1,71 @@
-import { useEffect, useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, Bell, SlidersHorizontal } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import BoxOs from "@/components/history/BoxOs";
-import { listarOs } from "@/services/serviceOrderService";
-import type { OrdemServicoInterface } from "../models/WorkOrder";
+import Alert from "@/components/common/Alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import BuscaOs from "@/components/orders/list/BuscaOs";
+import FiltroStatusDialog from "@/components/orders/list/FiltroStatusDialog";
+import FiltrosAtivos from "@/components/orders/list/FiltrosAtivos";
+import ResumoStatus from "@/components/orders/list/ResumoStatus";
+import { useListaOrdens } from "@/hooks/useListaOrdens";
+import { contarPorFiltro, filtrarOrdens, type FiltroOs } from "@/utils/filtroOs";
 
-// corrigir filtros( EM_REPARO, AGUARDANDO_PEÇA, EM_REPARO, FINALIZADO)
 function OrdemServico() {
+  const { ordens, carregando, erro } = useListaOrdens();
   const [busca, setBusca] = useState("");
-  const [filtroStatus, setFiltroStatus] = useState("Todas");
-  const [ordens, setOrdens] = useState<OrdemServicoInterface[]>([]);
+  const [filtros, setFiltros] = useState<FiltroOs[]>([]);
 
-  useEffect(() => {
-    async function carregarOs() {
-      try {
-        const dados = await listarOs();
-        console.log(dados)
-        setOrdens(dados);
-        
-      } catch (error) {
-        console.error("Erro ao carregar Ordens de Serviço:", error);
-      }
-    }
-    carregarOs();
-  }, []);
+  const contagem = useMemo(() => contarPorFiltro(ordens), [ordens]);
+  const ordensFiltradas = useMemo(() => filtrarOrdens(ordens, filtros, busca), [ordens, filtros, busca]);
 
-  const metricas = useMemo(() => {
-    return {
-      diagnostico: ordens.filter(o => o.status === "DIAGNOSTICO").length,
-      aguardandoPeca: ordens.filter(o => o.status === "ABERTA").length,
-      emReparo: ordens.filter(o => o.status === "EM_REPARO").length,
-      finalizado: ordens.filter(o => o.status === "FINALIZADO").length,
-    };
-  }, [ordens]);
+  // clicar no card filtra só aquele status; clicar de novo tira o filtro
+  function selecionarCard(filtro: FiltroOs) {
+    setFiltros((atual) => (atual.length === 1 && atual[0] === filtro ? [] : [filtro]));
+  }
 
-  const ordensFiltradas = useMemo(() => {
-    return ordens.filter((ordem) => {
-      const passaFiltroStatus =
-        filtroStatus === "Todas" ||
-        (filtroStatus === "Em Diagn." && ordem.status === "DIAGNOSTICO") ||
-        (filtroStatus === "Aguard. Peça" && ordem.status === "ABERTA") ||
-        (filtroStatus === "Em Reparo" && ordem.status === "EM_REPARO") ||
-        (filtroStatus === "Finalizado" && ordem.status === "FINALIZADO");
-
-      const termoBusca = busca.toLowerCase();
-      const passaBusca =
-        busca === "" ||
-        ordem.cliente?.nmCompleto?.toLowerCase().includes(termoBusca) ||
-        ordem.numOs?.toString().includes(termoBusca) ||
-        ordem.aparelho?.modelo?.toLowerCase().includes(termoBusca);
-
-      return passaFiltroStatus && passaBusca;
-    });
-  }, [ordens, busca, filtroStatus]);
-
-  const chips = ["Todas", "Em Diagn.", "Aguard. Peça", "Em Reparo", "Finalizado"];
+  function removerFiltro(filtro: FiltroOs) {
+    setFiltros((atual) => atual.filter((f) => f !== filtro));
+  }
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-background text-foreground p-4 md:p-8">
-      
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6 md:mb-8">
+    <div className="flex min-h-screen w-full flex-col gap-6 bg-background p-4 text-foreground md:gap-8 md:p-8">
+      <header className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <span className="text-primary text-[10px] md:text-xs font-bold uppercase tracking-widest">Stop Cell</span>
-          <h1 className="text-2xl md:text-3xl font-bold mt-1 text-foreground">Ordens de Serviço</h1>
+          <span className="text-[10px] font-bold tracking-widest text-primary uppercase md:text-xs">Stop Cell</span>
+          <h1 className="mt-1 text-2xl font-bold text-foreground md:text-3xl">Ordens de Serviço</h1>
         </div>
-        <div className="flex items-center gap-4 md:gap-6 w-full sm:w-auto justify-between sm:justify-end">
-          <Link
-            to="/nova-ordem-servico"
-            className="flex items-center justify-center gap-2 rounded-full bg-primary px-4 md:px-5 py-2 md:py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors flex-1 sm:flex-none"
-          >
-            <Plus size={18} strokeWidth={2.5} /> Nova O.S.
-          </Link>
-          <button className="text-foreground hover:text-foreground transition-colors p-2 bg-card sm:bg-transparent rounded-full sm:rounded-none">
-            <Bell size={22} />
-          </button>
+
+        <Link
+          to="/nova-ordem-servico"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto"
+        >
+          <Plus size={18} strokeWidth={2.5} /> Nova O.S.
+        </Link>
+      </header>
+
+      <div className="flex flex-col gap-3">
+        <div className="flex gap-2 md:gap-4">
+          <BuscaOs valor={busca} onChange={setBusca} />
+          <FiltroStatusDialog aplicados={filtros} contagem={contagem} onAplicar={setFiltros} />
         </div>
+        <FiltrosAtivos aplicados={filtros} onRemover={removerFiltro} onLimpar={() => setFiltros([])} />
       </div>
 
-      {/* busca e filtro da OS */}
-      <div className="flex gap-2 md:gap-4 mb-6 md:mb-8">
-        <div className="flex flex-1 items-center rounded-2xl bg-card border border-border px-3 md:px-4 py-1 md:py-1.5 focus-within:border-primary transition-colors">
-          <Search size={18} className="mr-2 md:mr-3 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Buscar O.S., Cliente..."
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            className="w-full bg-transparent p-2 text-sm md:text-base text-foreground placeholder:text-muted-foreground outline-none"
-          />
+      <ResumoStatus contagem={contagem} aplicados={filtros} onSelecionar={selecionarCard} />
+
+      <Alert mensagem={erro} />
+
+      {carregando ? (
+        <div className="flex flex-col gap-4">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-[88px] rounded-2xl" />
+          ))}
         </div>
-        <button className="flex items-center justify-center rounded-2xl border border-primary bg-card p-3 text-primary hover:bg-primary/10 transition-colors shrink-0">
-          <SlidersHorizontal size={18} className="md:w-5 md:h-5" />
-        </button>
-      </div>
-
-      {/* status da os   */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
-        <div className="bg-card border border-border rounded-2xl p-4 md:p-5 flex flex-col justify-between min-h-[90px] md:min-h-[110px]">
-          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px] font-bold text-muted-foreground tracking-wider">
-            <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-yellow-500"></div> EM DIAGN.
-          </div>
-          <div className="text-2xl md:text-3xl font-bold text-foreground mt-2">{metricas.diagnostico}</div>
-        </div>
-
-        <div className="bg-card border border-border rounded-2xl p-4 md:p-5 flex flex-col justify-between min-h-[90px] md:min-h-[110px]">
-          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px] font-bold text-muted-foreground tracking-wider">
-            <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-muted-foreground"></div> AGUARD. PEÇA
-          </div>
-          <div className="text-2xl md:text-3xl font-bold text-foreground mt-2">{metricas.aguardandoPeca}</div>
-        </div>
-
-        <div className="bg-card border border-border rounded-2xl p-4 md:p-5 flex flex-col justify-between min-h-[90px] md:min-h-[110px]">
-          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px] font-bold text-muted-foreground tracking-wider">
-            <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-blue-500"></div> EM REPARO
-          </div>
-          <div className="text-2xl md:text-3xl font-bold text-foreground mt-2">{metricas.emReparo}</div>
-        </div>
-
-        <div className="bg-card border border-border rounded-2xl p-4 md:p-5 flex flex-col justify-between min-h-[90px] md:min-h-[110px]">
-          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px] font-bold text-muted-foreground tracking-wider">
-            <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500"></div> FINALIZADO
-          </div>
-          <div className="text-2xl md:text-3xl font-bold text-foreground mt-2">{metricas.finalizado}</div>
-        </div>
-      </div>
-
-      {/* filtro para pesquisar  */}
-      <div className="flex gap-2 md:gap-3 mb-6 overflow-x-auto pb-2 scrollbar-hide w-full snap-x">
-        {chips.map((chip) => (
-          <button
-            key={chip}
-            onClick={() => setFiltroStatus(chip)}
-            className={`snap-start whitespace-nowrap px-4 md:px-5 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all border ${
-              filtroStatus === chip
-                ? "bg-primary border-primary text-primary-foreground"
-                : "bg-card border-border text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {chip}
-          </button>
-        ))}
-      </div>
-
-      {/* listas de os */}
-      <BoxOs ordens={ordensFiltradas} />
-
+      ) : (
+        <BoxOs ordens={ordensFiltradas} />
+      )}
     </div>
   );
 }

@@ -7,6 +7,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { PagamentoRepository } from './payment.repository';
 import { PagamentoDto } from '@/type/payment.dto';
+import { estaEncerrada } from '@/ordem-servico/status-os';
 
 @Injectable()
 export class PagamentoService {
@@ -31,8 +32,8 @@ export class PagamentoService {
         throw new NotFoundException('Ordem de serviço não encontrada');
       }
 
-      if (ordemServico.status === 'FINALIZADO') {
-        throw new BadRequestException('Ordem de serviço finalizada');
+      if (estaEncerrada(ordemServico.status)) {
+        throw new BadRequestException('Ordem de serviço encerrada (finalizada ou cancelada)');
       }
 
       const totalOs = ordemServico.vlTotal;

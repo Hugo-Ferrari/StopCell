@@ -1,16 +1,16 @@
-import type { OrdemServicoInterface } from "@/pages/history/History";
+import type { OrdemServicoResumo } from "@/types/ordemServico";
 
 export interface GrupoHistorico {
   chave: string;
-  ultimaOs: OrdemServicoInterface;
+  ultimaOs: OrdemServicoResumo;
   totalServicos: number;
 }
 
 // As ordens chegam da API da mais recente para a mais antiga,
 // então a primeira de cada grupo é a última OS daquele cliente/aparelho.
 function agrupar(
-  ordens: OrdemServicoInterface[],
-  getChave: (os: OrdemServicoInterface) => string
+  ordens: OrdemServicoResumo[],
+  getChave: (os: OrdemServicoResumo) => string
 ): GrupoHistorico[] {
   const grupos = new Map<string, GrupoHistorico>();
 
@@ -27,10 +27,10 @@ function agrupar(
   return Array.from(grupos.values());
 }
 
-export function agruparPorCliente(ordens: OrdemServicoInterface[]) {
+export function agruparPorCliente(ordens: OrdemServicoResumo[]) {
   return agrupar(ordens, (os) => os.cpfCliente);
 }
 
-export function agruparPorAparelho(ordens: OrdemServicoInterface[]) {
+export function agruparPorAparelho(ordens: OrdemServicoResumo[]) {
   return agrupar(ordens, (os) => os.imeiAparelho);
 }

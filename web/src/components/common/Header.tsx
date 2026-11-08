@@ -13,15 +13,15 @@ function Header() {
     "/configuracoes": "Configurações",
     "/configuracoes/loja": "Dados da Loja",
     "/configuracoes/usuarios": "Usuários e Permissões", // <- novo
-    "/estoque" : "Estoque",
+
   };
 
-  const titulo = matchPath(
-    { path: "/ordemServico/:numOs", end: true },
-    location.pathname
-  )
-    ? "Diagnóstico e Orçamento"
-    : titulos[location.pathname] || "Stop Cell";
+   // rotas com parâmetro não entram no objeto de cima, por isso o matchPath
+  const titulo = matchPath({ path: "/ordemServico/:numOs/checklist", end: true }, location.pathname)
+    ? "Checklist de Entrada"
+    : matchPath({ path: "/ordemServico/:numOs", end: true }, location.pathname)
+      ? "Diagnóstico e Orçamento"
+      : titulos[location.pathname] || "Stop Cell";
 
   return (
     <>

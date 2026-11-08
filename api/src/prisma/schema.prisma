@@ -14,6 +14,25 @@ enum FormaPagamento {
 
   @@map("forma_pagamento_enum")
 }
+// fluxo da O.S.: as transições permitidas ficam em ordem-servico/status-os.ts
+enum StatusOs {
+  ABERTA
+  DIAGNOSTICO
+  EM_APROVACAO
+  EM_REPARO
+  AGUARDANDO_PECA
+  FINALIZADO
+  CANCELADO
+
+  @@map("status_os_enum")
+}
+
+enum TipoItemOs {
+  PECA
+  SERVICO
+
+  @@map("tipo_item_os_enum")
+}
 
 model Empresa {
   cnpj         String  @id @db.VarChar(14)
@@ -169,7 +188,7 @@ model OrdemServico {
   idUsuario     Int       @map("id_usuario")
   dtEntrada     DateTime? @map("dt_entrada")
   dtSaida       DateTime? @map("dt_saida")
-  status        String?   @db.VarChar(50)
+  status        StatusOs  @default(ABERTA)
   vlTotal       Decimal?  @map("vl_total") @db.Decimal(10, 2)
   diagnostico   String?
 
@@ -195,6 +214,10 @@ model ItensOs {
   numOs         Int      @map("num_os")
   idServico     Int?     @map("id_servico")
   idPeca        Int?     @map("id_peca")
+  // a descrição fica no próprio item: a loja não tem estoque nem catálogo de peça/serviço.
+  // id_peca e id_servico ficaram só pras O.S. antigas
+  tipo          TipoItemOs
+  descricao     String   @db.VarChar(150)
   quantidade    Int?
   valorUnitario Decimal? @map("valor_unitario") @db.Decimal(10, 2)
 
@@ -209,6 +232,7 @@ model OsChecklist {
   numOs       Int     @map("num_os")
   idChecklist Int     @map("id_checklist")
   status      String? @db.VarChar(20)
+  observacao  String? @db.VarChar(255)
 
   ordemServico OrdemServico @relation(fields: [numOs], references: [numOs])
   checklist    Checklist    @relation(fields: [idChecklist], references: [idChecklist])
