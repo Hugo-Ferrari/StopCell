@@ -8,7 +8,7 @@ interface PermissionChecklistProps {
 }
 
 function PermissionChecklist({ catalogo, selecionadas, onChange }: PermissionChecklistProps) {
-  // junta as permissões por grupo (Ordens, Estoque...) mantendo a ordem do back
+  // junta as permissões por grupo (Ordens, Histórico...) mantendo a ordem do back
   const grupos = catalogo.reduce<Record<string, PermissaoCatalogo[]>>((acc, p) => {
     (acc[p.grupo] ??= []).push(p);
     return acc;

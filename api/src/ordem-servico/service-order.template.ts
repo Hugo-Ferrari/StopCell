@@ -1,5 +1,3 @@
-import { ROTULO_STATUS } from './status-os';
-
 // mesmos itens do checklist de entrada da tela de nova OS (ChecklistForm.tsx).
 // se a O.S. não tiver checklist salvo, imprime essa lista em branco pra marcar à mão
 const ITENS_CHECKLIST = [
@@ -79,6 +77,40 @@ function campo(rotulo: string, valor: unknown, classe = ''): string {
     <div class="campo ${classe}">
       <span class="rotulo-campo">${rotulo}:</span>
       <span class="valor-campo">${escapeHtml(valor)}</span>
+    </div>
+  `;
+}
+
+// a tela de aparelho grava o desenho como a sequência das bolinhas, de 1 a 9 (ex: 14789)
+function padraoDesenho(senha?: string | null): string {
+  const posicao = (bolinha: number) => ({
+    x: 10 + ((bolinha - 1) % 3) * 20,
+    y: 10 + Math.floor((bolinha - 1) / 3) * 20,
+  });
+
+  const sequencia = (senha ?? '').replace(/[^1-9]/g, '').split('').map(Number);
+
+  const caminho = sequencia
+    .map((bolinha) => `${posicao(bolinha).x},${posicao(bolinha).y}`)
+    .join(' ');
+
+  const bolinhas = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    .map((bolinha) => {
+      const { x, y } = posicao(bolinha);
+      const usada = sequencia.includes(bolinha);
+      const raio = bolinha === sequencia[0] ? 6 : 4;
+
+      return `<circle cx="${x}" cy="${y}" r="${raio}" fill="${usada ? '#D9480F' : '#fff'}" stroke="${usada ? '#D9480F' : '#A8A3A0'}" />`;
+    })
+    .join('');
+
+  return `
+    <div class="padrao-senha">
+      <span class="rotulo-campo">Desenho:</span>
+      <svg viewBox="0 0 60 60" width="54" height="54">
+        <polyline points="${caminho}" fill="none" stroke="#D9480F" stroke-width="2" />
+        ${bolinhas}
+      </svg>
     </div>
   `;
 }
@@ -438,6 +470,12 @@ export function gerarHtmlOrdemServico(os: any): string {
       padding: 8px 4px 0;
     }
 
+    .padrao-senha {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .pergunta {
       display: flex;
       justify-content: space-between;
@@ -740,9 +778,6 @@ export function gerarHtmlOrdemServico(os: any): string {
       ${campo('Telefone', formatarTelefone(os.cliente?.telefone), 'terco')}
       ${campo('E-mail', os.cliente?.email, 'terco')}
       ${campo('Endereço', os.cliente?.endereco)}
-      ${campo('Entrada', data(os.dtEntrada), 'terco')}
-      ${campo('Saída', data(os.dtSaida), 'terco')}
-      ${campo('Status', ROTULO_STATUS[os.status as keyof typeof ROTULO_STATUS] ?? os.status, 'terco')}
       ${campo('Atendente', os.usuario?.nome, 'metade')}
       ${campo('Retrabalho da O.S.', os.numOsAnterior ? `Nº ${os.numOsAnterior}` : 'Não', 'metade')}
     </section>
@@ -761,6 +796,7 @@ export function gerarHtmlOrdemServico(os: any): string {
           ${campo('Cor', aparelho.cor)}
           ${campo('IMEI', aparelho.imei)}
           ${campo('Tipo de senha', aparelho.tipoSenha)}
+          ${aparelho.tipoSenha === 'Padrão (Desenho)' ? padraoDesenho(aparelho.senhaAparelho) : ''}
 
           <div class="pergunta">
             Apresentou nota fiscal?
