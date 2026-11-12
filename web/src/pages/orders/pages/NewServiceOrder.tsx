@@ -23,7 +23,7 @@ export default function NewServiceOrder() {
   }
 
   return (
-    <div className="w-full max-w-4xl flex flex-col gap-6 relative mx-auto mt-8">
+    <div className="w-full max-w-4xl flex flex-col gap-6 relative mx-auto">
       
       {/* Pop-up de Toast */}
       {toast.visivel && (

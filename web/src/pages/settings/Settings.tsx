@@ -8,18 +8,10 @@ export function Settings() {
 
   return (
     <div className="flex flex-col w-full gap-6">
-      {/* Cabeçalho da página */}
-      <div>
-        <span className="text-primary text-[10px] md:text-xs font-bold uppercase tracking-widest">
-          Stop Cell
-        </span>
-        <h1 className="text-2xl md:text-3xl font-bold mt-1 text-foreground">
-          Configurações
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Gerencie as configurações da sua conta e da loja
-        </p>
-      </div>
+      {/* o título já aparece no Header, aqui fica só a explicação */}
+      <p className="text-sm text-muted-foreground">
+        Gerencie as configurações da sua conta e da loja
+      </p>
 
       {/* Lista de configurações: cada card em sua própria linha */}
       <div className="flex flex-col gap-3.5 sm:gap-4 w-full">
