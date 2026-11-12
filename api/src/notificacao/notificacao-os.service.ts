@@ -61,6 +61,7 @@ export class NotificacaoOsService {
         data: {
           numOs,
           cpfCliente: os.cpfCliente,
+          cnpjEmpresa: os.cnpjEmpresa,
           tipoEvento: os.status,
           dtHoraEnvio: new Date(),
           mensagemTexto: email.assunto,

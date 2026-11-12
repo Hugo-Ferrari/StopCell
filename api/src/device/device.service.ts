@@ -12,17 +12,26 @@ export class AparelhoService {
       throw new BadRequestException('Cliente não pertence à empresa');
     }
 
-    // o IMEI é a chave do aparelho. antes o erro do banco vazava como 500
-    const existente = await this.repository.findByImei(dto.imei);
+    // o IMEI é único dentro da loja; em outra loja o mesmo aparelho tem cadastro próprio
+    const existente = await this.repository.findById(dto.imei, cnpjEmpresa);
     if (existente) {
       throw new BadRequestException(
         existente.cpfCliente === dto.cpfCliente
           ? 'Esse aparelho já está cadastrado para este cliente. Selecione ele na lista.'
-          : 'Esse IMEI já está cadastrado para outro cliente.',
+          : 'Esse IMEI já está cadastrado para outro cliente da loja.',
       );
     }
 
-    return this.repository.cadastro(dto);
+    // dois cadastros do mesmo IMEI ao mesmo tempo passam pela conferência acima;
+    // o segundo esbarra na chave do banco, e aí recebe a mesma mensagem em vez de 500
+    try {
+      return await this.repository.cadastro(dto, cnpjEmpresa);
+    } catch (error: any) {
+      if (error?.code === 'P2002') {
+        throw new BadRequestException('Esse IMEI já está cadastrado nesta loja.');
+      }
+      throw error;
+    }
   }
 
   listar(cnpjEmpresa: string) {
@@ -51,7 +60,12 @@ export class AparelhoService {
     return this.repository.atualizar(imei, { ...dto, imei, cpfCliente: aparelho.cpfCliente }, cnpjEmpresa);
   }
 
-  remover(imei: string, cnpjEmpresa: string) {
+  async remover(imei: string, cnpjEmpresa: string) {
+    const aparelho = await this.repository.findById(imei, cnpjEmpresa);
+    if (!aparelho) {
+      throw new NotFoundException('Aparelho não encontrado');
+    }
+
     return this.repository.remover(imei, cnpjEmpresa);
   }
 }
