@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { User, UserPlus, CheckCircle2, XCircle } from "lucide-react";
+import { User, UserPlus } from "lucide-react";
 import type { criarClienteDto } from "@/services/customerService";
+import Toast from "@/components/common/Toast";
+import { useToast } from "@/hooks/useToast";
 
 // Importando os componentes menores lá da pasta steps
 import ExistingCustomer from "@/components/orders/steps/ExistingCustomer";
@@ -15,23 +17,12 @@ export default function NewServiceOrder() {
   });
 
   // Notificações centrais
-  const [toast, setToast] = useState<{ visivel: boolean; msg: string; tipo: "sucesso" | "erro" }>({ visivel: false, msg: "", tipo: "sucesso" });
-
-  function mostrarToast(msg: string, tipo: "sucesso" | "erro") {
-    setToast({ visivel: true, msg, tipo });
-    setTimeout(() => setToast({ visivel: false, msg: "", tipo: "sucesso" }), 4000);
-  }
+  const { toast, mostrarToast } = useToast();
 
   return (
     <div className="w-full max-w-4xl flex flex-col gap-6 relative mx-auto">
-      
-      {/* Pop-up de Toast */}
-      {toast.visivel && (
-        <div className={`fixed top-10 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl transition-all animate-in slide-in-from-top-5 ${toast.tipo === "sucesso" ? "bg-green-500/10 border border-green-500/50 text-green-700 dark:text-green-500" : "bg-red-500/10 border border-red-500/50 text-red-600 dark:text-red-500"}`}>
-          {toast.tipo === "sucesso" ? <CheckCircle2 size={24} /> : <XCircle size={24} />}
-          <span className="font-bold text-sm">{toast.msg}</span>
-        </div>
-      )}
+
+      <Toast mensagem={toast?.mensagem} tipo={toast?.tipo} />
 
       {/* Navegação das Abas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

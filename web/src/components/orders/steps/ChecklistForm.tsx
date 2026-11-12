@@ -114,14 +114,14 @@ export default function ChecklistForm({ imeiAparelho, dadosChecklist, setDadosCh
                   <button 
                     type="button" 
                     onClick={() => updateChecklistItem(index, "OK")} 
-                    className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all border ${item.status === "OK" ? "bg-green-500/10 border-green-500/50 text-green-700 dark:text-green-500" : "bg-transparent border-border text-muted-foreground hover:border-muted-foreground"}`}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all border ${item.status === "OK" ? "bg-success/10 border-success/50 text-success" : "bg-transparent border-border text-muted-foreground hover:border-muted-foreground"}`}
                   >
                     <CheckCircle2 size={14} /> OK
                   </button>
                   <button 
                     type="button" 
                     onClick={() => updateChecklistItem(index, "NOK")} 
-                    className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all border ${item.status === "NOK" ? "bg-red-500/10 border-red-500/50 text-red-600 dark:text-red-500" : "bg-transparent border-border text-muted-foreground hover:border-muted-foreground"}`}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all border ${item.status === "NOK" ? "bg-destructive/10 border-destructive/50 text-destructive" : "bg-transparent border-border text-muted-foreground hover:border-muted-foreground"}`}
                   >
                     <XCircle size={14} /> NÃO OK
                   </button>

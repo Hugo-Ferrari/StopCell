@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import FormInput from "@/components/common/FormInput";
+import { useViaCep } from "@/hooks/useViaCep";
+import { formatarCep, formatarCpf, formatarTelefone } from "@/utils/masks";
+import { mensagemDeErro } from "@/utils/apiError";
 import { criandoCliente, type criarClienteDto } from "@/services/customerService";
 
 interface NewCustomerProps {
@@ -12,27 +16,24 @@ export default function NewCustomer({ mostrarToast, setAbaAtiva, setClienteSelec
   const [nomeNovo, setNomeNovo] = useState("");
   const [cpfNovo, setCpfNovo] = useState("");
   const [whatsAppNovo, setWhatsAppNovo] = useState("");
-  const [emailNovo, setEmailNovo] = useState(""); // Estado do email já existia
+  const [emailNovo, setEmailNovo] = useState("");
   const [cepNovo, setCepNovo] = useState("");
   const [enderecoNovo, setEnderecoNovo] = useState("");
   const [carregando, setCarregando] = useState(false);
 
+  const { buscarCep, carregandoCep } = useViaCep();
+
   async function handleBuscarCep(cepDigitado: string) {
-    const cepLimpo = cepDigitado.replace(/\D/g, "");
+    const cepLimpo = cepDigitado.replace(/\D/g, "").slice(0, 8);
     setCepNovo(cepLimpo);
 
     if (cepLimpo.length === 8) {
-      try {
-        const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
-        const data = await response.json();
-        if (!data.erro) {
-          setEnderecoNovo(`${data.logradouro}, Nº  - ${data.bairro}, ${data.localidade} - ${data.uf}`);
-          mostrarToast("Endereço encontrado!", "sucesso");
-        } else {
-          mostrarToast("CEP não encontrado.", "erro");
-        }
-      } catch {
-        mostrarToast("Erro ao buscar CEP.", "erro");
+      const endereco = await buscarCep(cepLimpo);
+      if (endereco?.enderecoFormatado) {
+        setEnderecoNovo(endereco.enderecoFormatado);
+        mostrarToast("Endereço encontrado!", "sucesso");
+      } else {
+        mostrarToast("CEP não encontrado.", "erro");
       }
     }
   }
@@ -42,31 +43,27 @@ export default function NewCustomer({ mostrarToast, setAbaAtiva, setClienteSelec
     const cpfLimpo = cpfNovo.replace(/\D/g, "");
     const whatsLimpo = whatsAppNovo.replace(/\D/g, "");
 
-    // Adicionei validação de e-mail obrigatório
     if (!nomeNovo.trim() || cpfLimpo.length !== 11 || !whatsLimpo || !emailNovo.trim() || !enderecoNovo) {
       return mostrarToast("Preencha todos os campos corretamente (incluindo o e-mail).", "erro");
     }
 
     try {
       setCarregando(true);
-      const dadosNovo = {
+      const criado = await criandoCliente({
         nmCompleto: nomeNovo.trim(),
         cpf: cpfLimpo,
         telefone: whatsLimpo,
-        email: emailNovo.trim(), // O E-mail está sendo mandado agora
+        email: emailNovo.trim(),
         endereco: enderecoNovo.trim(),
-      };
+      });
 
-      const criado = await criandoCliente(dadosNovo as any);
-      
       setClienteSelecionado({ ...criado, aparelhos: [] });
       mostrarToast("Cliente cadastrado com sucesso!", "sucesso");
-      
+
       setNomeNovo(""); setCpfNovo(""); setWhatsAppNovo(""); setEmailNovo(""); setCepNovo(""); setEnderecoNovo("");
       setAbaAtiva("existente");
-    } catch (error: any) {
-      const msg = error.response?.data?.message || "Erro ao cadastrar. Verifique o CPF.";
-      mostrarToast(Array.isArray(msg) ? msg[0] : msg, "erro");
+    } catch (error) {
+      mostrarToast(mensagemDeErro(error, "Erro ao cadastrar. Verifique o CPF.").split("\n")[0], "erro");
     } finally {
       setCarregando(false);
     }
@@ -75,37 +72,67 @@ export default function NewCustomer({ mostrarToast, setAbaAtiva, setClienteSelec
   return (
     <form onSubmit={handleCadastrarCliente} className="bg-card border border-border rounded-3xl p-5 md:p-8 flex flex-col gap-4 md:gap-6 animate-in fade-in slide-in-from-bottom-2">
       <h2 className="text-foreground font-bold mb-2">Dados do Novo Cliente</h2>
-      
-      <div className="flex flex-col gap-2">
-        <label className="text-xs md:text-sm font-bold text-foreground">Nome Completo *</label>
-        <input type="text" value={nomeNovo} onChange={(e) => setNomeNovo(e.target.value)} placeholder="Digite o nome" className="w-full bg-background border border-border rounded-xl p-3.5 text-foreground outline-none focus:border-primary" />
-      </div>
+
+      <FormInput
+        label="Nome Completo *"
+        id="nomeNovo"
+        value={nomeNovo}
+        onChange={(e) => setNomeNovo(e.target.value)}
+        placeholder="Digite o nome"
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-        <div className="flex flex-col gap-2">
-          <label className="text-xs md:text-sm font-bold text-foreground">CPF *</label>
-          <input type="text" value={cpfNovo} onChange={(e) => setCpfNovo(e.target.value)} placeholder="000.000.000-00" className="w-full bg-background border border-border rounded-xl p-3.5 text-foreground outline-none focus:border-primary" />
-        </div>
-        
-        <div className="flex flex-col gap-2">
-          <label className="text-xs md:text-sm font-bold text-foreground">WhatsApp *</label>
-          <input type="text" value={whatsAppNovo} onChange={(e) => setWhatsAppNovo(e.target.value)} placeholder="(00) 00000-0000" className="w-full bg-background border border-border rounded-xl p-3.5 text-foreground outline-none focus:border-primary" />
-        </div>
+        <FormInput
+          label="CPF *"
+          id="cpfNovo"
+          inputMode="numeric"
+          value={formatarCpf(cpfNovo)}
+          onChange={(e) => setCpfNovo(e.target.value)}
+          placeholder="000.000.000-00"
+        />
 
-        {/* CAMPO DE E-MAIL ADICIONADO AQUI */}
-        <div className="flex flex-col gap-2">
-          <label className="text-xs md:text-sm font-bold text-foreground">E-mail *</label>
-          <input type="email" value={emailNovo} onChange={(e) => setEmailNovo(e.target.value)} placeholder="cliente@email.com" className="w-full bg-background border border-border rounded-xl p-3.5 text-foreground outline-none focus:border-primary" />
-        </div>
-        
-        <div className="flex flex-col gap-2">
-          <label className="text-xs md:text-sm font-bold text-foreground">CEP</label>
-          <input type="text" maxLength={9} value={cepNovo} onChange={(e) => handleBuscarCep(e.target.value)} placeholder="00000-000" className="w-full bg-background border border-border rounded-xl p-3.5 text-foreground outline-none focus:border-primary" />
-        </div>
+        <FormInput
+          label="WhatsApp *"
+          id="whatsAppNovo"
+          inputMode="tel"
+          value={formatarTelefone(whatsAppNovo)}
+          onChange={(e) => setWhatsAppNovo(e.target.value)}
+          placeholder="(00) 00000-0000"
+        />
 
-        <div className="flex flex-col gap-2 md:col-span-2">
-          <label className="text-xs md:text-sm font-bold text-foreground">Endereço Completo *</label>
-          <input type="text" value={enderecoNovo} onChange={(e) => setEnderecoNovo(e.target.value)} placeholder="Rua, Número, Bairro" className="w-full bg-background border border-border rounded-xl p-3.5 text-foreground outline-none focus:border-primary" />
+        <FormInput
+          label="E-mail *"
+          id="emailNovo"
+          type="email"
+          value={emailNovo}
+          onChange={(e) => setEmailNovo(e.target.value)}
+          placeholder="cliente@email.com"
+        />
+
+        <FormInput
+          label="CEP"
+          id="cepNovo"
+          inputMode="numeric"
+          value={formatarCep(cepNovo)}
+          onChange={(e) => handleBuscarCep(e.target.value)}
+          placeholder="00000-000"
+          rightElement={
+            carregandoCep ? (
+              <span className="text-xs text-primary flex items-center gap-1 font-medium">
+                <Loader2 size={14} className="animate-spin" /> Buscando...
+              </span>
+            ) : null
+          }
+        />
+
+        <div className="md:col-span-2">
+          <FormInput
+            label="Endereço Completo *"
+            id="enderecoNovo"
+            value={enderecoNovo}
+            onChange={(e) => setEnderecoNovo(e.target.value)}
+            placeholder="Rua, Número, Bairro"
+          />
         </div>
       </div>
 
