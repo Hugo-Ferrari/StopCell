@@ -22,6 +22,7 @@ import { PagamentoModule } from './payment/payment.module';
 import { OrdemServicoModule } from './ordem-servico/service-order.module';
 import { ServicoModule } from './service/service.module';
 import { ItensOsModule } from './item-os/item-os.module';
+import { FinanceiroModule } from './financeiro/financeiro.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ItensOsModule } from './item-os/item-os.module';
     OrdemServicoModule,
     ServicoModule,
     ItensOsModule,
+    FinanceiroModule,
   ],
   controllers: [AppController],
   providers: [
