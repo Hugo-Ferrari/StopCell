@@ -6,12 +6,16 @@ import {
 } from '@nestjs/common';
 import * as puppeteer from 'puppeteer';
 
+// o pacote puppeteer não reexporta mais os tipos Browser e Page
+type Navegador = Awaited<ReturnType<typeof puppeteer.launch>>;
+type Pagina = Awaited<ReturnType<Navegador['newPage']>>;
+
 // abrir um Chrome a cada impressão levava uns 2 segundos. aqui ele abre na
 // primeira impressão e fica aberto, cada PDF só abre e fecha uma aba
 @Injectable()
 export class OsPdfService implements OnModuleDestroy {
   private readonly logger = new Logger(OsPdfService.name);
-  private navegador?: Promise<puppeteer.Browser>;
+  private navegador?: Promise<Navegador>;
 
   private obterNavegador() {
     if (!this.navegador) {
@@ -32,7 +36,7 @@ export class OsPdfService implements OnModuleDestroy {
   }
 
   async gerar(html: string): Promise<Buffer> {
-    let pagina: puppeteer.Page | undefined;
+    let pagina: Pagina | undefined;
 
     try {
       const navegador = await this.obterNavegador();
