@@ -19,7 +19,7 @@ export function Settings() {
         {pode(PERMISSOES.LOJA_EDITAR) && (
           <SettingCard
             title="Dados da Loja"
-            description="Informações da sua loja, contato, logo e endereço."
+            description="Informações da sua loja, contato e endereço."
             icon={Store}
             to="/configuracoes/loja"
           />
