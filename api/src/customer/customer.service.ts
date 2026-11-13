@@ -1,5 +1,5 @@
 // clientes/clientes.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateClienteDto } from '@/type/create-customer.dto';
 import { ClientesRepository } from './customer.repository';
 
@@ -11,8 +11,16 @@ export class ClientesService {
     return await this.repository.findAll(cnpjEmpresa);
   }
 
+  // o CPF é único dentro da loja; outra loja pode ter o próprio cadastro do mesmo cliente
   async criarCliente(dto: CreateClienteDto, cnpjEmpresa: string) {
-    return await this.repository.create({ ...dto, cnpjEmpresa });
+    try {
+      return await this.repository.create({ ...dto, cnpjEmpresa });
+    } catch (error: any) {
+      if (error?.code === 'P2002') {
+        throw new ConflictException('Esse CPF já está cadastrado nesta loja.');
+      }
+      throw error;
+    }
   }
 
   async buscarPorId(cpf: string, cnpjEmpresa: string) {

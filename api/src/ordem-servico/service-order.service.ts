@@ -38,9 +38,9 @@ export class OrdemServicoService {
     if (!cliente)
       throw new NotFoundException('Cliente não encontrado para esta empresa');
 
-    // o aparelho não tem empresa, então confere pelo dono (cliente já é da empresa)
+    // o mesmo IMEI pode existir em outra loja, então busca só nesta e confere o dono
     const aparelho = await this.prisma.aparelho.findFirst({
-      where: { imei: dto.imeiAparelho, cpfCliente: dto.cpfCliente },
+      where: { cnpjEmpresa, imei: dto.imeiAparelho, cpfCliente: dto.cpfCliente },
     });
     if (!aparelho)
       throw new NotFoundException('Aparelho não encontrado para este cliente');

@@ -13,10 +13,8 @@ import { UsuarioModule } from './user/user.module';
 import { PerfilModule } from './perfil/perfil.module';
 import { PecaModule } from './peca/peca.module';
 import { OsChecklistModule } from './os-checklist/os-checklist.module';
-import { MarcaModule } from './marca/mark.module';
 import { DiagnosticoModule } from './diagnosis/diagnosis.module';
 import { ChecklistModule } from './checklist/checklist.module';
-import { CategoriaModule } from './category/category.module';
 import { AparelhoModule } from './device/device.module';
 import { PagamentoModule } from './payment/payment.module';
 import { OrdemServicoModule } from './ordem-servico/service-order.module';
@@ -34,10 +32,8 @@ import { FinanceiroModule } from './financeiro/financeiro.module';
     PerfilModule,
     PecaModule,
     OsChecklistModule,
-    MarcaModule,
     DiagnosticoModule,
     ChecklistModule,
-    CategoriaModule,
     AparelhoModule,
     PagamentoModule,
     OrdemServicoModule,
