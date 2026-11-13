@@ -11,11 +11,11 @@ export interface EmpresaDTO {
 export type UpdateEmpresaDTO = Omit<EmpresaDTO, "cnpj">;
 
 export async function buscarPerfilEmpresa(): Promise<EmpresaDTO> {
-  const response = await api.get<EmpresaDTO>("/empresa/minha");
+  const response = await api.get<EmpresaDTO>("/empresa/perfil");
   return response.data;
 }
 
 export async function atualizarPerfilEmpresa(data: UpdateEmpresaDTO): Promise<EmpresaDTO> {
-  const response = await api.patch<EmpresaDTO>("/empresa/minha", data);
+  const response = await api.patch<EmpresaDTO>("/empresa/perfil", data);
   return response.data;
 }

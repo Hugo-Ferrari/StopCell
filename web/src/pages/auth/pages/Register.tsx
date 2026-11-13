@@ -3,9 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Building2, MapPin, User, Phone, Mail, Lock, Loader2 } from "lucide-react";
 import Marca from "@/components/common/Mark";
 import FormInput from "@/components/common/FormInput";
-import AuthAlert from "@/components/auth/AuthAlert";
-import DicaDesativado from "@/components/common/DicaDesativado";
-import { mensagemDeErro } from "@/utils/apiError";
 import { cadastrarUsuario } from "../authService";
 import { formatarCnpj, formatarTelefone } from "@/utils/masks";
 import { emailValido } from "@/utils/validartors";
@@ -13,7 +10,6 @@ import { emailValido } from "@/utils/validartors";
 function Register() {
   const navigate = useNavigate();
   const [carregando, setCarregando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
 
   // Estados - EMPRESA
   const [nomeEmpresa, setNomeEmpresa] = useState("");
@@ -46,16 +42,15 @@ function Register() {
     e.preventDefault();
 
     if (!emailValido(email)) {
-      setErro("Digite um e-mail válido!");
+      alert("Digite um e-mail válido!");
       return;
     }
 
     if (senha !== confirmarSenha) {
-      setErro("As senhas não coincidem!");
+      alert("As senhas não coincidem!");
       return;
     }
 
-    setErro(null);
     setCarregando(true);
     try {
       const payload = {
@@ -76,9 +71,12 @@ function Register() {
 
       await cadastrarUsuario(payload);
 
-      navigate("/", { state: { mensagem: "Cadastro realizado com sucesso! Entre com seu e-mail e senha." } });
-    } catch (error) {
-      setErro(mensagemDeErro(error, "Erro ao criar conta. Verifique os dados."));
+      alert("Cadastro realizado com sucesso!");
+      navigate("/");
+    } catch (error: any) {
+      console.error(error);
+      const msgErro = error.response?.data?.message || "Erro ao criar conta. Verifique os dados.";
+      alert(Array.isArray(msgErro) ? msgErro.join(", ") : msgErro);
     } finally {
       setCarregando(false);
     }
@@ -203,20 +201,13 @@ function Register() {
           </div>
         </section>
 
-        <AuthAlert mensagem={erro} />
-
-        <DicaDesativado
-          mensagem={!carregando && !formularioValido ? "Preencha um e-mail válido e uma senha de pelo menos 6 caracteres, igual nos dois campos." : null}
-          className="mt-2 w-full"
+        <button
+          type="submit"
+          disabled={carregando || !formularioValido}
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 rounded-xl mt-2 transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
         >
-          <button
-            type="submit"
-            disabled={carregando || !formularioValido}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 rounded-xl transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
-          >
-            {carregando ? <Loader2 className="animate-spin" size={20} /> : "Criar conta e entrar"}
-          </button>
-        </DicaDesativado>
+          {carregando ? <Loader2 className="animate-spin" size={20} /> : "Criar conta e entrar"}
+        </button>
 
       </form>
     </div>

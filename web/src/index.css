@@ -183,19 +183,6 @@
         -moz-osx-font-smoothing: grayscale;
     }
 
-    /* o Tailwind 4 tirou a mãozinha dos botões, aqui ela volta pra todos */
-    button:not(:disabled),
-    [role="button"]:not([aria-disabled="true"]),
-    select:not(:disabled),
-    label[for] {
-        cursor: pointer;
-    }
-
-    button:disabled,
-    [role="button"][aria-disabled="true"] {
-        cursor: not-allowed;
-    }
-
     h1, h2, h3, h4 {
         font-family: var(--font-heading);
         letter-spacing: -0.01em;

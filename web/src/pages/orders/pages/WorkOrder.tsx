@@ -30,12 +30,12 @@ function OrdemServico() {
   }
 
   return (
-    <div className="flex w-full flex-col gap-6 text-foreground md:gap-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* o título já aparece no Header, aqui fica só a explicação */}
-        <p className="text-sm text-muted-foreground">
-          Cadastre e acompanhe os serviços da loja.
-        </p>
+    <div className="flex min-h-screen w-full flex-col gap-6 bg-background p-4 text-foreground md:gap-8 md:p-8">
+      <header className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <span className="text-[10px] font-bold tracking-widest text-primary uppercase md:text-xs">Stop Cell</span>
+          <h1 className="mt-1 text-2xl font-bold text-foreground md:text-3xl">Ordens de Serviço</h1>
+        </div>
 
         <Link
           to="/nova-ordem-servico"
@@ -43,7 +43,7 @@ function OrdemServico() {
         >
           <Plus size={18} strokeWidth={2.5} /> Nova O.S.
         </Link>
-      </div>
+      </header>
 
       <div className="flex flex-col gap-3">
         <div className="flex gap-2 md:gap-4">
