@@ -1,10 +1,16 @@
 import { Crown, Pencil } from "lucide-react";
 import type { UsuarioDaLoja } from "@/services/userService";
-import { iniciais } from "@/utils/iniciais";
 
 interface UserListProps {
   usuarios: UsuarioDaLoja[];
   onEditar: (usuario: UsuarioDaLoja) => void;
+}
+
+// pega as iniciais pro "avatar" (Yasmim Ferreira -> YF)
+function iniciais(nome: string | null) {
+  if (!nome) return "?";
+  const partes = nome.trim().split(/\s+/);
+  return (partes[0][0] + (partes.length > 1 ? partes[partes.length - 1][0] : "")).toUpperCase();
 }
 
 function UserList({ usuarios, onEditar }: UserListProps) {

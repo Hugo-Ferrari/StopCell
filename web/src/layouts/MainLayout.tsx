@@ -1,6 +1,5 @@
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/components/common/Header";
-import CarregandoTela from "@/components/common/CarregandoTela";
 import NavBar from "@/components/common/NavBar";
 import { Outlet } from "react-router-dom";
 import { UsuarioProvider } from "@/context/usuarioProvider";
@@ -28,10 +27,7 @@ function MainLayout() {
 
           <main className="p-4 transition-all duration-300 lg:p-8">
             <div className="mx-auto w-full max-w-7xl">
-              {/* fica aqui dentro pra o menu e o cabeçalho não piscarem enquanto a tela baixa */}
-              <Suspense fallback={<CarregandoTela />}>
-                <Outlet />
-              </Suspense>
+              <Outlet />
             </div>
           </main>
         </div>

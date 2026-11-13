@@ -1,11 +1,10 @@
 import { useState, type FormEvent } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { User, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 import { isAxiosError } from "axios";
 
 import Marca from "@/components/common/Mark";
 import LoginErrorMessage, { type ErroLogin } from "@/components/auth/LoginErrorMessage";
-import AuthAlert from "@/components/auth/AuthAlert";
 import ThemeToggle from "@/components/common/ThemeToggle";
 import { login, salvarToken } from "../authService";
 
@@ -14,8 +13,6 @@ const TENTATIVAS_ATE_SUGERIR_RECUPERACAO = 3;
 
 function Login() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const mensagemCadastro = (location.state as { mensagem?: string } | null)?.mensagem;
 
   const [emailUsuario, setEmailUsuario] = useState("");
   const [senha, setSenha] = useState("");
@@ -94,8 +91,6 @@ function Login() {
           className="mt-10 flex flex-col gap-5"
           noValidate
         >
-          {!erro && <AuthAlert mensagem={mensagemCadastro} tipo="sucesso" />}
-
           <div className="flex flex-col gap-2">
             <label
               htmlFor="emailUsuario"

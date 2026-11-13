@@ -35,8 +35,6 @@ export async function buscarUsuarioLogado() {
   return data;
 }
 
-export type AtualizarMeuPerfilDTO = Pick<NovoUsuarioDTO, "nome" | "login" | "emailUsuario">;
-
 export async function listarUsuarios() {
   const { data } = await api.get<UsuarioDaLoja[]>("/usuario");
   return data;

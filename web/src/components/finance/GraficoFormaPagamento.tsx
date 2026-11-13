@@ -9,7 +9,7 @@ const ROTULOS: Record<FormaPagamento, string> = {
   BOLETO: "Boleto",
 };
 
-const CORES = ["var(--primary)", "var(--success)", "var(--info)", "var(--warning)"];
+const CORES = ["#D9480F", "#067A46", "#1D6FB8", "#A16207"];
 
 interface GraficoFormaPagamentoProps {
   itens: { formaPagamento: FormaPagamento; total: number }[];

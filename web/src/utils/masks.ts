@@ -27,16 +27,6 @@ export function formatarTelefone(valor: string): string {
     .replace(/(\d{5})(\d)/, "$1-$2");
 }
 
-// Aplica máscara de CPF progressivamente: 000.000.000-00
-export function formatarCpf(valor: string): string {
-  const numeros = somenteNumeros(valor).slice(0, 11);
-
-  return numeros
-    .replace(/^(\d{3})(\d)/, "$1.$2")
-    .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
-    .replace(/\.(\d{3})(\d)/, ".$1-$2");
-}
-
 // Aplica máscara de CEP: 00000-000
 export function formatarCep(valor: string): string {
   const numeros = somenteNumeros(valor).slice(0, 8);

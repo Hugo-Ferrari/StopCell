@@ -8,10 +8,18 @@ export function Settings() {
 
   return (
     <div className="flex flex-col w-full gap-6">
-      {/* o título já aparece no Header, aqui fica só a explicação */}
-      <p className="text-sm text-muted-foreground">
-        Gerencie as configurações da sua conta e da loja
-      </p>
+      {/* Cabeçalho da página */}
+      <div>
+        <span className="text-primary text-[10px] md:text-xs font-bold uppercase tracking-widest">
+          Stop Cell
+        </span>
+        <h1 className="text-2xl md:text-3xl font-bold mt-1 text-foreground">
+          Configurações
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Gerencie as configurações da sua conta e da loja
+        </p>
+      </div>
 
       {/* Lista de configurações: cada card em sua própria linha */}
       <div className="flex flex-col gap-3.5 sm:gap-4 w-full">
@@ -19,7 +27,7 @@ export function Settings() {
         {pode(PERMISSOES.LOJA_EDITAR) && (
           <SettingCard
             title="Dados da Loja"
-            description="Informações da sua loja, contato e endereço."
+            description="Informações da sua loja, contato, logo e endereço."
             icon={Store}
             to="/configuracoes/loja"
           />

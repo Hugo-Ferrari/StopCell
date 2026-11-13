@@ -94,10 +94,18 @@ export default function History() {
 
   return (
     <div className="flex flex-col w-full gap-6">
-      {/* o título já aparece no Header, aqui fica só a explicação */}
-      <p className="text-sm text-muted-foreground">
-        Consulte as ordens de serviço, clientes e aparelhos atendidos
-      </p>
+      {/* Cabeçalho da página */}
+      <div>
+        <span className="text-primary text-[10px] md:text-xs font-bold uppercase tracking-widest">
+          Stop Cell
+        </span>
+        <h1 className="text-2xl md:text-3xl font-bold mt-1 text-foreground">
+          Histórico
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Consulte as ordens de serviço, clientes e aparelhos atendidos
+        </p>
+      </div>
 
       {/* Busca e filtro por período */}
       <FilterHistory busca={busca} onBuscaChange={setBusca} date={date} onDateChange={setDate} />
