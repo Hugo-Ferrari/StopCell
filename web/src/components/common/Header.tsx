@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { matchPath, useLocation } from "react-router-dom";
 import ThemeToggle from "@/components/common/ThemeToggle";
 
@@ -12,7 +13,8 @@ function Header() {
     "/fornecedores": "Fornecedores",
     "/configuracoes": "Configurações",
     "/configuracoes/loja": "Dados da Loja",
-    "/configuracoes/usuarios": "Usuários e Permissões", // <- novo
+    "/configuracoes/usuarios": "Usuários e Permissões",
+    "/configuracoes/perfil": "Meu Perfil",
 
   };
 
@@ -22,6 +24,13 @@ function Header() {
     : matchPath({ path: "/ordemServico/:numOs", end: true }, location.pathname)
       ? "Diagnóstico e Orçamento"
       : titulos[location.pathname] || "Stop Cell";
+
+  useEffect(() => {
+    document.title = `${titulo} · StopCell`;
+    return () => {
+      document.title = "StopCell";
+    };
+  }, [titulo]);
 
   return (
     <>

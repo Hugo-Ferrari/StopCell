@@ -105,15 +105,10 @@ function Financial() {
 
   return (
     <div className="flex w-full flex-col gap-6">
-      <div>
-        <span className="text-[10px] font-bold uppercase tracking-widest text-primary md:text-xs">
-          Stop Cell
-        </span>
-        <h1 className="mt-1 text-2xl font-bold text-foreground md:text-3xl">Financeiro</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Receitas das O.S. finalizadas e despesas lançadas na mão
-        </p>
-      </div>
+      {/* o título já aparece no Header, aqui fica só a explicação */}
+      <p className="text-sm text-muted-foreground">
+        Receitas das O.S. finalizadas e despesas lançadas na mão
+      </p>
 
       <FiltroPeriodo
         date={date}

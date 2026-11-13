@@ -14,7 +14,7 @@ export interface criarClienteDto {
 
 
 
-export async function criandoCliente(data: criarClienteDto) {
+export async function criandoCliente(data: Omit<criarClienteDto, "aparelhos">) {
     const response = await api.post("/clientes",data)
     return response.data
     

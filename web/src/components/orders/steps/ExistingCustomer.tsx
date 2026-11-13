@@ -6,6 +6,8 @@ import { salvarChecklistOs } from "@/services/osChecklistService";
 import { mensagemDeErro } from "@/utils/apiError";
 import CustomerSearch from "./CustomerSearch";
 import AparelhosDoCliente from "./aparelho/AparelhosDoCliente";
+import AparelhosPrevia from "./aparelho/AparelhosPrevia";
+import EtapaBloqueada from "./EtapaBloqueada";
 import ChecklistForm, { ITENS_CHECKLIST } from "./ChecklistForm";
 
 interface ExistingCustomerProps {
@@ -84,7 +86,7 @@ export default function ExistingCustomer({ mostrarToast, clienteSelecionado, set
         setClienteSelecionado={setClienteSelecionado}
       />
 
-      {clienteSelecionado?.cpf && (
+      {clienteSelecionado?.cpf ? (
         <AparelhosDoCliente
           // key: trocou de cliente, a lista e o formulário começam do zero
           key={clienteSelecionado.cpf}
@@ -92,26 +94,37 @@ export default function ExistingCustomer({ mostrarToast, clienteSelecionado, set
           mostrarToast={mostrarToast}
           onAparelhoDefinido={setImeiAparelhoValidado}
         />
+      ) : (
+        <EtapaBloqueada bloqueada aviso="Busque o cliente pelo CPF para escolher o aparelho">
+          <AparelhosPrevia />
+        </EtapaBloqueada>
       )}
 
-      {Boolean(imeiAparelhoValidado) && (
-        <ChecklistForm
-          imeiAparelho={imeiAparelhoValidado!}
-          dadosChecklist={dadosChecklist}
-          setDadosChecklist={setDadosChecklist}
-        />
-      )}
+      <EtapaBloqueada
+        bloqueada={!imeiAparelhoValidado}
+        aviso={
+          clienteSelecionado?.cpf
+            ? "Escolha ou cadastre o aparelho para preencher o checklist"
+            : "Busque o cliente pelo CPF primeiro"
+        }
+      >
+        <div className="flex flex-col gap-6">
+          <ChecklistForm
+            imeiAparelho={imeiAparelhoValidado ?? ""}
+            dadosChecklist={dadosChecklist}
+            setDadosChecklist={setDadosChecklist}
+          />
 
-      {Boolean(imeiAparelhoValidado) && (
-        <button
-          type="button"
-          onClick={handleGerarOSFinal}
-          disabled={gerandoOs}
-          className="w-full mt-2 flex justify-center items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-4 rounded-2xl font-bold transition-colors disabled:opacity-50"
-        >
-          {gerandoOs ? <Loader2 className="animate-spin" size={20} /> : "Finalizar: Gerar Ordem de Servico"}
-        </button>
-      )}
+          <button
+            type="button"
+            onClick={handleGerarOSFinal}
+            disabled={gerandoOs}
+            className="w-full mt-2 flex justify-center items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-4 rounded-2xl font-bold transition-colors disabled:opacity-50"
+          >
+            {gerandoOs ? <Loader2 className="animate-spin" size={20} /> : "Finalizar: Gerar Ordem de Servico"}
+          </button>
+        </div>
+      </EtapaBloqueada>
     </div>
   );
 }
