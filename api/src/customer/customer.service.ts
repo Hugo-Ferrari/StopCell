@@ -19,7 +19,6 @@ export class ClientesService {
     const cliente = await this.repository.findByCpf(cpf, cnpjEmpresa);
     if (!cliente)
       throw new NotFoundException(`Cliente com CPF ${cpf} não encontrado`);
-    console.log(JSON.stringify(cliente, null, 2));
     return cliente;
   }
 

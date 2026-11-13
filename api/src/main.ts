@@ -26,17 +26,27 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder()
-    .setTitle('StopCell API')
-    .setDescription('Documentação da API do sistema StopCell - TIC')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .addSecurityRequirements('bearer')
-    .build();
+  // a documentação fica aberta só fora de produção (ou se SWAGGER_ENABLED=true)
+  const swaggerAtivo =
+    process.env.NODE_ENV !== 'production' || process.env.SWAGGER_ENABLED === 'true';
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  if (swaggerAtivo) {
+    const config = new DocumentBuilder()
+      .setTitle('StopCell API')
+      .setDescription('Documentação da API do sistema StopCell - TIC')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .addSecurityRequirements('bearer')
+      .build();
+
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document);
+  }
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+
+bootstrap().catch((erro) => {
+  console.error('Falha ao iniciar a API', erro);
+  process.exit(1);
+});
