@@ -35,6 +35,6 @@ export class ClientesRepository {
   }
 
   delete(cpf: string, cnpjEmpresa: string) {
-    return this.prisma.cliente.delete({ where: { cnpjEmpresa_cpf: { cnpjEmpresa, cpf } } });
+    return this.prisma.cliente.delete({ where: { cpf, AND: { cnpjEmpresa } } });
   }
 }
