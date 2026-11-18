@@ -10,8 +10,9 @@ import {
 } from "@/services/pagamentoService";
 import { atualizarStatusOs } from "@/services/serviceOrderService";
 import { mensagemDeErro } from "@/utils/apiError";
-import { formatarMoeda, paraNumero } from "@/utils/moeda";
+import { formatarMoeda, paraNumero, valorEmTexto } from "@/utils/moeda";
 import { cn } from "@/lib/utils";
+import { useAvisos } from "@/hooks/useAvisos";
 
 interface FinalizarComPagamentoProps {
   numOs: number;
@@ -26,10 +27,6 @@ const FORMAS: { valor: FormaPagamento; texto: string; icone: typeof Banknote }[]
   { valor: "BOLETO", texto: "Boleto", icone: FileText },
 ];
 
-function emTexto(numero: number) {
-  return numero.toFixed(2).replace(".", ",");
-}
-
 // o back só deixa finalizar com tudo pago, então o recebimento fica aqui mesmo,
 // junto do botão de finalizar, em vez de mandar o técnico pra outra tela
 function FinalizarComPagamento({ numOs, total, onAlterado }: FinalizarComPagamentoProps) {
@@ -39,19 +36,20 @@ function FinalizarComPagamento({ numOs, total, onAlterado }: FinalizarComPagamen
   const [valor, setValor] = useState("");
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const { mostrar } = useAvisos();
 
-  const carregarPagamentos = useCallback(async () => {
-    try {
-      const pagamentos = await listarPagamentosOs(numOs);
-      const somaPago = pagamentos.reduce((soma, p) => soma + paraNumero(p.valorPago), 0);
-      setPago(somaPago);
-      setValor(emTexto(Math.max(total - somaPago, 0)));
-    } catch (error) {
-      setErro(mensagemDeErro(error, "Não foi possível carregar os pagamentos da O.S."));
-    } finally {
-      setCarregando(false);
-    }
-  }, [numOs, total]);
+  const carregarPagamentos = useCallback(
+    () =>
+      listarPagamentosOs(numOs)
+        .then((pagamentos) => {
+          const somaPago = pagamentos.reduce((soma, p) => soma + paraNumero(p.valorPago), 0);
+          setPago(somaPago);
+          setValor(valorEmTexto(Math.max(total - somaPago, 0)));
+        })
+        .catch((error) => setErro(mensagemDeErro(error, "Não foi possível carregar os pagamentos da O.S.")))
+        .finally(() => setCarregando(false)),
+    [numOs, total],
+  );
 
   useEffect(() => {
     void carregarPagamentos();
@@ -64,6 +62,7 @@ function FinalizarComPagamento({ numOs, total, onAlterado }: FinalizarComPagamen
 
   async function finalizar() {
     await atualizarStatusOs(numOs, "FINALIZADO");
+    mostrar("O.S. finalizada.", "sucesso");
     await onAlterado();
   }
 
@@ -77,6 +76,7 @@ function FinalizarComPagamento({ numOs, total, onAlterado }: FinalizarComPagamen
 
         // pagamento parcial: registra e deixa a O.S. aberta esperando o resto
         if (!quitaTudo) {
+          mostrar("Pagamento registrado.", "sucesso");
           await carregarPagamentos();
           return;
         }
@@ -149,7 +149,7 @@ function FinalizarComPagamento({ numOs, total, onAlterado }: FinalizarComPagamen
         onClick={handleConfirmar}
         disabled={salvando || valorInvalido}
         className={cn(
-          "h-14 w-full rounded-2xl text-base font-bold",
+          "h-12 w-full rounded-xl px-8",
           quitaTudo && "bg-success text-white hover:bg-success/90",
         )}
       >
