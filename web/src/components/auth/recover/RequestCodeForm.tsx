@@ -33,10 +33,9 @@ function RequestCodeForm({ email, onEmailChange, onSubmit, carregando, erro }: R
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-8">
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
       <FormInput
         label="E-mail"
-        inputSize="lg"
         icon={<Mail size={18} />}
         type="email"
         name="email"

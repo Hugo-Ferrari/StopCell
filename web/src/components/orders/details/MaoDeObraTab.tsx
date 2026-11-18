@@ -11,6 +11,7 @@ import { lancarItemOs } from "@/services/itemOsService";
 import { mensagemDeErro } from "@/utils/apiError";
 import { paraNumero } from "@/utils/moeda";
 import type { ItemOsInterface } from "@/types/ordemServico";
+import { useAvisos } from "@/hooks/useAvisos";
 
 interface MaoDeObraTabProps {
   numOs: number;
@@ -25,6 +26,7 @@ function MaoDeObraTab({ numOs, servicos, bloqueado, onAlterado, onRemover }: Mao
   const [valor, setValor] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const { mostrar } = useAvisos();
 
   const valorNumero = paraNumero(valor);
 
@@ -46,6 +48,7 @@ function MaoDeObraTab({ numOs, servicos, bloqueado, onAlterado, onRemover }: Mao
 
       setDescricao("");
       setValor("");
+      mostrar("Mão de obra lançada.", "sucesso");
       await onAlterado();
     } catch (error) {
       setErro(mensagemDeErro(error, "Não foi possível lançar a mão de obra."));
@@ -79,7 +82,7 @@ function MaoDeObraTab({ numOs, servicos, bloqueado, onAlterado, onRemover }: Mao
           <Button
             type="submit"
             disabled={enviando || !descricao.trim() || valorNumero <= 0}
-            className="h-11 self-end rounded-xl px-5"
+            className="h-12 self-end rounded-xl px-8"
           >
             {enviando ? <Loader2 className="animate-spin" /> : <Plus />}
             Adicionar ao orçamento

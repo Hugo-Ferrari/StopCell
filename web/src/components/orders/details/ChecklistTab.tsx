@@ -63,7 +63,7 @@ function ChecklistTab({ numOs }: ChecklistTabProps) {
 
       <Link
         to={`/ordemServico/${numOs}/checklist`}
-        className={cn(buttonVariants({ variant: "outline" }), "h-11 self-end rounded-xl px-5")}
+        className={cn(buttonVariants({ variant: "outline" }), "h-12 self-end rounded-xl px-8")}
       >
         {jaRegistrado ? "Ver checklist completo" : "Preencher checklist"}
         <ArrowRight />

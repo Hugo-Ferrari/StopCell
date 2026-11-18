@@ -17,6 +17,7 @@ import CancelarOsDialog from "./CancelarOsDialog";
 import { atualizarStatusOs } from "@/services/serviceOrderService";
 import { mensagemDeErro } from "@/utils/apiError";
 import type { StatusOs } from "@/types/ordemServico";
+import { useAvisos } from "@/hooks/useAvisos";
 
 interface AcoesStatusProps {
   numOs: number;
@@ -61,6 +62,7 @@ const FLUXO: Partial<Record<StatusOs, { principal?: Acao; secundarias: Acao[] }>
 function AcoesStatus({ numOs, status, total, onAlterado }: AcoesStatusProps) {
   const [salvando, setSalvando] = useState<StatusOs | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const { mostrar } = useAvisos();
 
   if (status === "FINALIZADO") {
     return (
@@ -88,6 +90,7 @@ function AcoesStatus({ numOs, status, total, onAlterado }: AcoesStatusProps) {
 
     try {
       await atualizarStatusOs(numOs, acao.para);
+      mostrar("Status da O.S. atualizado.", "sucesso");
       await onAlterado();
     } catch (error) {
       setErro(mensagemDeErro(error, "Não foi possível atualizar o status da O.S."));
@@ -114,7 +117,7 @@ function AcoesStatus({ numOs, status, total, onAlterado }: AcoesStatusProps) {
         <Button
           onClick={() => mudarPara(principal)}
           disabled={salvando !== null || semValor}
-          className="h-14 w-full rounded-2xl text-base font-bold"
+          className="h-12 w-full rounded-xl px-8"
         >
           {salvando === principal.para ? (
             <Loader2 className="size-5 animate-spin" />

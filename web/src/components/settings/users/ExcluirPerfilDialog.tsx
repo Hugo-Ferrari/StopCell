@@ -67,14 +67,14 @@ function ExcluirPerfilDialog({ perfil, onFechar, onConfirmar }: ExcluirPerfilDia
             variant="outline"
             onClick={fechar}
             disabled={excluindo}
-            className="h-12 rounded-2xl text-base font-semibold"
+            className="h-12 rounded-xl px-8"
           >
             Voltar
           </Button>
           <Button
             onClick={handleExcluir}
             disabled={excluindo}
-            className="h-12 rounded-2xl bg-destructive text-base font-semibold text-white hover:bg-destructive/90"
+            className="h-12 rounded-xl bg-destructive px-8 text-white hover:bg-destructive/90"
           >
             {excluindo && <Loader2 className="animate-spin" />}
             Excluir perfil

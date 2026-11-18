@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import type { Recebimento } from "@/services/financeiroService";
 import type { FormaPagamento } from "@/services/pagamentoService";
 import { formatarMoeda } from "@/utils/moeda";
@@ -24,7 +25,7 @@ function TabelaUltimosPagamentos({ itens }: TabelaUltimosPagamentosProps) {
   const total = itens.reduce((s, i) => s + i.valorPago, 0);
 
   return (
-    <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 md:p-6">
       <div>
         <h2 className="font-semibold">Recebimentos</h2>
         <p className="text-sm text-muted-foreground tabular-nums">
@@ -60,13 +61,13 @@ function TabelaUltimosPagamentos({ itens }: TabelaUltimosPagamentosProps) {
           </ul>
 
           {itens.length > mostrando && (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={() => setMostrando((n) => n + POR_VEZ)}
-              className="self-center text-sm text-muted-foreground hover:text-foreground"
+              className="h-10 self-center rounded-xl px-5 text-muted-foreground"
             >
               Ver mais ({itens.length - mostrando})
-            </button>
+            </Button>
           )}
         </>
       )}

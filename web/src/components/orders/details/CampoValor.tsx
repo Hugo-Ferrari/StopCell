@@ -1,17 +1,17 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { limparValorDigitado } from "@/utils/moeda";
+import { mascaraValor } from "@/utils/moeda";
 
 interface CampoValorProps {
   id: string;
   rotulo: string;
   valor: string;
   onChange: (valor: string) => void;
+  onBlur?: () => void;
+  erro?: string;
 }
 
-// campo de dinheiro com o "R$" fixo na frente. guarda como texto pra deixar
-// o técnico digitar "45,90" sem o input brigar com a vírgula
-function CampoValor({ id, rotulo, valor, onChange }: CampoValorProps) {
+function CampoValor({ id, rotulo, valor, onChange, onBlur, erro }: CampoValorProps) {
   return (
     <div className="flex flex-col gap-2">
       <Label htmlFor={id}>{rotulo}</Label>
@@ -21,13 +21,16 @@ function CampoValor({ id, rotulo, valor, onChange }: CampoValorProps) {
         </span>
         <Input
           id={id}
-          inputMode="decimal"
+          inputMode="numeric"
           placeholder="0,00"
           value={valor}
-          onChange={(e) => onChange(limparValorDigitado(e.target.value))}
+          onChange={(e) => onChange(mascaraValor(e.target.value))}
+          onBlur={onBlur}
+          aria-invalid={erro ? true : undefined}
           className="pl-10 text-right tabular-nums"
         />
       </div>
+      {erro && <span className="text-xs text-destructive">{erro}</span>}
     </div>
   );
 }

@@ -26,7 +26,7 @@ function textoDoPeriodo(periodo: DateRange | undefined) {
 function SeletorPeriodo({ periodo, atalho, onAtalho, onPersonalizado }: SeletorPeriodoProps) {
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-      <div className="grid grid-cols-4 rounded-xl border border-border bg-card p-1">
+      <div className="grid grid-cols-4 rounded-2xl border border-border bg-card p-1">
         {ATALHOS.map((opcao) => (
           <button
             key={opcao.valor}
@@ -34,9 +34,9 @@ function SeletorPeriodo({ periodo, atalho, onAtalho, onPersonalizado }: SeletorP
             onClick={() => onAtalho(opcao.valor)}
             aria-pressed={atalho === opcao.valor}
             className={cn(
-              "rounded-lg px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors sm:text-sm",
+              "rounded-xl px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors sm:text-sm",
               atalho === opcao.valor
-                ? "bg-foreground text-background"
+                ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
@@ -50,7 +50,7 @@ function SeletorPeriodo({ periodo, atalho, onAtalho, onPersonalizado }: SeletorP
           className={cn(
             "flex h-[42px] items-center justify-center gap-2 rounded-xl border px-3 text-sm transition-colors sm:justify-start",
             atalho === null
-              ? "border-foreground bg-foreground text-background"
+              ? "border-primary bg-primary text-primary-foreground"
               : "border-border bg-card text-muted-foreground hover:text-foreground",
           )}
         >

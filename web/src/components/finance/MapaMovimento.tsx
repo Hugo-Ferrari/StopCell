@@ -20,7 +20,7 @@ function MapaMovimento({ movimento }: MapaMovimentoProps) {
   const turnoPico = pico && TURNOS.find((t) => t.valor === pico.turno)?.frase;
 
   return (
-    <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 md:p-6">
       <div>
         <h2 className="font-semibold">Dia mais forte</h2>
         <p className="text-xs text-muted-foreground">O.S. abertas por dia e turno</p>

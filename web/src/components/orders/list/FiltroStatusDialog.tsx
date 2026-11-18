@@ -87,10 +87,10 @@ function FiltroStatusDialog({ aplicados, contagem, onAplicar }: FiltroStatusDial
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={limpar} className="h-12 rounded-2xl text-base font-semibold">
+          <Button variant="outline" onClick={limpar} className="h-12 rounded-xl px-8">
             Limpar
           </Button>
-          <Button onClick={aplicar} className="h-12 rounded-2xl text-base font-semibold">
+          <Button onClick={aplicar} className="h-12 rounded-xl px-8">
             Aplicar filtros
           </Button>
         </DialogFooter>

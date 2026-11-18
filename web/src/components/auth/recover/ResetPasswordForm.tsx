@@ -42,10 +42,9 @@ function ResetPasswordForm({ onSubmit, carregando, erro }: ResetPasswordFormProp
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
       <FormInput
         label="Código recebido"
-        inputSize="lg"
         icon={<KeyRound size={18} />}
         type="text"
         name="codigo"
@@ -64,7 +63,6 @@ function ResetPasswordForm({ onSubmit, carregando, erro }: ResetPasswordFormProp
 
       <FormInput
         label="Nova senha"
-        inputSize="lg"
         icon={<Lock size={18} />}
         type="password"
         name="novaSenha"
@@ -78,7 +76,6 @@ function ResetPasswordForm({ onSubmit, carregando, erro }: ResetPasswordFormProp
 
       <FormInput
         label="Confirmar nova senha"
-        inputSize="lg"
         icon={<Lock size={18} />}
         type="password"
         name="confirmarSenha"

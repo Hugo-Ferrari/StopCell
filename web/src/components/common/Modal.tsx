@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ModalProps {
   aberto: boolean;
@@ -33,26 +34,27 @@ function Modal({ aberto, titulo, descricao, onFechar, children, tamanho = "max-w
         aria-labelledby="modal-titulo"
         // não fecha quando clica dentro do modal
         onClick={(e) => e.stopPropagation()}
-        className={`flex max-h-[92vh] w-full ${tamanho} flex-col rounded-t-2xl bg-card shadow-xl sm:rounded-xl`}
+        className={`flex max-h-[92vh] w-full ${tamanho} flex-col rounded-t-2xl border border-border bg-card shadow-xl sm:rounded-2xl`}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-border p-5 sm:p-6">
+        <div className="flex items-start justify-between gap-4 border-b border-border p-5 md:p-6">
           <div>
-            <h2 id="modal-titulo" className="text-lg font-semibold text-foreground sm:text-xl">
+            <h2 id="modal-titulo" className="text-lg font-semibold text-foreground">
               {titulo}
             </h2>
             {descricao && <p className="mt-0.5 text-sm text-muted-foreground">{descricao}</p>}
           </div>
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onFechar}
             aria-label="Fechar"
-            className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            className="size-9 shrink-0 rounded-xl text-muted-foreground"
           >
-            <X size={20} />
-          </button>
+            <X className="size-5" />
+          </Button>
         </div>
 
-        <div className="overflow-y-auto p-5 sm:p-6">{children}</div>
+        <div className="overflow-y-auto p-5 md:p-6">{children}</div>
       </div>
     </div>
   );

@@ -1,10 +1,13 @@
-import { useState } from "react";
-import { Loader2, Save, Building2, Phone, MapPin, Hash } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { Building2, Hash, Loader2, MapPin, Phone, Save } from "lucide-react";
 import Alert from "@/components/common/Alert";
-import { mensagemDeErro } from "@/utils/apiError";
-import { formatarCnpj, formatarTelefone, formatarCep } from "@/utils/masks";
-import { useViaCep } from "@/hooks/useViaCep";
 import FormInput from "@/components/common/FormInput";
+import { Button } from "@/components/ui/button";
+import { mensagemDeErro } from "@/utils/apiError";
+import { formatarCep, formatarCnpj, formatarTelefone } from "@/utils/masks";
+import { telefoneValido } from "@/utils/validartors";
+import { useViaCep } from "@/hooks/useViaCep";
+import { useErrosFormulario } from "@/hooks/useErrosFormulario";
 import type { EmpresaDTO, UpdateEmpresaDTO } from "@/services/enterpriseService";
 
 interface StoreFormProps {
@@ -14,173 +17,147 @@ interface StoreFormProps {
   onCancelar: () => void;
 }
 
+type Campo = "nomeFantasia" | "telefone" | "endereco";
+
 export default function StoreForm({ initialData, onSave, loading, onCancelar }: StoreFormProps) {
   const [nomeFantasia, setNomeFantasia] = useState(initialData.nomeFantasia || "");
   const [razaoSocial, setRazaoSocial] = useState(initialData.razaoSocial || "");
-  const [telefone, setTelefone] = useState(initialData.telefone || "");
+  const [telefone, setTelefone] = useState(formatarTelefone(initialData.telefone || ""));
   const [cep, setCep] = useState("");
   const [endereco, setEndereco] = useState(initialData.endereco || "");
-  // o CNPJ não é editável, só aparece no formulário
+  const [erroApi, setErroApi] = useState("");
   const cnpj = initialData.cnpj || "";
 
-  const { buscarCep, carregandoCep } = useViaCep();
+  const { buscarCep, carregandoCep, erroCep } = useViaCep();
 
-  const [erro, setErro] = useState("");
+  const telefoneLimpo = telefone.replace(/\D/g, "");
 
-  async function handleCepChange(value: string) {
-    const raw = value.replace(/\D/g, "").slice(0, 8);
-    setCep(raw);
+  const { erro, tocar, podeEnviar } = useErrosFormulario<Campo>({
+    nomeFantasia: !nomeFantasia.trim() ? "Informe o nome fantasia da loja" : undefined,
+    telefone: !telefoneValido(telefoneLimpo) ? "Digite o DDD e o número" : undefined,
+    endereco: !endereco.trim() ? "Informe o endereço da loja" : undefined,
+  });
 
-    if (raw.length === 8) {
-      const enderecoEncontrado = await buscarCep(raw);
-      if (enderecoEncontrado?.enderecoFormatado) {
-        setEndereco(enderecoEncontrado.enderecoFormatado);
-      }
-    }
+  async function handleCep(valor: string) {
+    const formatado = formatarCep(valor);
+    setCep(formatado);
+
+    if (formatado.replace(/\D/g, "").length !== 8) return;
+
+    const achado = await buscarCep(formatado);
+    if (achado?.enderecoFormatado) setEndereco(`${achado.enderecoFormatado}, Nº `);
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    setErroApi("");
 
-    const cleanTelefone = telefone.replace(/\D/g, "");
-
-    if (!nomeFantasia.trim()) {
-      return setErro("Informe o Nome Fantasia da loja.");
-    }
-
-    if (!cleanTelefone) {
-      return setErro("Informe um telefone de contato.");
-    }
-
-    if (!endereco.trim()) {
-      return setErro("Informe o endereço da loja.");
-    }
-
-    setErro("");
+    if (!podeEnviar()) return;
 
     try {
       await onSave({
         nomeFantasia: nomeFantasia.trim(),
         razaoSocial: razaoSocial.trim() || nomeFantasia.trim(),
-        telefone: cleanTelefone,
+        telefone: telefoneLimpo,
         endereco: endereco.trim(),
       });
     } catch (error) {
-      setErro(mensagemDeErro(error, "Erro ao salvar dados da loja."));
+      setErroApi(mensagemDeErro(error, "Não foi possível salvar os dados da loja."));
     }
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full rounded-xl border border-border bg-card p-5 sm:p-7 flex flex-col gap-5"
+      noValidate
+      className="flex w-full flex-col gap-5 rounded-2xl border border-border bg-card p-5 animate-in fade-in slide-in-from-bottom-2 md:p-6"
     >
-      <Alert mensagem={erro} />
-
       <div>
-        <h2 className="text-lg font-bold text-foreground">
-          Editar Informações da Loja
-        </h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Essas informações são impressas nas Ordens de Serviço
-        </p>
+        <h2 className="font-semibold text-foreground">Editar dados da loja</h2>
+        <p className="mt-0.5 text-sm text-muted-foreground">Essas informações são impressas nas ordens de serviço</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <Alert mensagem={erroApi} />
+
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <FormInput
-          label="Nome Fantasia *"
+          label="Nome fantasia *"
           id="nomeFantasia"
-          icon={<Building2 size={16} />}
+          icon={<Building2 size={18} />}
           value={nomeFantasia}
           onChange={(e) => setNomeFantasia(e.target.value)}
+          onBlur={tocar("nomeFantasia")}
           placeholder="Ex: Stop Cell Assistência"
-          required
+          error={erro("nomeFantasia")}
         />
 
         <FormInput
-          label="Razão Social"
+          label="Razão social"
           id="razaoSocial"
-          icon={<Building2 size={16} />}
+          icon={<Building2 size={18} />}
           value={razaoSocial}
           onChange={(e) => setRazaoSocial(e.target.value)}
           placeholder="Ex: Stop Cell LTDA"
+          helperText="Se ficar em branco, usa o nome fantasia"
         />
 
         <FormInput
           label="CNPJ"
           id="cnpj"
-          icon={<Hash size={16} />}
+          icon={<Hash size={18} />}
           value={cnpj ? formatarCnpj(cnpj) : ""}
           disabled
-          helperText="Identificador fixo da empresa (não editável)"
-          className="cursor-not-allowed opacity-70 font-mono"
+          helperText="Não pode ser alterado"
         />
 
         <FormInput
           label="Telefone / WhatsApp *"
           id="telefone"
-          icon={<Phone size={16} />}
-          value={formatarTelefone(telefone)}
-          onChange={(e) => setTelefone(e.target.value)}
+          icon={<Phone size={18} />}
+          type="tel"
+          inputMode="numeric"
+          value={telefone}
+          onChange={(e) => setTelefone(formatarTelefone(e.target.value))}
+          onBlur={tocar("telefone")}
           placeholder="(00) 00000-0000"
-          required
+          maxLength={15}
+          error={erro("telefone")}
         />
 
         <FormInput
           label="CEP"
           id="cep"
-          icon={<MapPin size={16} />}
-          value={formatarCep(cep)}
-          onChange={(e) => handleCepChange(e.target.value)}
+          icon={<MapPin size={18} />}
+          inputMode="numeric"
+          value={cep}
+          onChange={(e) => void handleCep(e.target.value)}
           placeholder="00000-000"
-          rightElement={
-            carregandoCep ? (
-              <span className="text-xs text-primary flex items-center gap-1 font-medium">
-                <Loader2 size={14} className="animate-spin" /> Buscando...
-              </span>
-            ) : null
-          }
-          helperText="Preencha o CEP para preencher o endereço automaticamente"
+          maxLength={9}
+          error={erroCep ?? undefined}
+          helperText={carregandoCep ? "Buscando endereço..." : "Preenche o endereço sozinho"}
         />
 
         <FormInput
-          label="Endereço Completo *"
+          label="Endereço completo *"
           id="endereco"
-          icon={<MapPin size={16} />}
+          icon={<MapPin size={18} />}
           value={endereco}
           onChange={(e) => setEndereco(e.target.value)}
-          placeholder="Rua, Número, Bairro, Cidade - UF"
-          required
+          onBlur={tocar("endereco")}
+          placeholder="Rua, número, bairro, cidade"
+          error={erro("endereco")}
         />
       </div>
 
-      <div className="flex flex-col-reverse gap-3 pt-4 border-t border-border mt-2 sm:flex-row sm:justify-end">
-        <button
-          type="button"
-          onClick={onCancelar}
-          disabled={loading}
-          className="flex items-center justify-center rounded-xl border border-border px-6 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-accent disabled:opacity-50 cursor-pointer"
-        >
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <Button type="button" variant="outline" onClick={onCancelar} disabled={loading} className="h-12 rounded-xl px-8">
           Cancelar
-        </button>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground transition-all hover:opacity-90 disabled:opacity-50 cursor-pointer"
-        >
-          {loading ? (
-            <>
-              <Loader2 size={16} className="animate-spin" /> Salvando...
-            </>
-          ) : (
-            <>
-              <Save size={16} /> Salvar Alterações
-            </>
-          )}
-        </button>
+        </Button>
+        <Button type="submit" disabled={loading} className="h-12 rounded-xl px-8">
+          {loading ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+          Salvar alterações
+        </Button>
       </div>
     </form>
   );
 }
-

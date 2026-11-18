@@ -55,7 +55,7 @@ function GraficoFormaPagamento({ itens }: GraficoFormaPagamentoProps) {
   const total = dados.reduce((soma, item) => soma + item.value, 0);
 
   return (
-    <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 md:p-6">
       <div>
         <h2 className="font-semibold">Como pagaram</h2>
         <p className="text-xs text-muted-foreground">entradas por forma de pagamento</p>

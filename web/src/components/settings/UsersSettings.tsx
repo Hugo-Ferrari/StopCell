@@ -7,6 +7,7 @@ import ProfileList from "@/components/settings/users/ProfileList";
 import ProfileFormModal from "@/components/settings/users/ProfileFormModal";
 import ExcluirPerfilDialog from "@/components/settings/users/ExcluirPerfilDialog";
 import DicaDesativado from "@/components/common/DicaDesativado";
+import { Button } from "@/components/ui/button";
 import type { PerfilAcesso } from "@/services/perfilService";
 import type { UsuarioDaLoja } from "@/services/userService";
 import { useUsersSettings } from "./hooks/useUsersSettings";
@@ -39,7 +40,6 @@ export default function UsersSettings() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 pb-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* o título já aparece no Header, aqui fica só a explicação */}
         <p className="text-sm text-muted-foreground">
           Cadastre os funcionários da loja e defina o que cada um pode acessar.
         </p>
@@ -49,27 +49,18 @@ export default function UsersSettings() {
             mensagem={semPerfis ? "Crie um perfil de acesso primeiro, na aba Perfis de acesso." : null}
             className="w-full sm:w-auto"
           >
-            <button
-              type="button"
-              onClick={() => setModalUsuario(null)}
-              disabled={semPerfis}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Plus size={18} /> Novo usuário
-            </button>
+            <Button onClick={() => setModalUsuario(null)} disabled={semPerfis} className="h-10 w-full rounded-xl px-5">
+              <Plus className="size-4" /> Novo usuário
+            </Button>
           </DicaDesativado>
         ) : (
-          <button
-            type="button"
-            onClick={() => setModalPerfil(null)}
-            className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
-          >
-            <Plus size={18} /> Novo perfil
-          </button>
+          <Button onClick={() => setModalPerfil(null)} className="h-10 w-full rounded-xl px-5 sm:w-auto">
+            <Plus className="size-4" /> Novo perfil
+          </Button>
         )}
       </div>
 
-      <div role="tablist" className="flex gap-1 rounded-xl border border-border bg-card p-1 sm:w-fit">
+      <div role="tablist" className="flex gap-1 rounded-2xl border border-border bg-card p-1 sm:w-fit">
         {(
           [
             ["usuarios", `Usuários (${usuarios.length})`],
@@ -82,7 +73,7 @@ export default function UsersSettings() {
             role="tab"
             aria-selected={aba === valor}
             onClick={() => setAba(valor)}
-            className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors sm:flex-none ${
+            className={`flex-1 rounded-xl px-4 py-2 text-sm font-medium transition-colors sm:flex-none ${
               aba === valor ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -96,7 +87,7 @@ export default function UsersSettings() {
       {aba === "usuarios" ? (
         <>
           {semPerfis && (
-            <p className="rounded-lg border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+            <p className="rounded-2xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
               Para cadastrar funcionários, crie antes um perfil de acesso na aba{" "}
               <button type="button" onClick={() => setAba("perfis")} className="font-semibold text-primary hover:underline">
                 Perfis de acesso

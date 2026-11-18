@@ -1,4 +1,5 @@
 import { Crown, Pencil } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { UsuarioDaLoja } from "@/services/userService";
 import { iniciais } from "@/utils/iniciais";
 
@@ -9,11 +10,11 @@ interface UserListProps {
 
 function UserList({ usuarios, onEditar }: UserListProps) {
   return (
-    <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+    <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
       {usuarios.map((u) => (
         <li key={u.idUsuario} className="flex items-center gap-3 p-4 sm:gap-4">
           <div
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+            className={`flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
               u.ativo ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
             }`}
           >
@@ -47,14 +48,15 @@ function UserList({ usuarios, onEditar }: UserListProps) {
 
           {/* o dono não aparece com editar: ele sempre tem acesso total */}
           {!u.ehDono && (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => onEditar(u)}
               aria-label={`Editar ${u.nome}`}
-              className="shrink-0 rounded-lg p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              className="size-9 shrink-0 rounded-xl text-muted-foreground"
             >
-              <Pencil size={16} />
-            </button>
+              <Pencil className="size-4" />
+            </Button>
           )}
         </li>
       ))}
