@@ -66,13 +66,10 @@ function Financial() {
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <header className="mb-2 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground md:text-3xl">Financeiro</h1>
-          <p className="mt-1 text-sm text-muted-foreground tabular-nums">
-            {intervalo(inicio, fim)} · comparando com {rotuloAnterior}
-          </p>
-        </div>
+      <header className="mb-2 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <p className="text-sm text-muted-foreground tabular-nums">
+          {intervalo(inicio, fim)} · comparando com {rotuloAnterior}
+        </p>
         <SeletorPeriodo periodo={periodo} atalho={atalho} onAtalho={escolherAtalho} onPersonalizado={escolherDatas} />
       </header>
 
