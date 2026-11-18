@@ -4,6 +4,7 @@ import { ArrowLeft, CheckCircle2, ClipboardCheck, Package, Stethoscope, Wrench }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { buttonVariants } from "@/components/ui/button";
 import Alert from "@/components/common/Alert";
+import TelaSemDados from "@/components/common/TelaSemDados";
 import PrintOsButton from "@/components/orders/PrintOsButton";
 import OsResumoCard from "@/components/orders/details/OsResumoCard";
 import DiagnosticoTab from "@/components/orders/details/DiagnosticoTab";
@@ -20,6 +21,7 @@ import { mensagemDeErro } from "@/utils/apiError";
 import { calcularOrcamento } from "@/utils/orcamento";
 import { estaEncerrada } from "@/utils/statusOs";
 import { cn } from "@/lib/utils";
+import { useAvisos } from "@/hooks/useAvisos";
 
 type Aba = "diagnostico" | "reparo" | "pecas" | "checklist";
 
@@ -50,11 +52,13 @@ function DetalhesOrdemServico() {
     if (location.state) navigate(location.pathname, { replace: true, state: null });
   }, [location.pathname, location.state, navigate]);
   const [erroRemocao, setErroRemocao] = useState<string | null>(null);
+  const { mostrar } = useAvisos();
 
   async function handleRemoverItem(idItemOs: number) {
     setErroRemocao(null);
     try {
       await removerItemOs(idItemOs);
+      mostrar("Item removido.", "sucesso");
       await recarregar();
     } catch (error) {
       setErroRemocao(mensagemDeErro(error, "Não foi possível remover o item."));
@@ -65,12 +69,18 @@ function DetalhesOrdemServico() {
 
   if (!ordem) {
     return (
-      <div className="flex flex-col items-start gap-4">
-        <Alert mensagem={erro ?? "Ordem de serviço não encontrada."} />
-        <Link to="/ordemServico" className={cn(buttonVariants({ variant: "outline" }), "h-10 rounded-xl px-4")}>
-          <ArrowLeft /> Voltar para as ordens
-        </Link>
-      </div>
+      <>
+        <Alert mensagem={erro} />
+        <TelaSemDados
+          titulo="Ordem de serviço não encontrada"
+          descricao="Confira o número da O.S. ou volte para a lista."
+          acao={
+            <Link to="/ordemServico" className={cn(buttonVariants(), "h-10 rounded-xl px-5")}>
+              <ArrowLeft /> Voltar para as ordens
+            </Link>
+          }
+        />
+      </>
     );
   }
 
@@ -80,13 +90,7 @@ function DetalhesOrdemServico() {
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in-0">
-      <div className="flex items-center justify-between gap-4">
-        <Link
-          to="/ordemServico"
-          className={cn(buttonVariants({ variant: "ghost" }), "h-10 rounded-xl px-3 text-muted-foreground")}
-        >
-          <ArrowLeft /> Ordens de serviço
-        </Link>
+      <div className="flex items-center justify-end gap-4">
         <PrintOsButton numOs={ordem.numOs} />
       </div>
 
