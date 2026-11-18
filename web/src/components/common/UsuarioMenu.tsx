@@ -40,7 +40,7 @@ function UsuarioMenu({ compacto }: UsuarioMenuProps) {
 
       <button
         type="button"
-        onClick={sairDoSistema}
+        onClick={() => sairDoSistema("saiu")}
         title="Sair"
         aria-label="Sair do sistema"
         className="flex size-10 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"

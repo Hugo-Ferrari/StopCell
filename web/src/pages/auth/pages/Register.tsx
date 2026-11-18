@@ -1,15 +1,14 @@
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft, Building2, CheckCircle2, Loader2, Lock, Mail, MapPin, Phone, User } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, Building2, Lock, Mail, MapPin, Phone, User } from "lucide-react";
 import Marca from "@/components/common/Mark";
 import FormInput from "@/components/common/FormInput";
 import Alert from "@/components/common/Alert";
-import { buttonVariants } from "@/components/ui/button";
+import AuthSubmitButton from "@/components/auth/AuthSubmitButton";
 import { cadastrarUsuario } from "../authService";
 import { mensagemDeErro } from "@/utils/apiError";
 import { formatarCnpj, formatarTelefone, limparCnpj } from "@/utils/masks";
 import { cnpjValido, emailValido, telefoneValido } from "@/utils/validartors";
-import { cn } from "@/lib/utils";
 
 type Campo =
   | "nomeEmpresa"
@@ -24,7 +23,7 @@ type Campo =
 
 function Register() {
   const [carregando, setCarregando] = useState(false);
-  const [cadastrado, setCadastrado] = useState(false);
+  const navigate = useNavigate();
   const [erroApi, setErroApi] = useState<string | null>(null);
   const [tentouEnviar, setTentouEnviar] = useState(false);
   const [tocados, setTocados] = useState<Partial<Record<Campo, boolean>>>({});
@@ -94,36 +93,17 @@ function Register() {
         },
       });
 
-      setCadastrado(true);
-      window.scrollTo({ top: 0 });
+      navigate("/", {
+        state: {
+          email: email.trim(),
+          mensagem: `Cadastro realizado com sucesso! A ${nomeEmpresa.trim()} já está no sistema. Entre com seu e-mail e senha.`,
+        },
+      });
     } catch (error) {
       setErroApi(mensagemDeErro(error, "Não foi possível criar a conta. Confira os dados e tente de novo."));
     } finally {
       setCarregando(false);
     }
-  }
-
-  if (cadastrado) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground">
-        <div className="flex w-full max-w-md flex-col items-center gap-4 rounded-3xl border border-border bg-card p-8 text-center animate-in fade-in-0 zoom-in-95">
-          <span className="flex size-14 items-center justify-center rounded-full bg-success/12 text-success">
-            <CheckCircle2 className="size-7" />
-          </span>
-          <div>
-            <h1 className="text-2xl font-bold">Conta criada</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              A <span className="font-medium text-foreground">{nomeEmpresa.trim()}</span> já está cadastrada. Entre
-              com o usuário <span className="font-medium text-foreground">{usuario.trim()}</span> e a senha que você
-              escolheu.
-            </p>
-          </div>
-          <Link to="/" className={cn(buttonVariants(), "mt-2 h-11 w-full rounded-xl")}>
-            Ir para o login
-          </Link>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -146,10 +126,10 @@ function Register() {
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="flex w-full max-w-2xl flex-col gap-10 rounded-3xl border border-border bg-card p-6 md:p-10"
+        className="flex w-full max-w-2xl flex-col gap-8 rounded-2xl border border-border bg-card p-5 md:p-6"
       >
-        <section className="flex flex-col gap-4">
-          <h2 className="mb-1 text-sm font-semibold text-muted-foreground">Empresa</h2>
+        <section className="flex flex-col gap-5">
+          <h2 className="font-semibold text-foreground">Empresa</h2>
 
           <FormInput
             label="Nome da empresa"
@@ -161,7 +141,7 @@ function Register() {
             error={erro("nomeEmpresa")}
           />
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <FormInput
               label="CNPJ"
               value={cnpj}
@@ -184,8 +164,8 @@ function Register() {
           </div>
         </section>
 
-        <section className="flex flex-col gap-4">
-          <h2 className="mb-1 text-sm font-semibold text-muted-foreground">Dono da empresa</h2>
+        <section className="flex flex-col gap-5">
+          <h2 className="font-semibold text-foreground">Dono da empresa</h2>
 
           <FormInput
             label="Nome completo"
@@ -197,7 +177,7 @@ function Register() {
             error={erro("nomeCompleto")}
           />
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <FormInput
               label="WhatsApp"
               icon={<Phone size={18} />}
@@ -223,8 +203,8 @@ function Register() {
           </div>
         </section>
 
-        <section className="flex flex-col gap-4">
-          <h2 className="mb-1 text-sm font-semibold text-muted-foreground">Acesso ao sistema</h2>
+        <section className="flex flex-col gap-5">
+          <h2 className="font-semibold text-foreground">Acesso ao sistema</h2>
 
           <FormInput
             label="Usuário"
@@ -237,7 +217,7 @@ function Register() {
             error={erro("usuario")}
           />
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <FormInput
               label="Senha"
               icon={<Lock size={18} />}
@@ -268,13 +248,9 @@ function Register() {
           {tentouEnviar && Object.values(erros).some(Boolean) && (
             <p className="text-center text-sm text-destructive">Confira os campos marcados em vermelho.</p>
           )}
-          <button
-            type="submit"
-            disabled={carregando}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-4 font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
-          >
-            {carregando ? <Loader2 className="animate-spin" size={20} /> : "Criar conta"}
-          </button>
+          <AuthSubmitButton carregando={carregando} textoCarregando="Criando conta...">
+            Criar conta
+          </AuthSubmitButton>
         </div>
       </form>
     </div>

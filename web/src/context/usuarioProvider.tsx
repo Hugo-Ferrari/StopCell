@@ -1,19 +1,29 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { isAxiosError } from "axios";
+import { RotateCw, WifiOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { sairDoSistema } from "@/api/token";
 import { buscarUsuarioLogado, type UsuarioLogado } from "@/services/userService";
 import type { Permissao } from "@/utils/permissoes";
 import { UsuarioContext } from "./usuarioContext";
+
+function usuarioNaoExiste(error: unknown) {
+  return isAxiosError(error) && error.response?.status === 404;
+}
 
 // Busca o /usuario/me uma vez quando entra no sistema e deixa disponível
 // pra qualquer tela (menu, rotas, botões) saber o que o usuário pode fazer.
 export function UsuarioProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<UsuarioLogado | null>(null);
   const [carregando, setCarregando] = useState(true);
+  const [falhou, setFalhou] = useState(false);
 
   const recarregar = useCallback(async () => {
     try {
       setUsuario(await buscarUsuarioLogado());
+      setFalhou(false);
     } catch (error) {
-      console.error("Erro ao carregar usuário logado:", error);
+      if (usuarioNaoExiste(error)) sairDoSistema("expirada");
     }
   }, []);
 
@@ -24,7 +34,10 @@ export function UsuarioProvider({ children }: { children: ReactNode }) {
     buscarUsuarioLogado()
       .then((dados) => montado && setUsuario(dados))
       // se for 401 o interceptor do axios já manda pro login
-      .catch((error) => console.error("Erro ao carregar usuário logado:", error))
+      .catch((error) => {
+        if (usuarioNaoExiste(error)) return sairDoSistema("expirada");
+        if (montado) setFalhou(true);
+      })
       .finally(() => montado && setCarregando(false));
 
     return () => {
@@ -44,6 +57,33 @@ export function UsuarioProvider({ children }: { children: ReactNode }) {
       recarregar,
     };
   }, [usuario, carregando, recarregar]);
+
+  if (falhou && !usuario) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <div
+          role="alert"
+          className="flex max-w-md flex-col items-center gap-4 rounded-2xl border border-border bg-card p-8 text-center"
+        >
+          <WifiOff className="size-10 text-muted-foreground" />
+          <div>
+            <h2 className="text-lg font-bold text-foreground">Não foi possível carregar seus dados</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Confira sua conexão e tente de novo. Se continuar, avise o administrador da loja.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button onClick={() => window.location.reload()} className="h-10 rounded-xl px-5">
+              <RotateCw /> Tentar de novo
+            </Button>
+            <Button variant="outline" onClick={() => sairDoSistema()} className="h-10 rounded-xl px-5">
+              Sair
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return <UsuarioContext.Provider value={value}>{children}</UsuarioContext.Provider>;
 }
