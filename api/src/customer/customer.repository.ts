@@ -12,14 +12,15 @@ export class ClientesRepository {
   }
 
   findByCpf(cpf: string, cnpjEmpresa: string) {
-    return this.prisma.cliente.findFirst({
-      where: { cpf, cnpjEmpresa },
+    return this.prisma.cliente.findUnique({
+      where: { cnpjEmpresa_cpf: { cnpjEmpresa, cpf } },
       include: {
         aparelhos: {
           include: {
             marca: true,
             categoria: true,
           },
+          omit: { senhaAparelho: true },
         },
       },
     });
@@ -35,6 +36,8 @@ export class ClientesRepository {
   }
 
   delete(cpf: string, cnpjEmpresa: string) {
-    return this.prisma.cliente.delete({ where: { cpf, AND: { cnpjEmpresa } } });
+    return this.prisma.cliente.delete({
+      where: { cnpjEmpresa_cpf: { cnpjEmpresa, cpf } },
+    });
   }
 }

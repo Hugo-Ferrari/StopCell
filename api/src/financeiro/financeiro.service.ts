@@ -235,6 +235,31 @@ export class FinanceiroService {
     };
   }
 
+    async recebimentos(cnpjEmpresa: string, query: PeriodoQueryDto) {
+    this.exigirEmpresa(cnpjEmpresa);
+    const { inicioDate, fimDate } = this.resolverPeriodo(query);
+
+    const pagamentos = await this.repository.listarRecebimentosNoPeriodo(
+      cnpjEmpresa,
+      inicioDate,
+      fimDate,
+    );
+
+    return pagamentos
+      .map((p) => ({
+        idPagamento: p.idPagamento,
+        numOs: p.numOs,
+        valorPago: dinheiro(p.valorPago),
+        formaPagamento: p.formaPagamento,
+        data: p.ordemServico.dtSaida ?? p.dtPagamento,
+        nomeCliente: p.ordemServico.cliente.nmCompleto ?? '',
+      }))
+      .sort(
+        (a, b) =>
+          new Date(b.data ?? 0).getTime() - new Date(a.data ?? 0).getTime(),
+      );
+  }
+
   async listarDespesas(cnpjEmpresa: string, query: PeriodoQueryDto) {
     this.exigirEmpresa(cnpjEmpresa);
     const { inicioDate, fimDate } = this.resolverPeriodo(query);

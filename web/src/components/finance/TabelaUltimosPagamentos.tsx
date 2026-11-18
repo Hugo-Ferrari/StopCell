@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { format } from "date-fns";
+import { Link } from "react-router-dom";
+import type { Recebimento } from "@/services/financeiroService";
 import type { FormaPagamento } from "@/services/pagamentoService";
-import type { UltimoPagamento } from "@/services/financeiroService";
 import { formatarMoeda } from "@/utils/moeda";
 
 const ROTULOS: Record<FormaPagamento, string> = {
@@ -10,50 +12,65 @@ const ROTULOS: Record<FormaPagamento, string> = {
   BOLETO: "Boleto",
 };
 
+const POR_VEZ = 8;
+
 interface TabelaUltimosPagamentosProps {
-  itens: UltimoPagamento[];
+  itens: Recebimento[];
 }
 
+// recebimentos do período escolhido, os mais novos primeiro
 function TabelaUltimosPagamentos({ itens }: TabelaUltimosPagamentosProps) {
-  if (itens.length === 0) {
-    return (
-      <p className="py-6 text-center text-sm text-muted-foreground">
-        Nenhum pagamento de O.S. finalizada ainda.
-      </p>
-    );
-  }
+  const [mostrando, setMostrando] = useState(POR_VEZ);
+  const total = itens.reduce((s, i) => s + i.valorPago, 0);
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left text-sm">
-        <thead className="text-xs uppercase tracking-wide text-muted-foreground">
-          <tr>
-            <th className="pb-2 pr-3 font-medium">Data</th>
-            <th className="pb-2 pr-3 font-medium">O.S.</th>
-            <th className="pb-2 pr-3 font-medium">Cliente</th>
-            <th className="pb-2 pr-3 font-medium">Forma</th>
-            <th className="pb-2 text-right font-medium">Valor</th>
-          </tr>
-        </thead>
-        <tbody>
-          {itens.map((item) => (
-            <tr key={item.idPagamento} className="border-t border-border">
-              <td className="py-2.5 pr-3 tabular-nums text-muted-foreground">
-                {item.dtPagamento ? format(new Date(item.dtPagamento), "dd/MM/yyyy HH:mm") : "—"}
-              </td>
-              <td className="py-2.5 pr-3 font-medium">#{item.numOs}</td>
-              <td className="py-2.5 pr-3">{item.nomeCliente || "—"}</td>
-              <td className="py-2.5 pr-3">
-                {item.formaPagamento ? ROTULOS[item.formaPagamento] : "—"}
-              </td>
-              <td className="py-2.5 text-right tabular-nums font-medium">
-                {formatarMoeda(item.valorPago)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+      <div>
+        <h2 className="font-semibold">Recebimentos</h2>
+        <p className="text-sm text-muted-foreground tabular-nums">
+          {itens.length > 0 ? `${itens.length} no período · ${formatarMoeda(total)}` : "Pagamentos das O.S. finalizadas"}
+        </p>
+      </div>
+
+      {itens.length === 0 ? (
+        <p className="py-6 text-center text-sm text-muted-foreground">Nenhum recebimento no período.</p>
+      ) : (
+        <>
+          <ul className="-mx-2 flex flex-col">
+            {itens.slice(0, mostrando).map((item) => (
+              <li key={item.idPagamento}>
+                <Link
+                  to={`/ordemServico/${item.numOs}`}
+                  className="flex items-center justify-between gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm">{item.nomeCliente || "Cliente sem nome"}</p>
+                    <p className="text-xs text-muted-foreground tabular-nums">
+                      O.S. #{item.numOs}
+                      {item.formaPagamento && ` · ${ROTULOS[item.formaPagamento]}`}
+                      {item.data && ` · ${format(new Date(item.data), "dd/MM")}`}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-sm font-medium text-success tabular-nums">
+                    + {formatarMoeda(item.valorPago)}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {itens.length > mostrando && (
+            <button
+              type="button"
+              onClick={() => setMostrando((n) => n + POR_VEZ)}
+              className="self-center text-sm text-muted-foreground hover:text-foreground"
+            >
+              Ver mais ({itens.length - mostrando})
+            </button>
+          )}
+        </>
+      )}
+    </section>
   );
 }
 

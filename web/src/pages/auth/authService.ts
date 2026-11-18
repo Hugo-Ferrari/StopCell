@@ -12,29 +12,8 @@ export async function cadastrarUsuario(dados: any) {
     return response.data;
 }
 
-const TOKEN_KEY = "token";
-
-export function salvarToken(token: string, lembrar: boolean) {
-    if(lembrar){
-        localStorage.setItem(TOKEN_KEY, token);
-    }
-    else{
-        sessionStorage.setItem(TOKEN_KEY, token);
-    }
-}
-
-export function obterToken() {
-    const token = localStorage.getItem(TOKEN_KEY);
-    if(token){
-        return token;
-    }
-    return sessionStorage.getItem(TOKEN_KEY);
-}
-
-export function removerToken() {
-    localStorage.removeItem(TOKEN_KEY);
-    sessionStorage.removeItem(TOKEN_KEY);
-}
+// as funções de token ficam em api/token.ts. reexporto aqui pra não quebrar quem já importa daqui
+export { obterToken, removerToken, salvarToken, sairDoSistema } from "@/api/token";
 
 export async function esqueceuSenha(email: string) {
   const { data } = await api.post('/auth/esqueci-senha', { email });

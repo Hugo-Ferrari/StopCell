@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, CheckCheck, Loader2, Save } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -18,12 +17,15 @@ function ChecklistEntrada() {
 
   const { ordem, carregando: carregandoOrdem, erro: erroOrdem } = useOrdemServico(numero);
   const checklist = useChecklistOs(numero);
-  const [salvo, setSalvo] = useState(false);
+  const navigate = useNavigate();
 
+  // salvou: volta pra tela da O.S. (onde fica o "Imprimir"), já na aba do checklist.
+  // se der erro, fica aqui pra não perder o que foi marcado
   async function handleSalvar() {
-    setSalvo(false);
     const deuCerto = await checklist.salvar();
-    setSalvo(deuCerto);
+    if (deuCerto) {
+      navigate(`/ordemServico/${numero}`, { state: { checklistSalvo: true } });
+    }
   }
 
   if (carregandoOrdem || checklist.carregando) return <DetalhesSkeleton />;
@@ -68,21 +70,14 @@ function ChecklistEntrada() {
             <ChecklistItemRow
               key={item.descricao}
               item={item}
-              onStatus={(status) => {
-                setSalvo(false);
-                checklist.marcarStatus(index, status);
-              }}
-              onObservacao={(texto) => {
-                setSalvo(false);
-                checklist.alterarObservacao(index, texto);
-              }}
+              onStatus={(status) => checklist.marcarStatus(index, status)}
+              onObservacao={(texto) => checklist.alterarObservacao(index, texto)}
             />
           ))}
         </ul>
       </Card>
 
       <Alert mensagem={checklist.erro} />
-      <Alert mensagem={salvo ? "Checklist salvo." : null} tipo="sucesso" />
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Link to={voltarPara} className={cn(buttonVariants({ variant: "outline" }), "h-12 rounded-xl px-5")}>

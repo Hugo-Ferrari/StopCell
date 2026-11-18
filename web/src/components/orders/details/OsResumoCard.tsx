@@ -3,6 +3,7 @@ import { RotateCcw, Smartphone } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import OsStatusBadge from "./OsStatusBadge";
 import type { OrdemDetalheInterface } from "@/types/ordemServico";
+import { formatarTelefone } from "@/utils/masks";
 
 interface OsResumoCardProps {
   ordem: OrdemDetalheInterface;
@@ -21,6 +22,10 @@ function formatarEntrada(data?: string) {
 function OsResumoCard({ ordem }: OsResumoCardProps) {
   const dados = [
     { rotulo: "Cliente", valor: ordem.cliente?.nmCompleto || "Não informado" },
+    {
+      rotulo: "Telefone",
+      valor: ordem.cliente?.telefone ? formatarTelefone(ordem.cliente.telefone) : "Não informado",
+    },
     { rotulo: "Modelo", valor: ordem.aparelho?.modelo || "Não informado" },
     { rotulo: "IMEI", valor: ordem.aparelho?.imei || "Não informado" },
     { rotulo: "Entrada", valor: formatarEntrada(ordem.dtEntrada) },

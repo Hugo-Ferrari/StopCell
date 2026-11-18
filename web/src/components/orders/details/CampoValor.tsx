@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { limparValorDigitado } from "@/utils/moeda";
 
 interface CampoValorProps {
   id: string;
@@ -23,7 +24,7 @@ function CampoValor({ id, rotulo, valor, onChange }: CampoValorProps) {
           inputMode="decimal"
           placeholder="0,00"
           value={valor}
-          onChange={(e) => onChange(e.target.value.replace(/[^\d.,]/g, ""))}
+          onChange={(e) => onChange(limparValorDigitado(e.target.value))}
           className="pl-10 text-right tabular-nums"
         />
       </div>

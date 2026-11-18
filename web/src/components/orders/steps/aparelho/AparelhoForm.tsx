@@ -5,6 +5,7 @@ import { atualizarAparelho, criarAparelho, type AparelhoDoCliente, type Aparelho
 import { mensagemDeErro } from "@/utils/apiError";
 import PadraoDesbloqueio from "./PadraoDesbloqueio";
 import { pedeSenhaDigitada, semTextoDeVazio, TIPOS_SENHA } from "./aparelhoUtils";
+import { categoriaExigeImei, erroDoImei, limparImei } from "@/utils/validartors";
 
 interface AparelhoFormProps {
   cpfCliente: string;
@@ -42,10 +43,15 @@ function AparelhoForm({
   const [senha, setSenha] = useState(semTextoDeVazio(aparelho?.senhaAparelho));
   const [salvando, setSalvando] = useState(false);
   const [tentouEnviar, setTentouEnviar] = useState(false);
+  const nomeCategoria = categorias.find((c) => c.value === idCategoria)?.label ?? "";
+  const ehCelular = categoriaExigeImei(nomeCategoria);
+  const erroImei = existente ? null : erroDoImei(imei, nomeCategoria);
+  // mostra o erro depois de tentar salvar, ou assim que completar os 15 números
+  const mostrarErroImei = Boolean(erroImei) && (tentouEnviar || limparImei(imei).length >= 15);
 
   function montarDto(): AparelhoDto {
     return {
-      imei: imei.trim(),
+      imei: limparImei(imei),
       cpfCliente,
       idCategoria: idCategoria!,
       idMarca: idMarca!,
@@ -76,6 +82,10 @@ function AparelhoForm({
 
     if (!imei.trim() || idCategoria === null || idMarca === null) {
       return mostrarToast("Preencha IMEI, categoria e marca.", "erro");
+    }
+
+    if (erroImei) {
+      return mostrarToast(erroImei, "erro");
     }
 
     const dto = montarDto();
@@ -110,23 +120,28 @@ function AparelhoForm({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
         <div className="flex flex-col gap-2 md:col-span-2">
           <label htmlFor="imei" className="flex justify-between text-xs font-bold text-foreground md:text-sm">
-            <span>IMEI / Nº de Série *</span>
-            {existente && (
+            <span>{ehCelular ? "IMEI *" : "IMEI / Nº de Série *"}</span>
+            {existente ? (
               <span className="flex items-center gap-1 font-normal text-muted-foreground">
                 <Lock className="size-3" /> não muda
               </span>
+            ) : (
+              ehCelular && <span className="font-normal text-muted-foreground">disque *#06# pra ver</span>
             )}
           </label>
           <input
             id="imei"
             type="text"
             value={imei}
-            onChange={(e) => setImei(e.target.value)}
+            onChange={(e) => setImei(ehCelular ? e.target.value.replace(/\D/g, "") : e.target.value)}
             disabled={existente}
-            placeholder="Digite o IMEI ou Nº de Série"
-            aria-invalid={tentouEnviar && !imei.trim()}
+            inputMode={ehCelular ? "numeric" : "text"}
+            maxLength={ehCelular ? 15 : 50}
+            placeholder={ehCelular ? "15 números" : "Digite o IMEI ou Nº de Série"}
+            aria-invalid={(tentouEnviar && !imei.trim()) || mostrarErroImei}
             className={`${classeInput} aria-invalid:border-destructive`}
           />
+          {mostrarErroImei && <p className="text-xs text-destructive">{erroImei}</p>}
         </div>
 
         <div className="flex flex-col gap-2">

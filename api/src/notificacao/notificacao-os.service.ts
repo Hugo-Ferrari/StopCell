@@ -60,6 +60,7 @@ export class NotificacaoOsService {
       await this.prisma.logNotificacao.create({
         data: {
           numOs,
+          cnpjEmpresa: os.cnpjEmpresa,
           cpfCliente: os.cpfCliente,
           tipoEvento: os.status,
           dtHoraEnvio: new Date(),

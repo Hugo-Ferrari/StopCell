@@ -1,5 +1,6 @@
 import api from "@/api/api";
 import type { FormaPagamento } from "@/services/pagamentoService";
+import type { StatusOs } from "@/types/ordemServico";
 
 export type AgruparPeriodo = "dia" | "mes";
 
@@ -105,4 +106,38 @@ export async function criarDespesa(payload: {
 
 export async function removerDespesa(idDespesa: number): Promise<void> {
   await api.delete(`/financeiro/despesas/${idDespesa}`);
+}
+
+export interface Recebimento {
+  idPagamento: number;
+  numOs: number;
+  valorPago: number;
+  formaPagamento: FormaPagamento | null;
+  data: string | null;
+  nomeCliente: string;
+}
+
+export type Turno = "manha" | "tarde" | "noite";
+
+export interface PainelFinanceiro {
+  tempoReparo: { atual: number | null; anterior: number | null };
+  clientes: { atendidos: number; recorrentes: number };
+  meses: { mes: string; faturamento: number; despesas: number }[];
+  servicos: {
+    totalGeral: number;
+    itens: { descricao: string; tipo: "PECA" | "SERVICO"; total: number; quantidadeOs: number }[];
+  };
+  movimento: { diaSemana: number; turno: Turno; quantidade: number }[];
+  parado: { status: StatusOs; quantidade: number; total: number }[];
+  marcas: { marca: string; total: number }[];
+}
+
+export async function buscarRecebimentos(params: PeriodoParams): Promise<Recebimento[]> {
+  const { data } = await api.get("/financeiro/recebimentos", { params: queryPeriodo(params) });
+  return data;
+}
+
+export async function buscarPainel(params: PeriodoParams): Promise<PainelFinanceiro> {
+  const { data } = await api.get("/financeiro/painel", { params: queryPeriodo(params) });
+  return data;
 }

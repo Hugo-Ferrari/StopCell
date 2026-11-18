@@ -1,165 +1,120 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { differenceInCalendarDays, eachDayOfInterval, eachMonthOfInterval, format } from "date-fns";
-import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import type { DateRange } from "react-day-picker";
 
-import CardsResumo from "@/components/finance/CardsResumo";
-import FiltroPeriodo from "@/components/finance/FiltroPeriodo";
-import FormularioDespesa from "@/components/finance/FormularioDespesa";
+import Alert from "@/components/common/Alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import DespesasCard from "@/components/finance/DespesasCard";
+import DinheiroParado from "@/components/finance/DinheiroParado";
 import GraficoFormaPagamento from "@/components/finance/GraficoFormaPagamento";
-import GraficoReceitasDespesas from "@/components/finance/GraficoReceitasDespesas";
-import ListaDespesas from "@/components/finance/ListaDespesas";
+import GraficoMeses from "@/components/finance/GraficoMeses";
+import Indicadores from "@/components/finance/Indicadores";
+import Insights from "@/components/finance/Insights";
+import MapaMovimento from "@/components/finance/MapaMovimento";
+import PorMarca from "@/components/finance/PorMarca";
+import SeletorPeriodo from "@/components/finance/SeletorPeriodo";
 import TabelaUltimosPagamentos from "@/components/finance/TabelaUltimosPagamentos";
-import {
-  buscarDespesasPorPeriodo,
-  buscarReceitasPorForma,
-  buscarReceitasPorPeriodo,
-  buscarResumo,
-  buscarUltimosPagamentos,
-  listarDespesas,
-  type AgruparPeriodo,
-  type Despesa,
-  type ReceitasPorForma,
-  type ResumoFinanceiro,
-  type SeriePeriodo,
-  type UltimoPagamento,
-} from "@/services/financeiroService";
-import { mensagemDeErro } from "@/utils/apiError";
+import TopServicos from "@/components/finance/TopServicos";
+import { useFinanceiro } from "@/hooks/useFinanceiro";
+import { deIso, iso, periodoAnterior, periodoDoAtalho, type AtalhoPeriodo } from "@/utils/financeiro";
+import { gerarInsights } from "@/utils/insightsFinanceiro";
+import { cn } from "@/lib/utils";
 
-function iso(data: Date) {
-  return format(data, "yyyy-MM-dd");
+function CarregandoFinanceiro() {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <Skeleton key={i} className="h-[136px] rounded-xl" />
+        ))}
+      </div>
+      <div className="grid gap-4 lg:grid-cols-3">
+        <Skeleton className="h-[340px] rounded-xl lg:col-span-2" />
+        <Skeleton className="h-[340px] rounded-xl" />
+      </div>
+    </div>
+  );
 }
 
-function periodoPadrao(): DateRange {
-  const to = new Date();
-  return { from: new Date(to.getFullYear(), to.getMonth(), 1), to };
+function intervalo(inicio: string, fim: string) {
+  if (inicio === fim) return format(deIso(inicio), "d 'de' MMMM", { locale: ptBR });
+  return `${format(deIso(inicio), "dd/MM")} a ${format(deIso(fim), "dd/MM/yyyy")}`;
 }
 
 function Financial() {
-  const [date, setDate] = useState<DateRange | undefined>(periodoPadrao);
-  const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useState<string | null>(null);
-  const [resumo, setResumo] = useState<ResumoFinanceiro | null>(null);
-  const [receitas, setReceitas] = useState<SeriePeriodo | null>(null);
-  const [despesasSerie, setDespesasSerie] = useState<SeriePeriodo | null>(null);
-  const [formas, setFormas] = useState<ReceitasPorForma | null>(null);
-  const [despesas, setDespesas] = useState<Despesa[]>([]);
-  const [ultimos, setUltimos] = useState<UltimoPagamento[]>([]);
+  const [atalho, setAtalho] = useState<AtalhoPeriodo | null>("mes");
+  const [periodo, setPeriodo] = useState<DateRange | undefined>(() => periodoDoAtalho("mes"));
 
-  const inicio = iso(date?.from ?? periodoPadrao().from!);
-  const fim = iso(date?.to ?? date?.from ?? new Date());
-  const agrupar: AgruparPeriodo =
-    differenceInCalendarDays(new Date(`${fim}T12:00:00`), new Date(`${inicio}T12:00:00`)) > 45
-      ? "mes"
-      : "dia";
+  const hoje = new Date();
+  const inicio = iso(periodo?.from ?? hoje);
+  const fim = iso(periodo?.to ?? periodo?.from ?? hoje);
+  const anterior = periodoAnterior(inicio, fim);
+  const rotuloAnterior = `${format(deIso(anterior.inicio), "dd/MM")} a ${format(deIso(anterior.fim), "dd/MM")}`;
 
-  const carregar = useCallback(async () => {
-    setErro(null);
-    const params = { inicio, fim, agrupar };
+  const { dados, carregando, erro, recarregar } = useFinanceiro(inicio, fim);
 
-    try {
-      const [resumoData, receitasData, despesasData, formasData, listaDespesas, ultimosData] =
-        await Promise.all([
-          buscarResumo(params),
-          buscarReceitasPorPeriodo(params),
-          buscarDespesasPorPeriodo(params),
-          buscarReceitasPorForma(params),
-          listarDespesas(params),
-          buscarUltimosPagamentos(10),
-        ]);
+  function escolherAtalho(novo: AtalhoPeriodo) {
+    setAtalho(novo);
+    setPeriodo(periodoDoAtalho(novo));
+  }
 
-      setResumo(resumoData);
-      setReceitas(receitasData);
-      setDespesasSerie(despesasData);
-      setFormas(formasData);
-      setDespesas(listaDespesas);
-      setUltimos(ultimosData.itens);
-    } catch (error) {
-      setErro(mensagemDeErro(error, "Não foi possível carregar o financeiro."));
-    } finally {
-      setCarregando(false);
-    }
-  }, [agrupar, fim, inicio]);
-
-  useEffect(() => {
-    void carregar();
-  }, [carregar]);
-
-  const serieCombinada = useMemo(() => {
-    const inicioDate = new Date(`${inicio}T12:00:00`);
-    const fimDate = new Date(`${fim}T12:00:00`);
-    const eixos =
-      agrupar === "mes"
-        ? eachMonthOfInterval({ start: inicioDate, end: fimDate }).map((d) => format(d, "yyyy-MM"))
-        : eachDayOfInterval({ start: inicioDate, end: fimDate }).map((d) => format(d, "yyyy-MM-dd"));
-
-    const mapaReceita = new Map(receitas?.itens.map((i) => [i.periodo, i.total]) ?? []);
-    const mapaDespesa = new Map(despesasSerie?.itens.map((i) => [i.periodo, i.total]) ?? []);
-
-    return eixos.map((periodo) => ({
-      periodo,
-      receitas: mapaReceita.get(periodo) ?? 0,
-      despesas: mapaDespesa.get(periodo) ?? 0,
-    }));
-  }, [agrupar, despesasSerie, fim, inicio, receitas]);
+  function escolherDatas(novo: DateRange | undefined) {
+    setAtalho(null);
+    setPeriodo(novo);
+  }
 
   return (
-    <div className="flex w-full flex-col gap-6">
-      <div>
-        <span className="text-[10px] font-bold uppercase tracking-widest text-primary md:text-xs">
-          Stop Cell
-        </span>
-        <h1 className="mt-1 text-2xl font-bold text-foreground md:text-3xl">Financeiro</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Receitas das O.S. finalizadas e despesas lançadas na mão
-        </p>
-      </div>
-
-      <FiltroPeriodo
-        date={date}
-        onDateChange={setDate}
-        onLimpar={() => setDate(periodoPadrao())}
-      />
-
-      {carregando ? (
-        <div className="flex items-center justify-center gap-2 py-16 text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin" />
-          <span className="text-sm">Carregando financeiro...</span>
+    <div className="flex w-full flex-col gap-4">
+      <header className="mb-2 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground md:text-3xl">Financeiro</h1>
+          <p className="mt-1 text-sm text-muted-foreground tabular-nums">
+            {intervalo(inicio, fim)} · comparando com {rotuloAnterior}
+          </p>
         </div>
-      ) : erro ? (
-        <p className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {erro}
-        </p>
+        <SeletorPeriodo periodo={periodo} atalho={atalho} onAtalho={escolherAtalho} onPersonalizado={escolherDatas} />
+      </header>
+
+      <Alert mensagem={erro} />
+
+      {carregando && !dados ? (
+        <CarregandoFinanceiro />
       ) : (
-        <>
-          {resumo && <CardsResumo resumo={resumo} />}
+        dados && (
+          // trocando de período, a tela antiga fica apagadinha até a nova chegar
+          <div className={cn("flex flex-col gap-4 transition-opacity", carregando && "opacity-60")}>
+            <Indicadores resumo={dados.resumo} anterior={dados.resumoAnterior} tempoReparo={dados.painel.tempoReparo} />
 
-          <div className="grid gap-4 lg:grid-cols-5">
-            <div className="rounded-2xl border border-border bg-card p-5 lg:col-span-3">
-              <h2 className="mb-4 text-base font-semibold">Receitas e despesas</h2>
-              <GraficoReceitasDespesas dados={serieCombinada} agrupar={agrupar} />
-            </div>
-            <div className="rounded-2xl border border-border bg-card p-5 lg:col-span-2">
-              <h2 className="mb-4 text-base font-semibold">Por forma de pagamento</h2>
-              <GraficoFormaPagamento itens={formas?.itens ?? []} />
-            </div>
-          </div>
-
-          <div className="grid gap-4 lg:grid-cols-5">
-            <div className="rounded-2xl border border-border bg-card p-5 lg:col-span-2">
-              <h2 className="mb-4 text-base font-semibold">Nova despesa</h2>
-              <FormularioDespesa onCriada={carregar} />
-              <div className="mt-6">
-                <h3 className="mb-3 text-sm font-semibold">Lançamentos do período</h3>
-                <ListaDespesas despesas={despesas} onRemovida={carregar} />
+            <div className="grid items-start gap-4 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                <GraficoMeses meses={dados.painel.meses} />
               </div>
+              <TopServicos servicos={dados.painel.servicos} />
             </div>
-            <div className="rounded-2xl border border-border bg-card p-5 lg:col-span-3">
-              <h2 className="mb-4 text-base font-semibold">Últimos pagamentos</h2>
-              <TabelaUltimosPagamentos itens={ultimos} />
+
+            <div className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <GraficoFormaPagamento itens={dados.formas.itens} />
+              <MapaMovimento movimento={dados.painel.movimento} />
+              <DinheiroParado parado={dados.painel.parado} />
+              <PorMarca marcas={dados.painel.marcas} />
+            </div>
+
+            <Insights
+              itens={gerarInsights({
+                resumo: dados.resumo,
+                anterior: dados.resumoAnterior,
+                painel: dados.painel,
+                rotuloAnterior,
+              })}
+            />
+
+            <div className="grid items-start gap-4 lg:grid-cols-2">
+              <DespesasCard despesas={dados.despesas} onAlterado={recarregar} />
+              <TabelaUltimosPagamentos itens={dados.recebimentos} />
             </div>
           </div>
-        </>
+        )
       )}
     </div>
   );
