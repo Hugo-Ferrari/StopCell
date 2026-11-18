@@ -32,24 +32,36 @@ export class OrdemServicoService {
     if (!usuario)
       throw new NotFoundException('Usuário não encontrado para esta empresa');
 
-    const cliente = await this.prisma.cliente.findFirst({
-      where: { cpf: dto.cpfCliente, cnpjEmpresa },
+    const cliente = await this.prisma.cliente.findUnique({
+      where: { cnpjEmpresa_cpf: { cnpjEmpresa, cpf: dto.cpfCliente } },
     });
     if (!cliente)
       throw new NotFoundException('Cliente não encontrado para esta empresa');
 
-    // o aparelho não tem empresa, então confere pelo dono (cliente já é da empresa)
+    // o aparelho tem que ser desta loja e deste cliente
     const aparelho = await this.prisma.aparelho.findFirst({
-      where: { imei: dto.imeiAparelho, cpfCliente: dto.cpfCliente },
+      where: { cnpjEmpresa, imei: dto.imeiAparelho, cpfCliente: dto.cpfCliente },
     });
     if (!aparelho)
       throw new NotFoundException('Aparelho não encontrado para este cliente');
 
-    // retrabalho só pode apontar pra uma O.S. da mesma loja
+    // retrabalho é o mesmo aparelho voltando com o mesmo defeito de um conserto já entregue.
+    // por isso a O.S. anterior tem que ser desta loja, deste aparelho e estar finalizada
     if (dto.numOsAnterior) {
       const anterior = await this.repository.findByNumOs(dto.numOsAnterior, cnpjEmpresa);
-      if (!anterior)
-        throw new NotFoundException('O.S. anterior não encontrada para esta empresa');
+      if (!anterior) {
+        throw new NotFoundException('O.S. anterior não encontrada nesta loja');
+      }
+      if (anterior.imeiAparelho !== dto.imeiAparelho) {
+        throw new BadRequestException(
+          `A O.S. #${anterior.numOs} é de outro aparelho. Retrabalho tem que ser do mesmo aparelho.`,
+        );
+      }
+      if (anterior.status !== 'FINALIZADO') {
+        throw new BadRequestException(
+          `A O.S. #${anterior.numOs} ainda não foi finalizada. Só dá pra marcar retrabalho de um conserto já entregue.`,
+        );
+      }
     }
 
     const os = await this.repository.abrir({
@@ -151,10 +163,18 @@ export class OrdemServicoService {
   }
 
   // última O.S. do aparelho, usada pra preencher o retrabalho
+  // último conserto entregue do aparelho, pra sugerir no retrabalho.
+  // O.S. aberta ou cancelada não conta: não tem como ser retrabalho dela
   async buscarUltimaOsPorImei(imei: string, cnpjEmpresa: string) {
     return this.prisma.ordemServico.findFirst({
-      where: { imeiAparelho: imei, cnpjEmpresa },
+      where: { imeiAparelho: imei, cnpjEmpresa, status: 'FINALIZADO' },
       orderBy: { numOs: 'desc' },
+      select: {
+        numOs: true,
+        dtEntrada: true,
+        dtSaida: true,
+        itensOs: { select: { descricao: true } },
+      },
     });
   }
 

@@ -36,9 +36,17 @@ export async function baixarPdfOs(numOs: number) {
     return response.data;
 }
 
-export async function buscarUltimaOsPorImei(imei: string) {
+export interface UltimaOsAparelho {
+    numOs: number;
+    dtEntrada: string | null;
+    dtSaida: string | null;
+    itensOs: { descricao: string }[];
+}
+
+// a API responde 404 quando o aparelho nunca teve conserto finalizado; aqui vira null
+export async function buscarUltimaOsPorImei(imei: string): Promise<UltimaOsAparelho | null> {
     try {
-        const response = await api.get(`/ordemServico/aparelho/${imei}/ultima`);
+        const response = await api.get(`/ordemServico/aparelho/${encodeURIComponent(imei)}/ultima`);
         return response.data;
     } catch {
         return null;

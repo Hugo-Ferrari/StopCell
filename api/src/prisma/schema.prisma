@@ -53,8 +53,9 @@ model Empresa {
   @@map("empresa")
 }
 
+// cliente é por loja: o mesmo CPF pode estar cadastrado em lojas diferentes
 model Cliente {
-  cpf         String  @id @db.VarChar(11)
+  cpf         String  @db.VarChar(11)
   cnpjEmpresa String  @map("cnpj_empresa") @db.VarChar(14)
   nmCompleto  String? @map("nm_completo") @db.VarChar(100)
   telefone    String? @db.VarChar(20)
@@ -66,6 +67,7 @@ model Cliente {
   ordensServico   OrdemServico[]
   logNotificacoes LogNotificacao[]
 
+  @@id([cnpjEmpresa, cpf])
   @@map("cliente")
 }
 
@@ -160,8 +162,10 @@ model PerfilAcesso {
   @@map("perfil_acesso")
 }
 
+// aparelho também é por loja: o mesmo celular pode passar por lojas diferentes
 model Aparelho {
-  imei          String  @id @db.VarChar(50)
+  imei          String  @db.VarChar(50)
+  cnpjEmpresa   String  @map("cnpj_empresa") @db.VarChar(14)
   idCategoria   Int     @map("id_categoria")
   idMarca       Int     @map("id_marca")
   cpfCliente    String  @map("cpf_cliente") @db.VarChar(11)
@@ -172,10 +176,11 @@ model Aparelho {
 
   categoria Categoria @relation(fields: [idCategoria], references: [idCategoria])
   marca     Marca     @relation(fields: [idMarca], references: [idMarca])
-  cliente   Cliente   @relation(fields: [cpfCliente], references: [cpf])
+  cliente   Cliente   @relation(fields: [cnpjEmpresa, cpfCliente], references: [cnpjEmpresa, cpf])
 
   ordensServico OrdemServico[]
 
+  @@id([cnpjEmpresa, imei])
   @@map("aparelho")
 }
 
@@ -195,8 +200,9 @@ model OrdemServico {
   ordemServicoPai OrdemServico?  @relation("OsRetrabalho", fields: [numOsAnterior], references: [numOs])
   ordensFilhas    OrdemServico[] @relation("OsRetrabalho")
 
-  cliente  Cliente  @relation(fields: [cpfCliente], references: [cpf])
-  aparelho Aparelho @relation(fields: [imeiAparelho], references: [imei])
+    // cliente e aparelho são sempre da mesma loja da O.S.
+  cliente  Cliente  @relation(fields: [cnpjEmpresa, cpfCliente], references: [cnpjEmpresa, cpf])
+  aparelho Aparelho @relation(fields: [cnpjEmpresa, imeiAparelho], references: [cnpjEmpresa, imei])
   empresa  Empresa  @relation(fields: [cnpjEmpresa], references: [cnpj])
   usuario  Usuario  @relation(fields: [idUsuario], references: [idUsuario])
 
@@ -276,6 +282,7 @@ model Pagamento {
 model LogNotificacao {
   idLogNotificacao Int       @id @default(autoincrement()) @map("id_log_notificacao")
   numOs            Int       @map("num_os")
+  cnpjEmpresa      String    @map("cnpj_empresa") @db.VarChar(14)
   cpfCliente       String    @map("cpf_cliente") @db.VarChar(11)
   tipoEvento       String?   @map("tipo_evento") @db.VarChar(50)
   dtHoraEnvio      DateTime? @map("dt_hora_envio")
@@ -283,7 +290,7 @@ model LogNotificacao {
   statusEnvio      String?   @map("status_envio") @db.VarChar(50)
 
   ordemServico OrdemServico @relation(fields: [numOs], references: [numOs])
-  cliente      Cliente      @relation(fields: [cpfCliente], references: [cpf])
+  cliente      Cliente      @relation(fields: [cnpjEmpresa, cpfCliente], references: [cnpjEmpresa, cpf])
 
   @@map("log_notificacao")
 }

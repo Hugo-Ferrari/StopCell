@@ -29,6 +29,8 @@ export interface NovoUsuarioDTO {
 
 // na edição tudo é opcional, e a senha só vai se o dono digitar uma nova
 export type AtualizarUsuarioDTO = Partial<NovoUsuarioDTO> & { ativo?: boolean };
+// o que a própria pessoa pode mudar na tela "Meu perfil"
+export type AtualizarMeuPerfilDTO = Pick<NovoUsuarioDTO, "nome" | "login" | "emailUsuario">;
 
 export async function buscarUsuarioLogado() {
   const { data } = await api.get<UsuarioLogado>("/usuario/me");

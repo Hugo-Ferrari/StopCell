@@ -1,4 +1,5 @@
 import axios from "axios";
+import { obterToken, sairDoSistema } from "./token";
 
 const api = axios.create({
         // em produção define VITE_API_URL no .env do web; sem ele usa a API local
@@ -7,9 +8,7 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
 
-    const token =
-        localStorage.getItem("token") ||
-        sessionStorage.getItem("token");
+    const token = obterToken();
 
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -28,10 +27,7 @@ api.interceptors.response.use(
     const rotaDeAuth = url.startsWith("auth/");
 
     if (error.response?.status === 401 && !rotaDeAuth) {
-      localStorage.removeItem("token");
-      sessionStorage.removeItem("token");
-
-      window.location.href = "/";
+      sairDoSistema();
     }
 
     return Promise.reject(error);

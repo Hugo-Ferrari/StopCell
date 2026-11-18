@@ -6,7 +6,7 @@ import { salvarChecklistOs } from "@/services/osChecklistService";
 import { mensagemDeErro } from "@/utils/apiError";
 import CustomerSearch from "./CustomerSearch";
 import AparelhosDoCliente from "./aparelho/AparelhosDoCliente";
-import ChecklistForm, { ITENS_CHECKLIST } from "./ChecklistForm";
+import ChecklistForm, { checklistVazio, type DadosChecklist } from "./ChecklistForm";
 
 interface ExistingCustomerProps {
   mostrarToast: (msg: string, tipo: "sucesso" | "erro") => void;
@@ -17,19 +17,17 @@ interface ExistingCustomerProps {
 export default function ExistingCustomer({ mostrarToast, clienteSelecionado, setClienteSelecionado }: ExistingCustomerProps) {
   const [imeiAparelhoValidado, setImeiAparelhoValidado] = useState<string | null>(null);
   const [gerandoOs, setGerandoOs] = useState(false);
+  const [dadosChecklist, setDadosChecklist] = useState<DadosChecklist>(checklistVazio);
 
-  const [dadosChecklist, setDadosChecklist] = useState({
-    tecnico: "",
-    osAnterior: "",
-    relato: "",
-    itens: ITENS_CHECKLIST.map(nome => ({ nome, status: null as "OK" | "NOK" | "NA" | null, obs: "" }))
-  });
-
-  async function handleGerarOSFinal() {
+  async function handleGerarOs() {
     if (!clienteSelecionado?.cpf || !imeiAparelhoValidado) return;
 
     if (!dadosChecklist.relato.trim()) {
-      return mostrarToast("Por favor, preencha o Relato do Problema no checklist.", "erro");
+      return mostrarToast("Preencha o relato do problema.", "erro");
+    }
+
+    if (dadosChecklist.retrabalho && !dadosChecklist.osAnterior) {
+      return mostrarToast("Informe o número da O.S. anterior ou marque que não é retrabalho.", "erro");
     }
 
     try {
@@ -38,39 +36,34 @@ export default function ExistingCustomer({ mostrarToast, clienteSelecionado, set
       const novaOs = await criarOrdemServico({
         cpfCliente: clienteSelecionado.cpf,
         imeiAparelho: imeiAparelhoValidado,
-        diagnostico: dadosChecklist.relato,
-        numOsAnterior: dadosChecklist.osAnterior ? Number(dadosChecklist.osAnterior) : undefined
+        diagnostico: dadosChecklist.relato.trim(),
+        // só vai quando a pessoa marcou que é retrabalho
+        numOsAnterior: dadosChecklist.retrabalho ? Number(dadosChecklist.osAnterior) : undefined,
       });
 
-      // antes o checklist marcado aqui se perdia, agora vai junto com a O.S.
+      // o checklist vai junto com a O.S.
       // se falhar não desfaz nada: a O.S. já existe e dá pra preencher pela tela dela
       let checklistSalvo = true;
       try {
         await salvarChecklistOs(
           novaOs.numOs,
-          dadosChecklist.itens.map((item) => ({ descricao: item.nome, status: item.status, observacao: item.obs }))
+          dadosChecklist.itens.map((item) => ({ descricao: item.nome, status: item.status, observacao: item.obs })),
         );
       } catch {
         checklistSalvo = false;
       }
 
       if (checklistSalvo) {
-        mostrarToast(`O.S. #${novaOs.numOs} gerada com sucesso!`, "sucesso");
+        mostrarToast(`O.S. #${novaOs.numOs} gerada.`, "sucesso");
       } else {
         mostrarToast(`O.S. #${novaOs.numOs} criada, mas o checklist não foi salvo. Preencha pela tela da O.S.`, "erro");
       }
 
       setClienteSelecionado({} as criarClienteDto);
       setImeiAparelhoValidado(null);
-      setDadosChecklist({
-        tecnico: "",
-        osAnterior: "",
-        relato: "",
-        itens: ITENS_CHECKLIST.map(nome => ({ nome, status: null, obs: "" }))
-      });
-
+      setDadosChecklist(checklistVazio());
     } catch (error) {
-      mostrarToast(mensagemDeErro(error, "Erro ao processar a Ordem de Serviço."), "erro");
+      mostrarToast(mensagemDeErro(error, "Não foi possível gerar a ordem de serviço."), "erro");
     } finally {
       setGerandoOs(false);
     }
@@ -90,26 +83,32 @@ export default function ExistingCustomer({ mostrarToast, clienteSelecionado, set
           key={clienteSelecionado.cpf}
           cpfCliente={clienteSelecionado.cpf}
           mostrarToast={mostrarToast}
-          onAparelhoDefinido={setImeiAparelhoValidado}
+          onAparelhoDefinido={(imei) => {
+            setImeiAparelhoValidado(imei);
+            // trocou de aparelho: o retrabalho marcado era do outro
+            setDadosChecklist((atual) => ({ ...atual, retrabalho: false, osAnterior: "" }));
+          }}
         />
       )}
 
-      {Boolean(imeiAparelhoValidado) && (
+      {imeiAparelhoValidado && (
         <ChecklistForm
-          imeiAparelho={imeiAparelhoValidado!}
+          // key: trocou de aparelho, a pergunta do retrabalho começa do zero
+          key={imeiAparelhoValidado}
+          imeiAparelho={imeiAparelhoValidado}
           dadosChecklist={dadosChecklist}
           setDadosChecklist={setDadosChecklist}
         />
       )}
 
-      {Boolean(imeiAparelhoValidado) && (
+      {imeiAparelhoValidado && (
         <button
           type="button"
-          onClick={handleGerarOSFinal}
+          onClick={handleGerarOs}
           disabled={gerandoOs}
-          className="w-full mt-2 flex justify-center items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-4 rounded-2xl font-bold transition-colors disabled:opacity-50"
+          className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-10 py-4 font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
         >
-          {gerandoOs ? <Loader2 className="animate-spin" size={20} /> : "Finalizar: Gerar Ordem de Servico"}
+          {gerandoOs ? <Loader2 className="animate-spin" size={20} /> : "Gerar ordem de serviço"}
         </button>
       )}
     </div>

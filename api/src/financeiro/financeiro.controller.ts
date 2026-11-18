@@ -18,10 +18,14 @@ import {
   UltimosPagamentosQueryDto,
 } from '@/type/financeiro.dto';
 import { FinanceiroService } from './financeiro.service';
+import { PainelFinanceiroService } from './painel-financeiro.service';
 
 @Controller('financeiro')
 export class FinanceiroController {
-  constructor(private readonly service: FinanceiroService) {}
+    constructor(
+    private readonly service: FinanceiroService,
+    private readonly painelService: PainelFinanceiroService,
+  ) {}
 
   @Permissao(PERMISSOES.FINANCEIRO_VER)
   @Get('resumo')
@@ -57,6 +61,18 @@ export class FinanceiroController {
     @Req() req: any,
   ) {
     return this.service.ultimosPagamentos(req.userCnpjEmpresa, query);
+  }
+
+    @Permissao(PERMISSOES.FINANCEIRO_VER)
+  @Get('recebimentos')
+  recebimentos(@Query() query: PeriodoQueryDto, @Req() req: any) {
+    return this.service.recebimentos(req.userCnpjEmpresa, query);
+  }
+
+  @Permissao(PERMISSOES.FINANCEIRO_VER)
+  @Get('painel')
+  painel(@Query() query: PeriodoQueryDto, @Req() req: any) {
+    return this.painelService.painelDoPeriodo(req.userCnpjEmpresa, query);
   }
 
   @Permissao(PERMISSOES.FINANCEIRO_VER)

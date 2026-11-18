@@ -14,6 +14,7 @@ export class AparelhoController {
     return this.service.cadastro(dto, req.userCnpjEmpresa);
   }
 
+  @Permissao(PERMISSOES.ORDENS_VER)
   @Get()
   listar(@Req() req: any) {
     return this.service.listar(req.userCnpjEmpresa);

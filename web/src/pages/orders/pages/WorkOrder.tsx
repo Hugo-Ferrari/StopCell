@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useMemo } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 
 import BoxOs from "@/components/history/BoxOs";
@@ -10,23 +10,52 @@ import FiltroStatusDialog from "@/components/orders/list/FiltroStatusDialog";
 import FiltrosAtivos from "@/components/orders/list/FiltrosAtivos";
 import ResumoStatus from "@/components/orders/list/ResumoStatus";
 import { useListaOrdens } from "@/hooks/useListaOrdens";
-import { contarPorFiltro, filtrarOrdens, type FiltroOs } from "@/utils/filtroOs";
+import { contarPorFiltro, filtrarOrdens, OPCOES_FILTRO, type FiltroOs } from "@/utils/filtroOs";
+
+const VALIDOS = new Set<string>(OPCOES_FILTRO.map((opcao) => opcao.valor));
+
+// ?status=EM_REPARO,AGUARDANDO_PECA vira ["EM_REPARO", "AGUARDANDO_PECA"].
+// o que não for um filtro conhecido é ignorado
+function lerFiltros(texto: string | null): FiltroOs[] {
+  if (!texto) return [];
+  return texto.split(",").filter((valor) => VALIDOS.has(valor)) as FiltroOs[];
+}
 
 function OrdemServico() {
   const { ordens, carregando, erro } = useListaOrdens();
-  const [busca, setBusca] = useState("");
-  const [filtros, setFiltros] = useState<FiltroOs[]>([]);
+
+  // filtro e busca ficam na URL: abrir uma O.S. e voltar mantém a lista como estava,
+  // e o financeiro consegue mandar pra cá já filtrado
+  const [params, setParams] = useSearchParams();
+  const filtros = useMemo(() => lerFiltros(params.get("status")), [params]);
+  const busca = params.get("busca") ?? "";
+
+  function atualizarUrl(chave: "status" | "busca", valor: string) {
+    setParams(
+      (atual) => {
+        const novos = new URLSearchParams(atual);
+        if (valor) novos.set(chave, valor);
+        else novos.delete(chave);
+        return novos;
+      },
+      // replace: cada letra digitada não vira uma entrada nova no "voltar" do navegador
+      { replace: true },
+    );
+  }
+
+  const setFiltros = (novos: FiltroOs[]) => atualizarUrl("status", novos.join(","));
+  const setBusca = (texto: string) => atualizarUrl("busca", texto);
 
   const contagem = useMemo(() => contarPorFiltro(ordens), [ordens]);
   const ordensFiltradas = useMemo(() => filtrarOrdens(ordens, filtros, busca), [ordens, filtros, busca]);
 
   // clicar no card filtra só aquele status; clicar de novo tira o filtro
   function selecionarCard(filtro: FiltroOs) {
-    setFiltros((atual) => (atual.length === 1 && atual[0] === filtro ? [] : [filtro]));
+    setFiltros(filtros.length === 1 && filtros[0] === filtro ? [] : [filtro]);
   }
 
   function removerFiltro(filtro: FiltroOs) {
-    setFiltros((atual) => atual.filter((f) => f !== filtro));
+    setFiltros(filtros.filter((f) => f !== filtro));
   }
 
   return (
@@ -34,7 +63,7 @@ function OrdemServico() {
       <header className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <span className="text-[10px] font-bold tracking-widest text-primary uppercase md:text-xs">Stop Cell</span>
-          <h1 className="mt-1 text-2xl font-bold text-foreground md:text-3xl">Ordens de Serviço</h1>
+          <h1 className="mt-1 text-2xl font-bold text-foreground md:text-3xl">Ordens de serviço</h1>
         </div>
 
         <Link

@@ -2,6 +2,9 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { AparelhoRepository } from './device.repository';
 import { AparelhoDto } from '@/type/device.dto';
 
+// código do Prisma pra chave duplicada
+const CHAVE_DUPLICADA = 'P2002';
+
 @Injectable()
 export class AparelhoService {
   constructor(private readonly repository: AparelhoRepository) {}
@@ -12,17 +15,26 @@ export class AparelhoService {
       throw new BadRequestException('Cliente não pertence à empresa');
     }
 
-    // o IMEI é a chave do aparelho. antes o erro do banco vazava como 500
-    const existente = await this.repository.findByImei(dto.imei);
+    // a checagem é só dentro da loja. se o celular já passou por outra loja,
+    // aqui ele é cadastrado de novo normalmente
+    const existente = await this.repository.findById(dto.imei, cnpjEmpresa);
     if (existente) {
       throw new BadRequestException(
         existente.cpfCliente === dto.cpfCliente
           ? 'Esse aparelho já está cadastrado para este cliente. Selecione ele na lista.'
-          : 'Esse IMEI já está cadastrado para outro cliente.',
+          : 'Esse IMEI já está cadastrado para outro cliente da loja.',
       );
     }
 
-    return this.repository.cadastro(dto);
+    try {
+      return await this.repository.cadastro(dto, cnpjEmpresa);
+    } catch (erro) {
+      // dois cadastros do mesmo IMEI ao mesmo tempo: o segundo cai aqui
+      if ((erro as { code?: string })?.code === CHAVE_DUPLICADA) {
+        throw new BadRequestException('Esse IMEI já está cadastrado nesta loja.');
+      }
+      throw erro;
+    }
   }
 
   listar(cnpjEmpresa: string) {
@@ -51,7 +63,12 @@ export class AparelhoService {
     return this.repository.atualizar(imei, { ...dto, imei, cpfCliente: aparelho.cpfCliente }, cnpjEmpresa);
   }
 
-  remover(imei: string, cnpjEmpresa: string) {
+  async remover(imei: string, cnpjEmpresa: string) {
+    const aparelho = await this.repository.findById(imei, cnpjEmpresa);
+    if (!aparelho) {
+      throw new NotFoundException('Aparelho não encontrado');
+    }
+
     return this.repository.remover(imei, cnpjEmpresa);
   }
 }

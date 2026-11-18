@@ -1,6 +1,9 @@
-import { useState } from "react";
-import { Search, Loader2 } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { IdCard, Loader2, Search } from "lucide-react";
+import FormInput from "@/components/common/FormInput";
+import { Button } from "@/components/ui/button";
 import { buscarClientePorCpf, type criarClienteDto } from "@/services/customerService";
+import { formatarCpf, formatarTelefone } from "@/utils/masks";
 
 interface CustomerSearchProps {
   mostrarToast: (msg: string, tipo: "sucesso" | "erro") => void;
@@ -10,67 +13,81 @@ interface CustomerSearchProps {
 
 export default function CustomerSearch({ mostrarToast, clienteSelecionado, setClienteSelecionado }: CustomerSearchProps) {
   const [cpfBusca, setCpfBusca] = useState("");
-  const [buscandoCliente, setBuscandoCliente] = useState(false);
+  const [buscando, setBuscando] = useState(false);
+  const [erro, setErro] = useState<string | undefined>();
 
-  async function handleBuscarCliente() {
+  // aqui não valida os dígitos do CPF: cliente antigo pode ter sido salvo com CPF errado
+  // e precisa continuar sendo encontrado
+  async function handleBuscar(e: FormEvent) {
+    e.preventDefault();
     const cpfLimpo = cpfBusca.replace(/\D/g, "");
-    if (cpfLimpo.length !== 11) return mostrarToast("O CPF deve conter 11 dígitos.", "erro");
 
+    if (cpfLimpo.length !== 11) {
+      setErro("Digite os 11 números do CPF");
+      return;
+    }
+
+    setErro(undefined);
     try {
-      setBuscandoCliente(true);
+      setBuscando(true);
       const dados = await buscarClientePorCpf(cpfLimpo);
       if (dados) {
         setClienteSelecionado(dados);
-        mostrarToast("Cliente encontrado!", "sucesso");
       } else {
         mostrarToast("Cliente não encontrado.", "erro");
       }
     } catch {
-      mostrarToast("Erro ou cliente não existe.", "erro");
+      mostrarToast("Cliente não encontrado. Confira o CPF ou cadastre um novo.", "erro");
     } finally {
-      setBuscandoCliente(false);
+      setBuscando(false);
     }
   }
 
+  const cliente = clienteSelecionado?.cpf ? clienteSelecionado : null;
+
+  const dados = cliente
+    ? [
+        { rotulo: "Nome", valor: cliente.nmCompleto },
+        { rotulo: "CPF", valor: formatarCpf(cliente.cpf) },
+        { rotulo: "WhatsApp", valor: cliente.telefone ? formatarTelefone(cliente.telefone) : "" },
+        { rotulo: "E-mail", valor: cliente.email },
+        { rotulo: "Endereço", valor: cliente.endereco, inteiro: true },
+      ]
+    : [];
+
   return (
-    <div className="bg-card border border-border rounded-3xl p-5 md:p-8">
-      <h2 className="text-foreground font-bold mb-4">1. Buscar Cliente</h2>
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="flex flex-1 items-center bg-background border border-border rounded-xl px-4 py-1 focus-within:border-primary transition-colors">
-          <Search size={20} className="text-muted-foreground mr-2" />
-          <input
-            type="text"
-            placeholder="Digite apenas os números do CPF"
+    <section className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-5 md:p-6">
+      <h2 className="font-semibold text-foreground">Buscar cliente</h2>
+
+      <form onSubmit={handleBuscar} noValidate className="flex flex-col gap-3 sm:flex-row sm:items-start">
+        <div className="flex-1">
+          <FormInput
+            label="CPF do cliente"
+            icon={<IdCard size={18} />}
+            inputMode="numeric"
+            placeholder="000.000.000-00"
+            maxLength={14}
             value={cpfBusca}
-            onChange={(e) => setCpfBusca(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleBuscarCliente()}
-            className="w-full bg-transparent p-2 text-foreground outline-none"
+            onChange={(e) => setCpfBusca(formatarCpf(e.target.value))}
+            error={erro}
           />
         </div>
-        <button
-          type="button"
-          onClick={handleBuscarCliente}
-          disabled={buscandoCliente}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-xl font-bold transition-colors flex justify-center items-center"
-        >
-          {buscandoCliente ? <Loader2 className="animate-spin" size={20} /> : "Buscar"}
-        </button>
-      </div>
+        <Button type="submit" disabled={buscando} className="h-[42px] rounded-xl px-6 sm:mt-7">
+          {buscando ? <Loader2 className="size-4 animate-spin" /> : <Search className="size-4" />}
+          Buscar
+        </Button>
+      </form>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-        <div className="flex flex-col gap-2">
-          <label className="text-xs md:text-sm font-bold text-foreground">Nome</label>
-          <input type="text" readOnly value={clienteSelecionado.nmCompleto} className="w-full bg-background border border-border rounded-xl p-3.5 text-muted-foreground outline-none cursor-not-allowed" />
-        </div>
-        <div className="flex flex-col gap-2">
-          <label className="text-xs md:text-sm font-bold text-foreground">CPF</label>
-          <input type="text" readOnly value={clienteSelecionado.cpf} className="w-full bg-background border border-border rounded-xl p-3.5 text-muted-foreground outline-none cursor-not-allowed" />
-        </div>
-        <div className="flex flex-col gap-2 md:col-span-2">
-          <label className="text-xs md:text-sm font-bold text-foreground">Endereço Atual</label>
-          <input type="text" readOnly value={clienteSelecionado.endereco} className="w-full bg-background border border-border rounded-xl p-3.5 text-muted-foreground outline-none cursor-not-allowed" />
-        </div>
-      </div>
-    </div>
+      {cliente && (
+        <dl className="grid grid-cols-1 gap-x-6 gap-y-3 rounded-xl bg-muted/50 p-4 text-sm animate-in fade-in-0 sm:grid-cols-2">
+          {dados.map((item) => (
+            <div key={item.rotulo} className={item.inteiro ? "sm:col-span-2" : undefined}>
+              <dt className="text-xs text-muted-foreground">{item.rotulo}</dt>
+              <dd className="truncate font-medium tabular-nums">{item.valor || "Não informado"}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+    </section>
   );
 }

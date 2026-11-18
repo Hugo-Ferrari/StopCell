@@ -83,7 +83,10 @@ function FinalizarComPagamento({ numOs, total, onAlterado }: FinalizarComPagamen
       }
 
       await finalizar();
-    } catch (error) {
+        } catch (error) {
+      // o pagamento pode ter gravado e só a finalização ter falhado.
+      // recarrega pra tela mostrar o saldo real e não registrar o pagamento de novo
+      await carregarPagamentos();
       setErro(mensagemDeErro(error, "Não foi possível concluir a O.S."));
     } finally {
       setSalvando(false);

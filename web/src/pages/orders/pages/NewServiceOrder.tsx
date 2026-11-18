@@ -8,7 +8,7 @@ import NewCustomer from "@/components/orders/steps/NewCustomer";
 
 export default function NewServiceOrder() {
   const [abaAtiva, setAbaAtiva] = useState<"existente" | "novo">("existente");
-  
+
   // O pai guarda quem é o cliente selecionado para repassar aos filhos
   const [clienteSelecionado, setClienteSelecionado] = useState<criarClienteDto>({
     nmCompleto: "", cpf: "", telefone: "", email: "", endereco: "", aparelhos: []
@@ -24,7 +24,7 @@ export default function NewServiceOrder() {
 
   return (
     <div className="w-full max-w-4xl flex flex-col gap-6 relative mx-auto mt-8">
-      
+
       {/* Pop-up de Toast */}
       {toast.visivel && (
         <div className={`fixed top-10 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl transition-all animate-in slide-in-from-top-5 ${toast.tipo === "sucesso" ? "bg-green-500/10 border border-green-500/50 text-green-700 dark:text-green-500" : "bg-red-500/10 border border-red-500/50 text-red-600 dark:text-red-500"}`}>
@@ -36,30 +36,30 @@ export default function NewServiceOrder() {
       {/* Navegação das Abas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <button type="button" onClick={() => setAbaAtiva("existente")} className={`flex items-center justify-center gap-2 py-4 rounded-2xl font-medium transition-all ${abaAtiva === "existente" ? "bg-primary text-primary-foreground" : "bg-card border border-border text-muted-foreground hover:text-foreground"}`}>
-          <User size={20} /> Cliente Existente
+          <User size={20} /> Cliente já cadastrado
         </button>
         <button type="button" onClick={() => setAbaAtiva("novo")} className={`flex items-center justify-center gap-2 py-4 rounded-2xl font-medium transition-all ${abaAtiva === "novo" ? "bg-primary text-primary-foreground" : "bg-card border border-border text-muted-foreground hover:text-foreground"}`}>
           <UserPlus size={20} /> Cadastrar novo cliente
         </button>
       </div>
 
-      
+
       {abaAtiva === "existente" && (
-        <ExistingCustomer 
-          mostrarToast={mostrarToast} 
-          clienteSelecionado={clienteSelecionado} 
-          setClienteSelecionado={setClienteSelecionado} 
+        <ExistingCustomer
+          mostrarToast={mostrarToast}
+          clienteSelecionado={clienteSelecionado}
+          setClienteSelecionado={setClienteSelecionado}
         />
       )}
 
       {abaAtiva === "novo" && (
-        <NewCustomer 
-          mostrarToast={mostrarToast} 
-          setAbaAtiva={setAbaAtiva} 
-          setClienteSelecionado={setClienteSelecionado} 
+        <NewCustomer
+          mostrarToast={mostrarToast}
+          setAbaAtiva={setAbaAtiva}
+          setClienteSelecionado={setClienteSelecionado}
         />
       )}
-      
+
     </div>
   );
 }

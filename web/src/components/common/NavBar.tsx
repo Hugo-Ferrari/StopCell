@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { MENU_ITENS } from "@/config/menuItens";
 import { useUsuario } from "@/hooks/useUsuario";
+import UsuarioMenu from "./UsuarioMenu";
 
 interface NavBarProps {
   /** só vale no desktop: menu fininho, só com os ícones */
@@ -154,6 +155,8 @@ function NavBar({ recolhido, onAlternar }: NavBarProps) {
             );
           })}
         </nav>
+
+        <UsuarioMenu compacto={compacto} />
       </aside>
     </>
   );

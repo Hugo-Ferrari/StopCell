@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ClipboardCheck, Package, Stethoscope, Wrench } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, CheckCircle2, ClipboardCheck, Package, Stethoscope, Wrench } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { buttonVariants } from "@/components/ui/button";
 import Alert from "@/components/common/Alert";
@@ -35,7 +35,20 @@ function DetalhesOrdemServico() {
   const numero = Number(numOs);
 
   const { ordem, carregando, erro, recarregar } = useOrdemServico(numero);
-  const [aba, setAba] = useState<Aba>("diagnostico");
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // quando vem da tela do checklist depois de salvar, abre direto na aba dele
+  // e mostra o aviso perto do botão de imprimir
+  const [checklistSalvo, setChecklistSalvo] = useState(
+    () => (location.state as { checklistSalvo?: boolean } | null)?.checklistSalvo === true,
+  );
+  const [aba, setAba] = useState<Aba>(checklistSalvo ? "checklist" : "diagnostico");
+
+  // limpa o state da navegação, senão o aviso volta se a pessoa der F5
+  useEffect(() => {
+    if (location.state) navigate(location.pathname, { replace: true, state: null });
+  }, [location.pathname, location.state, navigate]);
   const [erroRemocao, setErroRemocao] = useState<string | null>(null);
 
   async function handleRemoverItem(idItemOs: number) {
@@ -76,6 +89,22 @@ function DetalhesOrdemServico() {
         </Link>
         <PrintOsButton numOs={ordem.numOs} />
       </div>
+
+      {checklistSalvo && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-success animate-in fade-in-0 slide-in-from-top-2 sm:flex-row sm:items-center sm:justify-between">
+          <span className="flex items-center gap-2 font-medium">
+            <CheckCircle2 className="size-4 shrink-0" />
+            Checklist salvo. A O.S. já pode ser impressa com ele preenchido.
+          </span>
+          <button
+            type="button"
+            onClick={() => setChecklistSalvo(false)}
+            className="self-end text-xs font-medium underline-offset-2 hover:underline sm:self-auto"
+          >
+            Fechar
+          </button>
+        </div>
+      )}
 
       <OsResumoCard ordem={ordem} />
 

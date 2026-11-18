@@ -89,6 +89,28 @@ export class FinanceiroRepository {
     });
   }
 
+    // recebimentos do período com a mesma regra de data do resumo,
+  // pra soma da lista bater com o "Entrou" da tela
+  listarRecebimentosNoPeriodo(cnpjEmpresa: string, inicio: Date, fim: Date) {
+    return this.prisma.pagamento.findMany({
+      where: pagamentoDaOsFinalizada(cnpjEmpresa, inicio, fim),
+      orderBy: { dtPagamento: 'desc' },
+      select: {
+        idPagamento: true,
+        numOs: true,
+        valorPago: true,
+        formaPagamento: true,
+        dtPagamento: true,
+        ordemServico: {
+          select: {
+            dtSaida: true,
+            cliente: { select: { nmCompleto: true } },
+          },
+        },
+      },
+    });
+  }
+
   criarDespesa(data: {
     cnpjEmpresa: string;
     descricao: string;
