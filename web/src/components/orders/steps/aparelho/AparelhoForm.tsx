@@ -141,7 +141,11 @@ function AparelhoForm({
             aria-invalid={(tentouEnviar && !imei.trim()) || mostrarErroImei}
             className={`${classeInput} aria-invalid:border-destructive`}
           />
-          {mostrarErroImei && <p className="text-xs text-destructive">{erroImei}</p>}
+          {tentouEnviar && !imei.trim() ? (
+            <p className="text-xs text-destructive">Informe o IMEI ou o número de série</p>
+          ) : (
+            mostrarErroImei && <p className="text-xs text-destructive">{erroImei}</p>
+          )}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -155,6 +159,7 @@ function AparelhoForm({
             onChange={setIdCategoria}
             invalido={tentouEnviar && idCategoria === null}
           />
+          {tentouEnviar && idCategoria === null && <p className="text-xs text-destructive">Escolha a categoria</p>}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -168,6 +173,7 @@ function AparelhoForm({
             onChange={setIdMarca}
             invalido={tentouEnviar && idMarca === null}
           />
+          {tentouEnviar && idMarca === null && <p className="text-xs text-destructive">Escolha a marca</p>}
         </div>
 
         <div className="flex flex-col gap-2">

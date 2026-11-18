@@ -12,39 +12,19 @@ import {
 } from "lucide-react";
 import { buscarUltimaOsPorImei, type UltimaOsAparelho } from "@/services/serviceOrderService";
 import { cn } from "@/lib/utils";
-
-export const ITENS_CHECKLIST = [
-  "Tela / Touch", "Botões", "Câmera frontal", "Câmera traseira",
-  "Conector de carga", "Som / Alto-falante", "Microfone",
-  "Wi-Fi / Rede", "Biometria / Face ID", "Bateria",
-  "Avarias físicas", "Chip / SIM",
-];
+import type { DadosChecklist } from "@/utils/checklist";
+import type { StatusChecklist } from "@/services/osChecklistService";
+import MarcarRestantes from "@/components/orders/checklist/MarcarRestantes";
 
 // garantia de serviço do Código de Defesa do Consumidor
 const GARANTIA_DIAS = 90;
-
-export type StatusItem = "OK" | "NOK" | "NA" | null;
-
-export interface DadosChecklist {
-  retrabalho: boolean;
-  osAnterior: string;
-  relato: string;
-  itens: { nome: string; status: StatusItem; obs: string }[];
-}
-
-export function checklistVazio(): DadosChecklist {
-  return {
-    retrabalho: false,
-    osAnterior: "",
-    relato: "",
-    itens: ITENS_CHECKLIST.map((nome) => ({ nome, status: null, obs: "" })),
-  };
-}
 
 interface ChecklistFormProps {
   imeiAparelho: string;
   dadosChecklist: DadosChecklist;
   setDadosChecklist: Dispatch<SetStateAction<DadosChecklist>>;
+  erroRelato?: string;
+  erroOsAnterior?: string;
 }
 
 const BOTOES_STATUS = [
@@ -120,22 +100,28 @@ function ResumoOsAnterior({ os }: { os: UltimaOsAparelho }) {
   );
 }
 
-export default function ChecklistForm({ imeiAparelho, dadosChecklist, setDadosChecklist }: ChecklistFormProps) {
+export default function ChecklistForm({
+  imeiAparelho,
+  dadosChecklist,
+  setDadosChecklist,
+  erroRelato,
+  erroOsAnterior,
+}: ChecklistFormProps) {
   const [ultimaOs, setUltimaOs] = useState<UltimaOsAparelho | null>(null);
-  const [buscando, setBuscando] = useState(true);
+  const [imeiBuscado, setImeiBuscado] = useState<string | null>(null);
+  const buscando = imeiBuscado !== imeiAparelho;
 
   // só busca pra sugerir: não marca retrabalho sozinho.
   // antes, todo aparelho que já tinha vindo virava retrabalho automaticamente
   useEffect(() => {
     let ativo = true;
-    setBuscando(true);
 
     buscarUltimaOsPorImei(imeiAparelho)
       .then((os) => {
         if (ativo) setUltimaOs(os);
       })
       .finally(() => {
-        if (ativo) setBuscando(false);
+        if (ativo) setImeiBuscado(imeiAparelho);
       });
 
     return () => {
@@ -159,6 +145,14 @@ export default function ChecklistForm({ imeiAparelho, dadosChecklist, setDadosCh
     }));
   }
 
+  function marcarRestantes(status: StatusChecklist) {
+    setDadosChecklist((atual) => ({
+      ...atual,
+      itens: atual.itens.map((item) => (item.status === null ? { ...item, status } : item)),
+    }));
+  }
+
+  const pendentes = dadosChecklist.itens.filter((item) => item.status === null).length;
   const mostrarResumo = ultimaOs && dadosChecklist.osAnterior === String(ultimaOs.numOs);
 
   return (
@@ -218,8 +212,10 @@ export default function ChecklistForm({ imeiAparelho, dadosChecklist, setDadosCh
                     value={dadosChecklist.osAnterior}
                     onChange={(e) => atualizar({ osAnterior: e.target.value.replace(/\D/g, "") })}
                     placeholder={String(ultimaOs.numOs)}
-                    className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary sm:w-40"
+                    aria-invalid={erroOsAnterior ? true : undefined}
+                    className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary aria-invalid:border-destructive sm:w-40"
                   />
+                  {erroOsAnterior && <p className="text-xs text-destructive">{erroOsAnterior}</p>}
                   {!mostrarResumo && dadosChecklist.osAnterior && (
                     <p className="text-xs text-muted-foreground">
                       O sistema confere se essa O.S. é deste aparelho e se já foi entregue.
@@ -243,8 +239,10 @@ export default function ChecklistForm({ imeiAparelho, dadosChecklist, setDadosCh
             placeholder="O que o cliente disse que está acontecendo com o aparelho"
             value={dadosChecklist.relato}
             onChange={(e) => atualizar({ relato: e.target.value })}
-            className="w-full resize-none rounded-xl border border-border bg-background p-4 text-foreground outline-none focus:border-primary"
+            aria-invalid={erroRelato ? true : undefined}
+            className="w-full resize-none rounded-xl border border-border bg-background p-4 text-foreground outline-none focus:border-primary aria-invalid:border-destructive"
           />
+          {erroRelato && <p className="text-xs text-destructive">{erroRelato}</p>}
         </div>
       </section>
 
@@ -252,9 +250,13 @@ export default function ChecklistForm({ imeiAparelho, dadosChecklist, setDadosCh
         <h2 className="mb-1 flex items-center gap-2 font-semibold text-foreground">
           <CheckCircle2 className="size-4 text-primary" /> Checklist de entrada
         </h2>
-        <p className="mb-6 text-sm text-muted-foreground">
+        <p className="mb-4 text-sm text-muted-foreground">
           Marque o estado de cada item no momento em que o aparelho chegou.
         </p>
+
+        <div className="mb-6">
+          <MarcarRestantes pendentes={pendentes} onMarcar={marcarRestantes} />
+        </div>
 
         <div className="flex flex-col gap-6">
           {dadosChecklist.itens.map((item, indice) => (

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ITENS_CHECKLIST } from "@/components/orders/steps/ChecklistForm";
+import { ITENS_CHECKLIST } from "@/utils/checklist";
 import {
   buscarChecklistOs,
   salvarChecklistOs,
@@ -69,8 +69,8 @@ export function useChecklistOs(numOs: number) {
     setItens((atual) => atual.map((item, i) => (i === index ? { ...item, observacao } : item)));
   }
 
-  function marcarTodosOk() {
-    setItens((atual) => atual.map((item) => (item.status === null ? { ...item, status: "OK" } : item)));
+  function marcarRestantes(status: StatusChecklist) {
+    setItens((atual) => atual.map((item) => (item.status === null ? { ...item, status } : item)));
   }
 
   async function salvar() {
@@ -98,7 +98,7 @@ export function useChecklistOs(numOs: number) {
     erro,
     marcarStatus,
     alterarObservacao,
-    marcarTodosOk,
+    marcarRestantes,
     salvar,
   };
 }

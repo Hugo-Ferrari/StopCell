@@ -6,7 +6,8 @@ import { salvarChecklistOs } from "@/services/osChecklistService";
 import { mensagemDeErro } from "@/utils/apiError";
 import CustomerSearch from "./CustomerSearch";
 import AparelhosDoCliente from "./aparelho/AparelhosDoCliente";
-import ChecklistForm, { checklistVazio, type DadosChecklist } from "./ChecklistForm";
+import ChecklistForm from "./ChecklistForm";
+import { checklistVazio, type DadosChecklist } from "@/utils/checklist";
 
 interface ExistingCustomerProps {
   mostrarToast: (msg: string, tipo: "sucesso" | "erro") => void;
@@ -18,15 +19,23 @@ export default function ExistingCustomer({ mostrarToast, clienteSelecionado, set
   const [imeiAparelhoValidado, setImeiAparelhoValidado] = useState<string | null>(null);
   const [gerandoOs, setGerandoOs] = useState(false);
   const [dadosChecklist, setDadosChecklist] = useState<DadosChecklist>(checklistVazio);
+  const [tentouGerar, setTentouGerar] = useState(false);
+
+  const erroRelato = !dadosChecklist.relato.trim() ? "Descreva o problema que o cliente relatou" : undefined;
+  const erroOsAnterior =
+    dadosChecklist.retrabalho && !dadosChecklist.osAnterior ? "Informe o número da O.S. anterior" : undefined;
 
   async function handleGerarOs() {
     if (!clienteSelecionado?.cpf || !imeiAparelhoValidado) return;
+    setTentouGerar(true);
 
-    if (!dadosChecklist.relato.trim()) {
+    if (erroRelato) {
+      document.getElementById("relato")?.focus();
       return mostrarToast("Preencha o relato do problema.", "erro");
     }
 
-    if (dadosChecklist.retrabalho && !dadosChecklist.osAnterior) {
+    if (erroOsAnterior) {
+      document.getElementById("os-anterior")?.focus();
       return mostrarToast("Informe o número da O.S. anterior ou marque que não é retrabalho.", "erro");
     }
 
@@ -62,6 +71,7 @@ export default function ExistingCustomer({ mostrarToast, clienteSelecionado, set
       setClienteSelecionado({} as criarClienteDto);
       setImeiAparelhoValidado(null);
       setDadosChecklist(checklistVazio());
+      setTentouGerar(false);
     } catch (error) {
       mostrarToast(mensagemDeErro(error, "Não foi possível gerar a ordem de serviço."), "erro");
     } finally {
@@ -98,6 +108,8 @@ export default function ExistingCustomer({ mostrarToast, clienteSelecionado, set
           imeiAparelho={imeiAparelhoValidado}
           dadosChecklist={dadosChecklist}
           setDadosChecklist={setDadosChecklist}
+          erroRelato={tentouGerar ? erroRelato : undefined}
+          erroOsAnterior={tentouGerar ? erroOsAnterior : undefined}
         />
       )}
 
