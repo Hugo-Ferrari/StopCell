@@ -5,6 +5,8 @@ import UserList from "@/components/settings/users/UserList";
 import UserFormModal from "@/components/settings/users/UserFormModal";
 import ProfileList from "@/components/settings/users/ProfileList";
 import ProfileFormModal from "@/components/settings/users/ProfileFormModal";
+import ExcluirPerfilDialog from "@/components/settings/users/ExcluirPerfilDialog";
+import DicaDesativado from "@/components/common/DicaDesativado";
 import type { PerfilAcesso } from "@/services/perfilService";
 import type { UsuarioDaLoja } from "@/services/userService";
 import { useUsersSettings } from "./hooks/useUsersSettings";
@@ -22,6 +24,7 @@ export default function UsersSettings() {
   const [aba, setAba] = useState<Aba>("usuarios");
   const [modalUsuario, setModalUsuario] = useState<ModalUsuario>(undefined);
   const [modalPerfil, setModalPerfil] = useState<ModalPerfil>(undefined);
+  const [perfilExcluindo, setPerfilExcluindo] = useState<PerfilAcesso | null>(null);
 
   if (carregando) {
     return (
@@ -42,15 +45,19 @@ export default function UsersSettings() {
         </p>
 
         {aba === "usuarios" ? (
-          <button
-            type="button"
-            onClick={() => setModalUsuario(null)}
-            disabled={semPerfis}
-            title={semPerfis ? "Crie um perfil de acesso primeiro" : undefined}
-            className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          <DicaDesativado
+            mensagem={semPerfis ? "Crie um perfil de acesso primeiro, na aba Perfis de acesso." : null}
+            className="w-full sm:w-auto"
           >
-            <Plus size={18} /> Novo usuário
-          </button>
+            <button
+              type="button"
+              onClick={() => setModalUsuario(null)}
+              disabled={semPerfis}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus size={18} /> Novo usuário
+            </button>
+          </DicaDesativado>
         ) : (
           <button
             type="button"
@@ -100,7 +107,7 @@ export default function UsersSettings() {
           <UserList usuarios={usuarios} onEditar={setModalUsuario} />
         </>
       ) : (
-        <ProfileList perfis={perfis} catalogo={catalogo} onEditar={setModalPerfil} onExcluir={excluirPerfil} />
+        <ProfileList perfis={perfis} catalogo={catalogo} onEditar={setModalPerfil} onExcluir={setPerfilExcluindo} />
       )}
 
       {/* o key faz o formulário começar limpo toda vez que abre */}
@@ -113,6 +120,12 @@ export default function UsersSettings() {
           onSalvar={(dados) => salvarUsuario(dados, modalUsuario?.idUsuario)}
         />
       )}
+
+      <ExcluirPerfilDialog
+        perfil={perfilExcluindo}
+        onFechar={() => setPerfilExcluindo(null)}
+        onConfirmar={excluirPerfil}
+      />
 
       {modalPerfil !== undefined && (
         <ProfileFormModal

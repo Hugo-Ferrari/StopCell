@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
-import { Loader2, Save, CheckCircle2, XCircle, Building2, Phone, MapPin, Hash } from "lucide-react";
+import { useState } from "react";
+import { Loader2, Save, Building2, Phone, MapPin, Hash } from "lucide-react";
+import Alert from "@/components/common/Alert";
+import { mensagemDeErro } from "@/utils/apiError";
 import { formatarCnpj, formatarTelefone, formatarCep } from "@/utils/masks";
 import { useViaCep } from "@/hooks/useViaCep";
 import FormInput from "@/components/common/FormInput";
@@ -9,36 +11,21 @@ interface StoreFormProps {
   initialData: EmpresaDTO;
   onSave: (data: UpdateEmpresaDTO) => Promise<void>;
   loading: boolean;
+  onCancelar: () => void;
 }
 
-export default function StoreForm({ initialData, onSave, loading }: StoreFormProps) {
+export default function StoreForm({ initialData, onSave, loading, onCancelar }: StoreFormProps) {
   const [nomeFantasia, setNomeFantasia] = useState(initialData.nomeFantasia || "");
   const [razaoSocial, setRazaoSocial] = useState(initialData.razaoSocial || "");
-  const [cnpj, setCnpj] = useState(initialData.cnpj || "");
   const [telefone, setTelefone] = useState(initialData.telefone || "");
   const [cep, setCep] = useState("");
   const [endereco, setEndereco] = useState(initialData.endereco || "");
+  // o CNPJ não é editável, só aparece no formulário
+  const cnpj = initialData.cnpj || "";
 
   const { buscarCep, carregandoCep } = useViaCep();
 
-  useEffect(() => {
-    setNomeFantasia(initialData.nomeFantasia || "");
-    setRazaoSocial(initialData.razaoSocial || "");
-    setCnpj(initialData.cnpj || "");
-    setTelefone(initialData.telefone || "");
-    setEndereco(initialData.endereco || "");
-  }, [initialData]);
-
-  const [toast, setToast] = useState<{
-    visible: boolean;
-    message: string;
-    type: "success" | "error";
-  }>({ visible: false, message: "", type: "success" });
-
-  function showToast(message: string, type: "success" | "error") {
-    setToast({ visible: true, message, type });
-    setTimeout(() => setToast({ visible: false, message: "", type: "success" }), 4000);
-  }
+  const [erro, setErro] = useState("");
 
   async function handleCepChange(value: string) {
     const raw = value.replace(/\D/g, "").slice(0, 8);
@@ -58,16 +45,18 @@ export default function StoreForm({ initialData, onSave, loading }: StoreFormPro
     const cleanTelefone = telefone.replace(/\D/g, "");
 
     if (!nomeFantasia.trim()) {
-      return showToast("Informe o Nome Fantasia da loja.", "error");
+      return setErro("Informe o Nome Fantasia da loja.");
     }
 
     if (!cleanTelefone) {
-      return showToast("Informe um telefone de contato.", "error");
+      return setErro("Informe um telefone de contato.");
     }
 
     if (!endereco.trim()) {
-      return showToast("Informe o endereço da loja.", "error");
+      return setErro("Informe o endereço da loja.");
     }
+
+    setErro("");
 
     try {
       await onSave({
@@ -76,9 +65,8 @@ export default function StoreForm({ initialData, onSave, loading }: StoreFormPro
         telefone: cleanTelefone,
         endereco: endereco.trim(),
       });
-      showToast("Dados salvos com sucesso!", "success");
-    } catch {
-      showToast("Erro ao salvar dados da loja.", "error");
+    } catch (error) {
+      setErro(mensagemDeErro(error, "Erro ao salvar dados da loja."));
     }
   }
 
@@ -87,29 +75,14 @@ export default function StoreForm({ initialData, onSave, loading }: StoreFormPro
       onSubmit={handleSubmit}
       className="w-full rounded-xl border border-border bg-card p-5 sm:p-7 flex flex-col gap-5"
     >
-      {toast.visible && (
-        <div
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-            toast.type === "success"
-              ? "bg-green-500/10 border border-green-500/30 text-green-700 dark:text-green-400"
-              : "bg-destructive/10 border border-destructive/30 text-destructive"
-          }`}
-        >
-          {toast.type === "success" ? (
-            <CheckCircle2 size={18} className="shrink-0" />
-          ) : (
-            <XCircle size={18} className="shrink-0" />
-          )}
-          <span>{toast.message}</span>
-        </div>
-      )}
+      <Alert mensagem={erro} />
 
       <div>
         <h2 className="text-lg font-bold text-foreground">
           Editar Informações da Loja
         </h2>
         <p className="text-xs text-muted-foreground mt-0.5">
-          Essas informações são impressas nas Ordens de Serviço e no cabeçalho do sistema
+          Essas informações são impressas nas Ordens de Serviço
         </p>
       </div>
 
@@ -181,7 +154,16 @@ export default function StoreForm({ initialData, onSave, loading }: StoreFormPro
         />
       </div>
 
-      <div className="flex justify-end pt-2 border-t border-border mt-2">
+      <div className="flex flex-col-reverse gap-3 pt-4 border-t border-border mt-2 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          onClick={onCancelar}
+          disabled={loading}
+          className="flex items-center justify-center rounded-xl border border-border px-6 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-accent disabled:opacity-50 cursor-pointer"
+        >
+          Cancelar
+        </button>
+
         <button
           type="submit"
           disabled={loading}

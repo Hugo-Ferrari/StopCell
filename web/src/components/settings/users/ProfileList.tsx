@@ -1,5 +1,6 @@
 import { Pencil, ShieldCheck, Trash2, Users } from "lucide-react";
 import type { PerfilAcesso, PermissaoCatalogo } from "@/services/perfilService";
+import DicaDesativado from "@/components/common/DicaDesativado";
 
 interface ProfileListProps {
   perfis: PerfilAcesso[];
@@ -48,16 +49,19 @@ function ProfileList({ perfis, catalogo, onEditar, onExcluir }: ProfileListProps
                 >
                   <Pencil size={16} />
                 </button>
-                <button
-                  type="button"
-                  onClick={() => onExcluir(perfil)}
-                  disabled={emUso}
-                  aria-label={`Excluir perfil ${perfil.nome}`}
-                  title={emUso ? "Troque o perfil dos usuários antes de excluir" : undefined}
-                  className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+                <DicaDesativado
+                  mensagem={emUso ? "Esse perfil está em uso. Troque o perfil dos usuários antes de excluir." : null}
                 >
-                  <Trash2 size={16} />
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => onExcluir(perfil)}
+                    disabled={emUso}
+                    aria-label={`Excluir perfil ${perfil.nome}`}
+                    className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </DicaDesativado>
               </div>
             </div>
 

@@ -69,15 +69,10 @@ export function useUsersSettings() {
     await carregar();
   }
 
+  // a confirmação e a mensagem de erro ficam no ExcluirPerfilDialog
   async function excluirPerfil(perfil: PerfilAcesso) {
-    if (!window.confirm(`Excluir o perfil "${perfil.nome}"?`)) return;
-
-    try {
-      await removerPerfil(perfil.idPerfil);
-      await carregar();
-    } catch (error) {
-      setErro(mensagemDeErro(error, "Não foi possível excluir o perfil."));
-    }
+    await removerPerfil(perfil.idPerfil);
+    await carregar();
   }
 
   return { usuarios, perfis, catalogo, carregando, erro, salvarPerfil, salvarUsuario, excluirPerfil };

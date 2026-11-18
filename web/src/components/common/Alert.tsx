@@ -5,7 +5,7 @@ interface AlertProps {
 
 const estilos = {
   erro: "border-destructive/30 bg-destructive/10 text-destructive",
-  sucesso: "border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400",
+  sucesso: "border-success/30 bg-success/10 text-success",
 };
 
 function Alert({ mensagem, tipo = "erro" }: AlertProps) {
