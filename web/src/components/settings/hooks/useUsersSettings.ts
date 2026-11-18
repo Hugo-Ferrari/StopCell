@@ -18,6 +18,7 @@ import {
   type UsuarioDaLoja,
 } from "@/services/userService";
 import { mensagemDeErro } from "@/utils/apiError";
+import { useAvisos } from "@/hooks/useAvisos";
 
 // só busca, sem mexer em estado (assim dá pra usar no useEffect e nos recarregamentos)
 async function buscarTudo() {
@@ -35,6 +36,7 @@ export function useUsersSettings() {
   const [catalogo, setCatalogo] = useState<PermissaoCatalogo[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
+  const { mostrar } = useAvisos();
 
   const aplicar = useCallback((dados: Awaited<ReturnType<typeof buscarTudo>>) => {
     setUsuarios(dados.usuarios);
@@ -60,6 +62,7 @@ export function useUsersSettings() {
     if (idPerfil) await atualizarPerfil(idPerfil, dados);
     else await criarPerfil(dados);
     await carregar();
+    mostrar(idPerfil ? "Perfil atualizado." : "Perfil criado.", "sucesso");
   }
 
   async function salvarUsuario(dados: AtualizarUsuarioDTO, idUsuario?: number) {
@@ -67,12 +70,14 @@ export function useUsersSettings() {
     // o modal já validou os campos obrigatórios antes de chegar aqui
     else await criarUsuario(dados as NovoUsuarioDTO);
     await carregar();
+    mostrar(idUsuario ? "Usuário atualizado." : "Usuário cadastrado.", "sucesso");
   }
 
   // a confirmação e a mensagem de erro ficam no ExcluirPerfilDialog
   async function excluirPerfil(perfil: PerfilAcesso) {
     await removerPerfil(perfil.idPerfil);
     await carregar();
+    mostrar(`Perfil "${perfil.nome}" excluído.`, "sucesso");
   }
 
   return { usuarios, perfis, catalogo, carregando, erro, salvarPerfil, salvarUsuario, excluirPerfil };

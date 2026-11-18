@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, RotateCw } from "lucide-react";
 import StoreCard from "@/components/settings/StoreCard";
 import StoreForm from "@/components/settings/StoreForm";
 import Alert from "@/components/common/Alert";
+import TelaSemDados from "@/components/common/TelaSemDados";
+import { Button } from "@/components/ui/button";
 import { mensagemDeErro } from "@/utils/apiError";
 import {
   buscarPerfilEmpresa,
@@ -63,7 +65,20 @@ export default function StoreSettings() {
   }
 
   if (erroCarregar) {
-    return <Alert mensagem={erroCarregar} />;
+    return (
+      <>
+        <Alert mensagem={erroCarregar} />
+        <TelaSemDados
+          titulo="Não foi possível carregar os dados da loja"
+          descricao="Recarregue a página para tentar de novo."
+          acao={
+            <Button onClick={() => window.location.reload()} className="h-10 rounded-xl px-5">
+              <RotateCw className="size-4" /> Recarregar a página
+            </Button>
+          }
+        />
+      </>
+    );
   }
 
   return (
