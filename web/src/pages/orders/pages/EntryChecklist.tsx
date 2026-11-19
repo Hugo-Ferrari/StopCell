@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Loader2, Save } from "lucide-react";
+import { CheckCheck, Loader2, Save } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Alert from "@/components/common/Alert";
@@ -8,7 +8,6 @@ import OsResumoCard from "@/components/orders/details/OsResumoCard";
 import DetalhesSkeleton from "@/components/orders/details/DetalhesSkeleton";
 import ChecklistContadores from "@/components/orders/checklist/ChecklistContadores";
 import ChecklistItemRow from "@/components/orders/checklist/ChecklistItemRow";
-import MarcarRestantes from "@/components/orders/checklist/MarcarRestantes";
 import { useOrdemServico } from "@/hooks/useOrdemServico";
 import { useChecklistOs } from "@/hooks/useChecklistOs";
 import { cn } from "@/lib/utils";
@@ -58,7 +57,7 @@ function ChecklistEntrada() {
       <ChecklistContadores contagem={checklist.contagem} />
 
       <Card className="gap-0 py-0">
-        <div className="flex flex-col gap-3 border-b border-border px-4 py-4 sm:px-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-4 sm:px-5">
           <div>
             <h2 className="font-semibold">Estado do aparelho na entrada</h2>
             <p className="text-sm text-muted-foreground">
@@ -68,7 +67,11 @@ function ChecklistEntrada() {
             </p>
           </div>
 
-          <MarcarRestantes pendentes={checklist.contagem.pendentes} onMarcar={checklist.marcarRestantes} />
+          {checklist.contagem.pendentes > 0 && (
+            <Button variant="outline" onClick={checklist.marcarTodosOk} className="h-9 rounded-xl px-3">
+              <CheckCheck /> Marcar o resto como OK
+            </Button>
+          )}
         </div>
 
         <ul className="divide-y divide-border">

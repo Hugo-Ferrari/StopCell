@@ -69,8 +69,8 @@ export function useChecklistOs(numOs: number) {
     setItens((atual) => atual.map((item, i) => (i === index ? { ...item, observacao } : item)));
   }
 
-  function marcarRestantes(status: StatusChecklist) {
-    setItens((atual) => atual.map((item) => (item.status === null ? { ...item, status } : item)));
+  function marcarTodosOk() {
+    setItens((atual) => atual.map((item) => (item.status === null ? { ...item, status: "OK" } : item)));
   }
 
   async function salvar() {
@@ -98,7 +98,7 @@ export function useChecklistOs(numOs: number) {
     erro,
     marcarStatus,
     alterarObservacao,
-    marcarRestantes,
+    marcarTodosOk,
     salvar,
   };
 }

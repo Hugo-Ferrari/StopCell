@@ -13,8 +13,6 @@ import {
 import { buscarUltimaOsPorImei, type UltimaOsAparelho } from "@/services/serviceOrderService";
 import { cn } from "@/lib/utils";
 import type { DadosChecklist } from "@/utils/checklist";
-import type { StatusChecklist } from "@/services/osChecklistService";
-import MarcarRestantes from "@/components/orders/checklist/MarcarRestantes";
 
 // garantia de serviço do Código de Defesa do Consumidor
 const GARANTIA_DIAS = 90;
@@ -145,14 +143,6 @@ export default function ChecklistForm({
     }));
   }
 
-  function marcarRestantes(status: StatusChecklist) {
-    setDadosChecklist((atual) => ({
-      ...atual,
-      itens: atual.itens.map((item) => (item.status === null ? { ...item, status } : item)),
-    }));
-  }
-
-  const pendentes = dadosChecklist.itens.filter((item) => item.status === null).length;
   const mostrarResumo = ultimaOs && dadosChecklist.osAnterior === String(ultimaOs.numOs);
 
   return (
@@ -250,13 +240,9 @@ export default function ChecklistForm({
         <h2 className="mb-1 flex items-center gap-2 font-semibold text-foreground">
           <CheckCircle2 className="size-4 text-primary" /> Checklist de entrada
         </h2>
-        <p className="mb-4 text-sm text-muted-foreground">
+        <p className="mb-6 text-sm text-muted-foreground">
           Marque o estado de cada item no momento em que o aparelho chegou.
         </p>
-
-        <div className="mb-6">
-          <MarcarRestantes pendentes={pendentes} onMarcar={marcarRestantes} />
-        </div>
 
         <div className="flex flex-col gap-6">
           {dadosChecklist.itens.map((item, indice) => (

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { expiracaoDoToken, lembrouDoLogin, obterToken, sairDoSistema } from "@/api/token";
 
-const TEMPO_INATIVIDADE = 30 * 60 * 1000;
+const TEMPO_INATIVIDADE = 2 * 60 * 60 * 1000;
 const INTERVALO_CONFERENCIA = 30 * 1000;
 const EVENTOS_DE_USO = ["pointerdown", "keydown", "scroll", "touchstart", "mousemove"] as const;
 
