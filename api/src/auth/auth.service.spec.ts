@@ -14,7 +14,7 @@ describe('AuthService - recuperação de senha', () => {
     prisma = {
       tokenRecuperacaoSenha: {
         findFirst: jest.fn(),
-        updateMany: jest.fn(),
+        updateMany: jest.fn().mockResolvedValue({ count: 1 }),
         create: jest.fn(),
         update: jest.fn(),
       },
@@ -95,7 +95,7 @@ describe('AuthService - recuperação de senha', () => {
       await expect(service.redefinirSenha(dto)).rejects.toThrow('Código inválido ou expirado');
     });
 
-    it('incrementa tentativas quando o código está errado', async () => {
+    it('conta a tentativa no banco antes de conferir o código', async () => {
       usuarioRepository.findByEmail.mockResolvedValue(usuario);
       prisma.tokenRecuperacaoSenha.findFirst.mockResolvedValue(await tokenValido(1));
 
@@ -103,13 +103,13 @@ describe('AuthService - recuperação de senha', () => {
         service.redefinirSenha({ ...dto, codigo: '000000' }),
       ).rejects.toThrow(BadRequestException);
 
-      expect(prisma.tokenRecuperacaoSenha.update).toHaveBeenCalledWith({
-        where: { idToken: 't1' },
-        data: { tentativas: 2, usado: false },
+      expect(prisma.tokenRecuperacaoSenha.updateMany).toHaveBeenNthCalledWith(1, {
+        where: { idToken: 't1', usado: false, tentativas: { lt: 5 } },
+        data: { tentativas: { increment: 1 } },
       });
     });
 
-    it('invalida o código na 5ª tentativa errada', async () => {
+    it('invalida o código quando chega a 5 tentativas erradas', async () => {
       usuarioRepository.findByEmail.mockResolvedValue(usuario);
       prisma.tokenRecuperacaoSenha.findFirst.mockResolvedValue(await tokenValido(4));
 
@@ -117,17 +117,28 @@ describe('AuthService - recuperação de senha', () => {
         service.redefinirSenha({ ...dto, codigo: '000000' }),
       ).rejects.toThrow(BadRequestException);
 
-      expect(prisma.tokenRecuperacaoSenha.update).toHaveBeenCalledWith({
-        where: { idToken: 't1' },
-        data: { tentativas: 5, usado: true },
+      expect(prisma.tokenRecuperacaoSenha.updateMany).toHaveBeenNthCalledWith(2, {
+        where: { idToken: 't1', tentativas: { gte: 5 } },
+        data: { usado: true },
       });
     });
 
     it('rejeita código já bloqueado por excesso de tentativas, mesmo se correto', async () => {
       usuarioRepository.findByEmail.mockResolvedValue(usuario);
       prisma.tokenRecuperacaoSenha.findFirst.mockResolvedValue(await tokenValido(5));
+      prisma.tokenRecuperacaoSenha.updateMany.mockResolvedValue({ count: 0 });
 
       await expect(service.redefinirSenha(dto)).rejects.toThrow(BadRequestException);
+      expect(prisma.usuario.update).not.toHaveBeenCalled();
+    });
+
+    it('não confere o código quando outra tentativa já usou a última chance', async () => {
+      usuarioRepository.findByEmail.mockResolvedValue(usuario);
+      prisma.tokenRecuperacaoSenha.findFirst.mockResolvedValue(await tokenValido(4));
+      prisma.tokenRecuperacaoSenha.updateMany.mockResolvedValue({ count: 0 });
+
+      await expect(service.redefinirSenha(dto)).rejects.toThrow(BadRequestException);
+      expect(prisma.tokenRecuperacaoSenha.updateMany).toHaveBeenCalledTimes(1);
       expect(prisma.usuario.update).not.toHaveBeenCalled();
     });
 

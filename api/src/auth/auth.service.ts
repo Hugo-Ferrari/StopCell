@@ -167,14 +167,19 @@ export class AuthService {
       },
       orderBy: { criadoEm: 'desc' },
     });
-    if (!token || token.tentativas >= MAX_TENTATIVAS) throw erro;
+    if (!token) throw erro;
+
+    const tentativa = await this.prisma.tokenRecuperacaoSenha.updateMany({
+      where: { idToken: token.idToken, usado: false, tentativas: { lt: MAX_TENTATIVAS } },
+      data: { tentativas: { increment: 1 } },
+    });
+    if (tentativa.count === 0) throw erro;
 
     const codigoCorreto = await bcrypt.compare(dto.codigo, token.token);
     if (!codigoCorreto) {
-      const tentativas = token.tentativas + 1;
-      await this.prisma.tokenRecuperacaoSenha.update({
-        where: { idToken: token.idToken },
-        data: { tentativas, usado: tentativas >= MAX_TENTATIVAS },
+      await this.prisma.tokenRecuperacaoSenha.updateMany({
+        where: { idToken: token.idToken, tentativas: { gte: MAX_TENTATIVAS } },
+        data: { usado: true },
       });
       throw erro;
     }
