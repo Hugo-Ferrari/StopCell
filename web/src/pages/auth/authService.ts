@@ -16,10 +16,11 @@ export interface CadastroLojaDTO {
     };
 }
 
-export async function login(emailUsuario: string, senha: string) {
+export async function login(emailUsuario: string, senha: string, lembrar: boolean) {
     const response = await api.post<{ token: string }>("/auth/login", {
         emailUsuario,
-        senha
+        senha,
+        lembrar,
     });
     return response.data;
 }

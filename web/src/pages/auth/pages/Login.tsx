@@ -66,7 +66,7 @@ function Login() {
     setCarregando(true);
 
     try {
-      const data = await login(emailUsuario.trim(), senha);
+      const data = await login(emailUsuario.trim(), senha, lembrar);
 
       salvarToken(data.token, lembrar);
       setSenhasErradas(0);
