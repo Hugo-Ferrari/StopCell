@@ -1,8 +1,8 @@
 import { IsString, IsNotEmpty, MinLength, Matches } from 'class-validator';
 
 export class EmpresaDto {
-  @Matches(/^\d{11}$/, {
-    message: 'O documento deve conter exatamente 11 dígitos numéricos.',
+  @Matches(/^[0-9A-Z]{12}\d{2}$/, {
+    message: 'O CNPJ deve ter 14 caracteres.',
   })
     @IsString()
     @IsNotEmpty()
