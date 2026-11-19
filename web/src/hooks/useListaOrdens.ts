@@ -8,16 +8,17 @@ export function useListaOrdens() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
 
-  const carregar = useCallback(async () => {
-    try {
-      setOrdens(await listarOs());
-      setErro(null);
-    } catch (error) {
-      setErro(mensagemDeErro(error, "Não foi possível carregar as ordens de serviço."));
-    } finally {
-      setCarregando(false);
-    }
-  }, []);
+  const carregar = useCallback(
+    () =>
+      listarOs()
+        .then((dados) => {
+          setOrdens(dados);
+          setErro(null);
+        })
+        .catch((error) => setErro(mensagemDeErro(error, "Não foi possível carregar as ordens de serviço.")))
+        .finally(() => setCarregando(false)),
+    [],
+  );
 
   useEffect(() => {
     void carregar();

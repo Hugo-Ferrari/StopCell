@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { removerDespesa, type Despesa } from "@/services/financeiroService";
 import { mensagemDeErro } from "@/utils/apiError";
 import { formatarMoeda } from "@/utils/moeda";
+import { useAvisos } from "@/hooks/useAvisos";
 
 interface ListaDespesasProps {
   despesas: Despesa[];
@@ -14,12 +15,14 @@ interface ListaDespesasProps {
 function ListaDespesas({ despesas, onRemovida }: ListaDespesasProps) {
   const [removendo, setRemovendo] = useState<number | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const { mostrar } = useAvisos();
 
   async function handleRemover(idDespesa: number) {
     setErro(null);
     setRemovendo(idDespesa);
     try {
       await removerDespesa(idDespesa);
+      mostrar("Despesa removida.", "sucesso");
       await onRemovida();
     } catch (error) {
       setErro(mensagemDeErro(error, "Não foi possível apagar a despesa."));

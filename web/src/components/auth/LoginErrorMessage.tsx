@@ -1,4 +1,6 @@
+import { useEffect, type ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { useAvisos } from "@/hooks/useAvisos";
 
 export type TipoErroLogin =
   | "emailNaoCadastrado"
@@ -12,17 +14,12 @@ export interface ErroLogin {
   mensagem?: string;
 }
 
-const linkClasse = "font-semibold underline underline-offset-2 hover:text-foreground";
+const linkClasse = "underline underline-offset-2 hover:text-foreground";
 
-function LoginErrorMessage({ erro }: { erro: ErroLogin | null }) {
-  if (!erro) return null;
-
-  return (
-    <div
-      role="alert"
-      className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-    >
-      {erro.tipo === "emailNaoCadastrado" && (
+function textoDoErro(erro: ErroLogin): ReactNode {
+  switch (erro.tipo) {
+    case "emailNaoCadastrado":
+      return (
         <>
           E-mail não cadastrado,{" "}
           <Link to="/cadastro" className={linkClasse}>
@@ -30,11 +27,11 @@ function LoginErrorMessage({ erro }: { erro: ErroLogin | null }) {
           </Link>
           .
         </>
-      )}
-
-      {erro.tipo === "senhaIncorreta" && "Senha incorreta."}
-
-      {erro.tipo === "senhaIncorretaRepetida" && (
+      );
+    case "senhaIncorreta":
+      return "Senha incorreta.";
+    case "senhaIncorretaRepetida":
+      return (
         <>
           Senha incorreta. Clique em{" "}
           <Link to="/recuperarSenha" className={linkClasse}>
@@ -42,11 +39,20 @@ function LoginErrorMessage({ erro }: { erro: ErroLogin | null }) {
           </Link>{" "}
           para mudar.
         </>
-      )}
+      );
+    default:
+      return erro.mensagem;
+  }
+}
 
-      {erro.tipo === "outro" && erro.mensagem}
-    </div>
-  );
+function LoginErrorMessage({ erro }: { erro: ErroLogin | null }) {
+  const { mostrar } = useAvisos();
+
+  useEffect(() => {
+    if (erro) mostrar(textoDoErro(erro), "erro");
+  }, [erro, mostrar]);
+
+  return null;
 }
 
 export default LoginErrorMessage;

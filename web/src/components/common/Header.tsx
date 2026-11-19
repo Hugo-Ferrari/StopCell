@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { matchPath, useLocation } from "react-router-dom";
 import ThemeToggle from "@/components/common/ThemeToggle";
+import VoltarLink from "@/components/common/VoltarLink";
 
 function Header() {
   const location = useLocation();
@@ -12,8 +14,8 @@ function Header() {
     "/fornecedores": "Fornecedores",
     "/configuracoes": "Configurações",
     "/configuracoes/loja": "Dados da Loja",
-    "/configuracoes/usuarios": "Usuários e Permissões", // <- novo
-
+    "/configuracoes/usuarios": "Usuários e Permissões",
+    "/configuracoes/perfil": "Meu Perfil",
   };
 
    // rotas com parâmetro não entram no objeto de cima, por isso o matchPath
@@ -23,22 +25,33 @@ function Header() {
       ? "Diagnóstico e Orçamento"
       : titulos[location.pathname] || "Stop Cell";
 
+  useEffect(() => {
+    document.title = `${titulo} · StopCell`;
+    return () => {
+      document.title = "StopCell";
+    };
+  }, [titulo]);
+
   return (
     <>
 
       <header className="sticky top-0 z-10 flex h-20 items-center justify-between gap-4 border-b border-border bg-background/95 px-5 pl-16 backdrop-blur-sm transition-all duration-300 lg:px-8">
-        <div className="flex flex-col">
-          <span className="text-xs font-extrabold uppercase tracking-widest lg:text-sm">
-            <span className="text-foreground">
-              ST<span className="text-primary">O</span>P
+        <div className="flex min-w-0 items-center gap-2 lg:gap-3">
+          <VoltarLink />
+
+          <div className="flex min-w-0 flex-col">
+            <span className="text-xs font-extrabold uppercase tracking-widest lg:text-sm">
+              <span className="text-foreground">
+                ST<span className="text-primary">O</span>P
+              </span>
+
+              <span className="text-primary">CELL</span>
             </span>
 
-            <span className="text-primary">CELL</span>
-          </span>
-
-          <h1 className="text-lg font-bold text-foreground lg:text-2xl">
-            {titulo}
-          </h1>
+            <h1 className="truncate text-lg font-bold text-foreground lg:text-2xl">
+              {titulo}
+            </h1>
+          </div>
         </div>
 
         <ThemeToggle />

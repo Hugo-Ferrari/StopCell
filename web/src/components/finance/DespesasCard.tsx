@@ -14,6 +14,7 @@ import { formatarMoeda } from "@/utils/moeda";
 import FormularioDespesa from "./FormularioDespesa";
 import ListaDespesas from "./ListaDespesas";
 import { cn } from "@/lib/utils";
+import { useAvisos } from "@/hooks/useAvisos";
 
 interface DespesasCardProps {
   despesas: Despesa[];
@@ -24,14 +25,16 @@ interface DespesasCardProps {
 function DespesasCard({ despesas, onAlterado }: DespesasCardProps) {
   const [aberto, setAberto] = useState(false);
   const total = despesas.reduce((soma, d) => soma + d.valor, 0);
+  const { mostrar } = useAvisos();
 
   async function handleCriada() {
     setAberto(false);
+    mostrar("Despesa lançada.", "sucesso");
     await onAlterado();
   }
 
   return (
-    <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 md:p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 className="font-semibold">Despesas</h2>

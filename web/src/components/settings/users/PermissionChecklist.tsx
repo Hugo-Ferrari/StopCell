@@ -17,7 +17,7 @@ function PermissionChecklist({ catalogo, selecionadas, onChange }: PermissionChe
   return (
     <div className="flex flex-col gap-4">
       {Object.entries(grupos).map(([grupo, permissoes]) => (
-        <fieldset key={grupo} className="rounded-lg border border-border p-3 sm:p-4">
+        <fieldset key={grupo} className="rounded-xl border border-border p-3 sm:p-4">
           <legend className="px-1 text-xs font-bold uppercase tracking-widest text-muted-foreground">
             {grupo}
           </legend>

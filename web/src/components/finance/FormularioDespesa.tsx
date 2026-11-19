@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from "react";
-import { Loader2, Plus } from "lucide-react";
+import { CalendarDays, FileText, Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import FormInput from "@/components/common/FormInput";
 import CampoValor from "@/components/orders/details/CampoValor";
 import Alert from "@/components/common/Alert";
+import { useErrosFormulario } from "@/hooks/useErrosFormulario";
 import { criarDespesa } from "@/services/financeiroService";
 import { mensagemDeErro } from "@/utils/apiError";
 import { paraNumero } from "@/utils/moeda";
@@ -12,6 +12,8 @@ import { paraNumero } from "@/utils/moeda";
 interface FormularioDespesaProps {
   onCriada: () => Promise<void>;
 }
+
+type Campo = "descricao" | "valor" | "data";
 
 function hojeIso() {
   const agora = new Date();
@@ -25,17 +27,21 @@ function FormularioDespesa({ onCriada }: FormularioDespesaProps) {
   const [valor, setValor] = useState("");
   const [dataDespesa, setDataDespesa] = useState(hojeIso);
   const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
+  const [erroApi, setErroApi] = useState<string | null>(null);
+
+  const valorNumero = paraNumero(valor);
+
+  const { erro, tocar, podeEnviar, reiniciar } = useErrosFormulario<Campo>({
+    descricao: !descricao.trim() ? "Informe a descrição" : undefined,
+    valor: valorNumero <= 0 ? "Informe um valor maior que zero" : undefined,
+    data: !dataDespesa ? "Informe a data" : undefined,
+  });
 
   async function handleSubmit(evento: FormEvent) {
     evento.preventDefault();
-    setErro(null);
+    setErroApi(null);
 
-    const valorNumero = paraNumero(valor);
-    if (!descricao.trim() || valorNumero <= 0) {
-      setErro("Informe a descrição e um valor maior que zero.");
-      return;
-    }
+    if (!podeEnviar()) return;
 
     setSalvando(true);
     try {
@@ -47,45 +53,55 @@ function FormularioDespesa({ onCriada }: FormularioDespesaProps) {
       setDescricao("");
       setValor("");
       setDataDespesa(hojeIso());
+      reiniciar();
       await onCriada();
     } catch (error) {
-      setErro(mensagemDeErro(error, "Não foi possível lançar a despesa."));
+      setErroApi(mensagemDeErro(error, "Não foi possível lançar a despesa."));
     } finally {
       setSalvando(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="despesa-descricao">Descrição</Label>
-        <Input
-          id="despesa-descricao"
-          maxLength={150}
-          placeholder="Aluguel, energia, material..."
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-        />
-      </div>
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+      <FormInput
+        label="Descrição *"
+        id="despesa-descricao"
+        icon={<FileText size={18} />}
+        maxLength={150}
+        placeholder="Aluguel, energia, material..."
+        value={descricao}
+        onChange={(e) => setDescricao(e.target.value)}
+        onBlur={tocar("descricao")}
+        error={erro("descricao")}
+      />
 
-      <CampoValor id="despesa-valor" rotulo="Valor" valor={valor} onChange={setValor} />
+      <CampoValor
+        id="despesa-valor"
+        rotulo="Valor *"
+        valor={valor}
+        onChange={setValor}
+        onBlur={tocar("valor")}
+        erro={erro("valor")}
+      />
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="despesa-data">Data</Label>
-        <Input
-          id="despesa-data"
-          type="date"
-          value={dataDespesa}
-          onChange={(e) => setDataDespesa(e.target.value)}
-        />
-      </div>
+      <FormInput
+        label="Data *"
+        id="despesa-data"
+        type="date"
+        icon={<CalendarDays size={18} />}
+        value={dataDespesa}
+        onChange={(e) => setDataDespesa(e.target.value)}
+        onBlur={tocar("data")}
+        error={erro("data")}
+      />
 
-      <Button type="submit" disabled={salvando} className="h-11 rounded-xl">
+      <Alert mensagem={erroApi} />
+
+      <Button type="submit" disabled={salvando} className="h-12 rounded-xl px-8">
         {salvando ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
         Lançar despesa
       </Button>
-
-      <Alert mensagem={erro} />
     </form>
   );
 }

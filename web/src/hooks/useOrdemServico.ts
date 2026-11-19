@@ -8,19 +8,16 @@ export function useOrdemServico(numOs: number) {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
 
-  // as abas chamam isso depois de salvar, pra tela mostrar o que ficou gravado no banco
   const recarregar = useCallback(async () => {
     if (!numOs) return;
 
-    try {
-      const dados = await buscarOrdemServicoPorNumero(numOs);
-      setOrdem(dados);
-      setErro(null);
-    } catch (error) {
-      setErro(mensagemDeErro(error, "Não foi possível carregar a ordem de serviço."));
-    } finally {
-      setCarregando(false);
-    }
+    return buscarOrdemServicoPorNumero(numOs)
+      .then((dados) => {
+        setOrdem(dados);
+        setErro(null);
+      })
+      .catch((error) => setErro(mensagemDeErro(error, "Não foi possível carregar a ordem de serviço.")))
+      .finally(() => setCarregando(false));
   }, [numOs]);
 
   useEffect(() => {

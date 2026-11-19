@@ -40,15 +40,14 @@ export function paraNumero(valor: string | number | null | undefined): number {
   return Number.isFinite(numero) ? arredondarCentavos(numero) : 0;
 }
 
-// usado no onChange dos campos de valor: só deixa número, ponto e uma vírgula,
-// e corta o que passar de 2 casas depois da vírgula
-export function limparValorDigitado(texto: string): string {
-  const permitido = texto.replace(/[^\d.,]/g, "");
-  const posicaoVirgula = permitido.indexOf(",");
+export function valorEmTexto(valor: number): string {
+  return valor.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
 
-  if (posicaoVirgula === -1) return permitido;
+const MAXIMO_DIGITOS = 11;
 
-  const parteInteira = permitido.slice(0, posicaoVirgula);
-  const centavos = permitido.slice(posicaoVirgula + 1).replace(/[.,]/g, "").slice(0, 2);
-  return `${parteInteira},${centavos}`;
+export function mascaraValor(texto: string): string {
+  const digitos = texto.replace(/\D/g, "").replace(/^0+/, "").slice(0, MAXIMO_DIGITOS);
+  if (!digitos) return "";
+  return valorEmTexto(Number(digitos) / 100);
 }

@@ -11,6 +11,7 @@ import { lancarItemOs } from "@/services/itemOsService";
 import { mensagemDeErro } from "@/utils/apiError";
 import { formatarMoeda, paraNumero } from "@/utils/moeda";
 import type { ItemOsInterface } from "@/types/ordemServico";
+import { useAvisos } from "@/hooks/useAvisos";
 
 interface PecasTabProps {
   numOs: number;
@@ -26,6 +27,7 @@ function PecasTab({ numOs, pecas, bloqueado, onAlterado, onRemover }: PecasTabPr
   const [valor, setValor] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const { mostrar } = useAvisos();
 
   const valorNumero = paraNumero(valor);
   const podeEnviar = descricao.trim().length > 0 && valorNumero > 0;
@@ -49,6 +51,7 @@ function PecasTab({ numOs, pecas, bloqueado, onAlterado, onRemover }: PecasTabPr
       setDescricao("");
       setValor("");
       setQuantidade(1);
+      mostrar("Peça lançada.", "sucesso");
       await onAlterado();
     } catch (error) {
       setErro(mensagemDeErro(error, "Não foi possível lançar a peça."));
@@ -105,7 +108,7 @@ function PecasTab({ numOs, pecas, bloqueado, onAlterado, onRemover }: PecasTabPr
 
           <Alert mensagem={erro} />
 
-          <Button type="submit" disabled={enviando || !podeEnviar} className="h-11 self-end rounded-xl px-5">
+          <Button type="submit" disabled={enviando || !podeEnviar} className="h-12 self-end rounded-xl px-8">
             {enviando ? <Loader2 className="animate-spin" /> : <Plus />}
             {podeEnviar
               ? `Adicionar ${formatarMoeda(quantidade * valorNumero)} ao orçamento`

@@ -123,7 +123,7 @@ function Indicadores({ resumo, anterior, tempoReparo }: IndicadoresProps) {
       {itens.map((item) => {
         const Icone = item.icone;
         return (
-          <div key={item.rotulo} className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
+          <div key={item.rotulo} className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
             <div className="flex items-center gap-2.5">
               <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-lg", item.corIcone)}>
                 <Icone className="size-[18px]" strokeWidth={2} />

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { atualizarStatusOs } from "@/services/serviceOrderService";
 import { mensagemDeErro } from "@/utils/apiError";
+import { useAvisos } from "@/hooks/useAvisos";
 
 interface CancelarOsDialogProps {
   numOs: number;
@@ -24,6 +25,7 @@ function CancelarOsDialog({ numOs, onCancelada }: CancelarOsDialogProps) {
   const [aberto, setAberto] = useState(false);
   const [cancelando, setCancelando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const { mostrar } = useAvisos();
 
   async function handleCancelar() {
     setCancelando(true);
@@ -31,6 +33,7 @@ function CancelarOsDialog({ numOs, onCancelada }: CancelarOsDialogProps) {
 
     try {
       await atualizarStatusOs(numOs, "CANCELADO");
+      mostrar("O.S. cancelada.", "sucesso");
       setAberto(false);
       await onCancelada();
     } catch (error) {
@@ -67,14 +70,14 @@ function CancelarOsDialog({ numOs, onCancelada }: CancelarOsDialogProps) {
           <Button
             variant="outline"
             onClick={() => setAberto(false)}
-            className="h-12 rounded-2xl text-base font-semibold"
+            className="h-12 rounded-xl px-8"
           >
             Voltar
           </Button>
           <Button
             onClick={handleCancelar}
             disabled={cancelando}
-            className="h-12 rounded-2xl bg-destructive text-base font-semibold text-white hover:bg-destructive/90"
+            className="h-12 rounded-xl bg-destructive px-8 text-white hover:bg-destructive/90"
           >
             {cancelando && <Loader2 className="animate-spin" />}
             Cancelar O.S.

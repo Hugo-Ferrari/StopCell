@@ -15,7 +15,7 @@ function DinheiroParado({ parado }: DinheiroParadoProps) {
   const quantidade = parado.reduce((s, p) => s + p.quantidade, 0);
 
   return (
-    <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 md:p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 className="font-semibold">Dinheiro parado</h2>

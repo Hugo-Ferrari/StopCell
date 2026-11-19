@@ -94,33 +94,24 @@ export default function History() {
 
   return (
     <div className="flex flex-col w-full gap-6">
-      {/* Cabeçalho da página */}
-      <div>
-        <span className="text-primary text-[10px] md:text-xs font-bold uppercase tracking-widest">
-          Stop Cell
-        </span>
-        <h1 className="text-2xl md:text-3xl font-bold mt-1 text-foreground">
-          Histórico
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Consulte as ordens de serviço, clientes e aparelhos atendidos
-        </p>
-      </div>
+      <p className="text-sm text-muted-foreground">
+        Consulte as ordens de serviço, clientes e aparelhos atendidos
+      </p>
 
       {/* Busca e filtro por período */}
       <FilterHistory busca={busca} onBuscaChange={setBusca} date={date} onDateChange={setDate} />
 
       {/* Abas */}
-      <div className="flex w-full bg-card border border-border rounded-full p-1">
+      <div className="flex w-full gap-1 rounded-2xl border border-border bg-card p-1">
         {abas.map((aba) => (
           <button
             key={aba.id}
             type="button"
             onClick={() => setAbaAtiva(aba.id)}
             className={cn(
-              "flex flex-1 items-center justify-center gap-2 py-3 rounded-full text-sm font-semibold transition-all duration-300",
+              "flex h-10 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-medium transition-colors",
               abaAtiva === aba.id
-                ? "bg-accent text-foreground shadow-sm"
+                ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -128,9 +119,9 @@ export default function History() {
             {!carregando && !erro && (
               <span
                 className={cn(
-                  "min-w-6 rounded-full px-1.5 py-0.5 text-[10px] sm:text-xs font-bold",
+                  "min-w-6 rounded-full px-1.5 py-0.5 text-[10px] font-bold sm:text-xs",
                   abaAtiva === aba.id
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-primary-foreground/20 text-primary-foreground"
                     : "bg-muted text-muted-foreground"
                 )}
               >

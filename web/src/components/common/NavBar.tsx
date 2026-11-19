@@ -156,7 +156,7 @@ function NavBar({ recolhido, onAlternar }: NavBarProps) {
           })}
         </nav>
 
-        <UsuarioMenu compacto={compacto} />
+        <UsuarioMenu compacto={compacto} onNavegar={fecharMenu} />
       </aside>
     </>
   );

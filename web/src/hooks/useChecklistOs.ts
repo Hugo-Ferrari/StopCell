@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ITENS_CHECKLIST } from "@/components/orders/steps/ChecklistForm";
+import { ITENS_CHECKLIST } from "@/utils/checklist";
 import {
   buscarChecklistOs,
   salvarChecklistOs,

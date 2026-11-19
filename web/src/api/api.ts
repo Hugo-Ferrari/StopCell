@@ -27,7 +27,7 @@ api.interceptors.response.use(
     const rotaDeAuth = url.startsWith("auth/");
 
     if (error.response?.status === 401 && !rotaDeAuth) {
-      sairDoSistema();
+      sairDoSistema("expirada");
     }
 
     return Promise.reject(error);

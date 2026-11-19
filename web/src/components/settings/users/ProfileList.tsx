@@ -1,5 +1,7 @@
 import { Pencil, ShieldCheck, Trash2, Users } from "lucide-react";
 import type { PerfilAcesso, PermissaoCatalogo } from "@/services/perfilService";
+import DicaDesativado from "@/components/common/DicaDesativado";
+import { Button } from "@/components/ui/button";
 
 interface ProfileListProps {
   perfis: PerfilAcesso[];
@@ -11,8 +13,8 @@ interface ProfileListProps {
 function ProfileList({ perfis, catalogo, onEditar, onExcluir }: ProfileListProps) {
   if (perfis.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-border p-8 text-center">
-        <ShieldCheck className="mx-auto h-8 w-8 text-muted-foreground" />
+      <div className="rounded-2xl border border-dashed border-border p-8 text-center">
+        <ShieldCheck className="mx-auto size-8 text-muted-foreground" />
         <p className="mt-3 font-semibold text-foreground">Nenhum perfil criado</p>
         <p className="mt-1 text-sm text-muted-foreground">
           Crie perfis como "Técnico" ou "Atendente" para definir o que cada funcionário pode acessar.
@@ -30,34 +32,39 @@ function ProfileList({ perfis, catalogo, onEditar, onExcluir }: ProfileListProps
         const emUso = perfil.totalUsuarios > 0;
 
         return (
-          <div key={perfil.idPerfil} className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:p-5">
+          <div key={perfil.idPerfil} className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className="truncate font-bold text-foreground">{perfil.nome}</h3>
+                <h3 className="truncate font-semibold text-foreground">{perfil.nome}</h3>
                 {perfil.descricao && (
                   <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">{perfil.descricao}</p>
                 )}
               </div>
 
               <div className="flex shrink-0 gap-1">
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => onEditar(perfil)}
                   aria-label={`Editar perfil ${perfil.nome}`}
-                  className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  className="size-9 rounded-xl text-muted-foreground"
                 >
-                  <Pencil size={16} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onExcluir(perfil)}
-                  disabled={emUso}
-                  aria-label={`Excluir perfil ${perfil.nome}`}
-                  title={emUso ? "Troque o perfil dos usuários antes de excluir" : undefined}
-                  className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+                  <Pencil className="size-4" />
+                </Button>
+                <DicaDesativado
+                  mensagem={emUso ? "Esse perfil está em uso. Troque o perfil dos usuários antes de excluir." : null}
                 >
-                  <Trash2 size={16} />
-                </button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onExcluir(perfil)}
+                    disabled={emUso}
+                    aria-label={`Excluir perfil ${perfil.nome}`}
+                    className="size-9 rounded-xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </DicaDesativado>
               </div>
             </div>
 

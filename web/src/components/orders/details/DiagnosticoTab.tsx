@@ -71,7 +71,7 @@ function DiagnosticoTab({ numOs, relatoCliente, diagnosticos, onSalvo }: Diagnos
         <Button
           onClick={handleSalvar}
           disabled={salvando || !texto.trim()}
-          className="h-11 self-end rounded-xl px-5"
+          className="h-12 self-end rounded-xl px-8"
         >
           {salvando ? <Loader2 className="animate-spin" /> : <Save />}
           Salvar diagnóstico

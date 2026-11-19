@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, RotateCw } from "lucide-react";
 import StoreCard from "@/components/settings/StoreCard";
 import StoreForm from "@/components/settings/StoreForm";
+import Alert from "@/components/common/Alert";
+import TelaSemDados from "@/components/common/TelaSemDados";
+import { Button } from "@/components/ui/button";
+import { mensagemDeErro } from "@/utils/apiError";
 import {
   buscarPerfilEmpresa,
   atualizarPerfilEmpresa,
@@ -19,6 +23,9 @@ export default function StoreSettings() {
   });
   const [carregandoInicial, setCarregandoInicial] = useState(true);
   const [salvando, setSalvando] = useState(false);
+  const [editando, setEditando] = useState(false);
+  const [sucesso, setSucesso] = useState("");
+  const [erroCarregar, setErroCarregar] = useState("");
 
   useEffect(() => {
     async function carregarDados() {
@@ -28,7 +35,7 @@ export default function StoreSettings() {
           setStore(dados);
         }
       } catch (error) {
-        console.error("Erro ao carregar dados da empresa:", error);
+        setErroCarregar(mensagemDeErro(error, "Não foi possível carregar os dados da loja. Recarregue a página."));
       } finally {
         setCarregandoInicial(false);
       }
@@ -42,6 +49,8 @@ export default function StoreSettings() {
     try {
       const atualizado = await atualizarPerfilEmpresa(novosDados);
       setStore(atualizado || { ...store, ...novosDados });
+      setEditando(false);
+      setSucesso("Dados da loja atualizados com sucesso!");
     } finally {
       setSalvando(false);
     }
@@ -55,15 +64,44 @@ export default function StoreSettings() {
     );
   }
 
+  if (erroCarregar) {
+    return (
+      <>
+        <Alert mensagem={erroCarregar} />
+        <TelaSemDados
+          titulo="Não foi possível carregar os dados da loja"
+          descricao="Recarregue a página para tentar de novo."
+          acao={
+            <Button onClick={() => window.location.reload()} className="h-10 rounded-xl px-5">
+              <RotateCw className="size-4" /> Recarregar a página
+            </Button>
+          }
+        />
+      </>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto pb-10">
-      <StoreCard store={store} />
-
-      <StoreForm
-        initialData={store}
-        onSave={handleSalvar}
-        loading={salvando}
-      />
+      {editando ? (
+        <StoreForm
+          initialData={store}
+          onSave={handleSalvar}
+          loading={salvando}
+          onCancelar={() => setEditando(false)}
+        />
+      ) : (
+        <>
+          <Alert mensagem={sucesso} tipo="sucesso" />
+          <StoreCard
+            store={store}
+            onEditar={() => {
+              setSucesso("");
+              setEditando(true);
+            }}
+          />
+        </>
+      )}
     </div>
   );
 }

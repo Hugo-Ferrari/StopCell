@@ -57,7 +57,7 @@ function PorMarca({ marcas }: PorMarcaProps) {
   const [maior, ...resto] = blocos;
 
   return (
-    <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 md:p-6">
       <div>
         <h2 className="font-semibold">Por marca</h2>
         <p className="text-xs text-muted-foreground">faturamento do período</p>

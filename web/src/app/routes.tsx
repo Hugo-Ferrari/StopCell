@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import Login from "@/pages/auth/pages/Login";
 import MainLayout from "@/layouts/MainLayout";
 import RequirePermissao from "@/components/common/RequirePermissao";
+import RequireLogin from "@/components/common/RequireLogin";
 import { PERMISSOES } from "@/utils/permissoes";
 
 // cada tela vira um arquivo separado e só baixa quando alguém abre.
@@ -18,7 +19,9 @@ const ChecklistEntrada = lazy(() => import("@/pages/orders/pages/EntryChecklist"
 const Historico = lazy(() => import("@/pages/history/History"));
 const Configuracoes = lazy(() => import("@/pages/settings/Settings"));
 const StoreSettings = lazy(() => import("@/pages/settings/StoreSettings"));
+const ProfileSettings = lazy(() => import("@/pages/settings/ProfileSettings"));
 const UsersSettings = lazy(() => import("@/components/settings/UsersSettings"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
 
 const { ORDENS_VER, ORDENS_EDITAR, HISTORICO_VER, FINANCEIRO_VER, LOJA_EDITAR } = PERMISSOES;
 
@@ -46,7 +49,7 @@ export function AppRoutes() {
       <Route path="/cadastro" element={<Tela><Register /></Tela>} />
 
       {/* rotas privadas */}
-      <Route element={<MainLayout />}>
+      <Route element={<RequireLogin><MainLayout /></RequireLogin>}>
         {/* o login sempre cai aqui, então quem não tem acesso é levado pra outra tela */}
         <Route
           path="/ordemServico"
@@ -107,6 +110,8 @@ export function AppRoutes() {
             </RequirePermissao>
           }
         />
+        {/* qualquer usuário logado vê o próprio perfil (editar, só o dono) */}
+        <Route path="/configuracoes/perfil" element={<Tela><ProfileSettings /></Tela>} />
         <Route
           path="/configuracoes/usuarios"
           element={
@@ -115,6 +120,8 @@ export function AppRoutes() {
             </RequirePermissao>
           }
         />
+
+        <Route path="*" element={<Tela><NotFound /></Tela>} />
       </Route>
     </Routes>
   );

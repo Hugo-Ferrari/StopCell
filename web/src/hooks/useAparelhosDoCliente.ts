@@ -7,16 +7,17 @@ export function useAparelhosDoCliente(cpf: string) {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
 
-  const carregar = useCallback(async () => {
-    try {
-      setAparelhos(await listarAparelhosDoCliente(cpf));
-      setErro(null);
-    } catch (error) {
-      setErro(mensagemDeErro(error, "Não foi possível carregar os aparelhos do cliente."));
-    } finally {
-      setCarregando(false);
-    }
-  }, [cpf]);
+  const carregar = useCallback(
+    () =>
+      listarAparelhosDoCliente(cpf)
+        .then((dados) => {
+          setAparelhos(dados);
+          setErro(null);
+        })
+        .catch((error) => setErro(mensagemDeErro(error, "Não foi possível carregar os aparelhos do cliente.")))
+        .finally(() => setCarregando(false)),
+    [cpf],
+  );
 
   useEffect(() => {
     void carregar();

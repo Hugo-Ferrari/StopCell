@@ -61,7 +61,7 @@ function GraficoMeses({ meses }: GraficoMesesProps) {
   const vazio = dados.every((m) => m.faturamento === 0 && m.despesas === 0);
 
   return (
-    <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
+    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 md:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-semibold">Faturamento e lucro</h2>
