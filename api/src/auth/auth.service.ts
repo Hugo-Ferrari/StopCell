@@ -109,7 +109,7 @@ export class AuthService {
         email: usuario.emailUsuario,
         cnpjEmpresa: usuario.cnpjEmpresa,
       },
-      { expiresIn: '8h' },
+      { expiresIn: dto.lembrar ? '7d' : '8h' },
     );
     return { token };
   }
