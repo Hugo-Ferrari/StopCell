@@ -1,5 +1,5 @@
 // empresa/empresa.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { EmpresaRepository } from './enterprise.repository';
 import { EmpresaDto, UpdateEmpresaDTO } from '@/type/enterprise.dto';
 
@@ -14,8 +14,15 @@ export class EmpresaService {
   return empresa;
 }
 
-  cadastrar(dto: EmpresaDto) {
-    return this.repository.create(dto);
+  async cadastrar(dto: EmpresaDto) {
+    try {
+      return await this.repository.create(dto);
+    } catch (erro) {
+      if ((erro as { code?: string })?.code === 'P2002') {
+        throw new ConflictException('Já existe uma empresa cadastrada com esse CNPJ.');
+      }
+      throw erro;
+    }
   }
 
   async atualizar(cnpj: string, dto: UpdateEmpresaDTO) {

@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { AparelhoRepository } from './device.repository';
 import { AparelhoDto } from '@/type/device.dto';
 
@@ -19,7 +24,7 @@ export class AparelhoService {
     // aqui ele é cadastrado de novo normalmente
     const existente = await this.repository.findById(dto.imei, cnpjEmpresa);
     if (existente) {
-      throw new BadRequestException(
+      throw new ConflictException(
         existente.cpfCliente === dto.cpfCliente
           ? 'Esse aparelho já está cadastrado para este cliente. Selecione ele na lista.'
           : 'Esse IMEI já está cadastrado para outro cliente da loja.',
@@ -31,7 +36,7 @@ export class AparelhoService {
     } catch (erro) {
       // dois cadastros do mesmo IMEI ao mesmo tempo: o segundo cai aqui
       if ((erro as { code?: string })?.code === CHAVE_DUPLICADA) {
-        throw new BadRequestException('Esse IMEI já está cadastrado nesta loja.');
+        throw new ConflictException('Esse IMEI já está cadastrado nesta loja.');
       }
       throw erro;
     }

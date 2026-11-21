@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaService } from './prisma/prisma.service';
+import { PrismaModule } from './prisma/prisma.module';
+import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
 import { JwtAuthGuard } from './auth/jwt.guards';
 import { PermissoesGuard } from './auth/permissoes.guard';
 import { AuthModule } from './auth/auth.module';
@@ -26,6 +27,7 @@ import { FinanceiroModule } from './financeiro/financeiro.module';
 
 @Module({
   imports: [
+    PrismaModule,
     JwtModule.register({ global: true, secret: process.env.JWT_SECRET }),
     AuthModule,
     ClientesModule,
@@ -48,10 +50,9 @@ import { FinanceiroModule } from './financeiro/financeiro.module';
   controllers: [AppController],
   providers: [
     AppService,
-    PrismaService,
+    { provide: APP_FILTER, useClass: PrismaExceptionFilter },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: PermissoesGuard },
   ],
-  exports: [PrismaService],
 })
 export class AppModule {}

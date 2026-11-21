@@ -1,5 +1,5 @@
 // clientes/clientes.service.ts
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateClienteDto } from '@/type/create-customer.dto';
 import { ClientesRepository } from './customer.repository';
 
@@ -17,7 +17,7 @@ export class ClientesService {
     } catch (erro) {
       // CPF repetido dentro da mesma loja. em outra loja pode, o cliente é por loja
       if ((erro as { code?: string })?.code === 'P2002') {
-        throw new BadRequestException('Já existe um cliente com esse CPF nesta loja.');
+        throw new ConflictException('Já existe um cliente com esse CPF nesta loja.');
       }
       throw erro;
     }
