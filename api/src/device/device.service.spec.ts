@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { ConflictException } from '@nestjs/common';
 import { AparelhoService } from './device.service';
 
 describe('AparelhoService - cadastro', () => {
@@ -44,7 +44,7 @@ describe('AparelhoService - cadastro', () => {
   it('dois cadastros ao mesmo tempo: o segundo recebe mensagem, não erro 500', async () => {
     repository.cadastro.mockRejectedValue({ code: 'P2002' });
 
-    await expect(service.cadastro(dto, '11111111000111')).rejects.toThrow(BadRequestException);
+    await expect(service.cadastro(dto, '11111111000111')).rejects.toThrow(ConflictException);
     await expect(service.cadastro(dto, '11111111000111')).rejects.toThrow(
       'Esse IMEI já está cadastrado nesta loja.',
     );

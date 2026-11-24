@@ -4,7 +4,6 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { EmpresaRepository } from '@/enterprise/enterprise.repository';
 import { UsuarioRepository } from '@/user/user.repository';
-import { PrismaService } from '@/prisma/prisma.service';
 import { MailModule } from '@/mail/mail.module';
 
 
@@ -23,7 +22,6 @@ import { MailModule } from '@/mail/mail.module';
     AuthService,
     EmpresaRepository,
     UsuarioRepository,
-    PrismaService,
   ],
   exports: [AuthService],
 })
