@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { MarcaService } from './mark.service';
 import { MarcaDto } from '@/type/mark.dto';
 import { Permissao } from '@/common/decorators/permissao.decorator'; // <- novo
@@ -16,8 +16,8 @@ export class MarcaController {
 
   @Permissao(PERMISSOES.ORDENS_EDITAR, PERMISSOES.ESTOQUE_EDITAR) // <- novo
   @Put(':id')
-  atualizar(@Param('id') id: string, @Body() dto: MarcaDto) {
-    return this.service.atualizar(+id, dto);
+  atualizar(@Param('id', ParseIntPipe) id: number, @Body() dto: MarcaDto) {
+    return this.service.atualizar(id, dto);
   }
 
   // sem etiqueta: qualquer usuário logado pode buscar marca

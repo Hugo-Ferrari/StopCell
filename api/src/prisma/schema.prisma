@@ -134,6 +134,7 @@ model Usuario {
   nivelAcesso  String? @map("nivel_acesso") @db.VarChar(20)
   idPerfil     Int?    @map("id_perfil")
   ativo        Boolean @default(true)
+  senhaAlteradaEm DateTime? @map("senha_alterada_em")
 
   perfil        PerfilAcesso?  @relation(fields: [idPerfil], references: [idPerfil], onDelete: Restrict)
 

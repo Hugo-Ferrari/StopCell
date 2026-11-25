@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { CategoriaService } from './category.service';
 import { categoriaDto } from '@/type/category.dto';
 import { Permissao } from '@/common/decorators/permissao.decorator'; // <- novo
@@ -17,7 +17,7 @@ export class CategoriaController {
 
   @Permissao(PERMISSOES.ORDENS_EDITAR, PERMISSOES.ESTOQUE_EDITAR) // <- novo
   @Put(':id')
-  atualizar(@Param('id') id: string, @Body() dto: categoriaDto) {
-    return this.service.atualizar(+id, dto);
+  atualizar(@Param('id', ParseIntPipe) id: number, @Body() dto: categoriaDto) {
+    return this.service.atualizar(id, dto);
   }
 }

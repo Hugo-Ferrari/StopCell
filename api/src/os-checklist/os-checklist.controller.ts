@@ -38,14 +38,14 @@ export class OsChecklistController {
   @Permissao(PERMISSOES.ORDENS_EDITAR) // <- novo
   @Patch(':ordemServicoId/:checklistId/status')
   async atualizarStatus(
-    @Param('ordemServicoId') ordemServicoId: string,
-    @Param('checklistId') checklistId: string,
+    @Param('ordemServicoId', ParseIntPipe) ordemServicoId: number,
+    @Param('checklistId', ParseIntPipe) checklistId: number,
     @Query('status') status: string,
     @Req() req: any,
   ) {
     const resposta = await this.service.atualizarStatus(
-      +ordemServicoId,
-      +checklistId,
+      ordemServicoId,
+      checklistId,
       status,
       req.userCnpjEmpresa,
     );

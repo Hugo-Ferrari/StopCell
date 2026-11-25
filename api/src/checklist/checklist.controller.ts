@@ -1,4 +1,4 @@
-import { Controller, Post, Put, Body, Param, Req } from '@nestjs/common';
+import { Controller, Post, Put, Body, Param, ParseIntPipe, Req } from '@nestjs/common';
 import { ChecklistService } from './checklist.service';
 import { ChecklistDto } from '@/type/checklist.dto';
 import { Permissao } from '@/common/decorators/permissao.decorator'; // <- novo
@@ -16,7 +16,7 @@ export class ChecklistController {
 
   @Permissao(PERMISSOES.ORDENS_EDITAR) // <- novo
   @Put(':id')
-  atualizar(@Param('id') id: string, @Body() dto: ChecklistDto, @Req() req) {
-    return this.service.atualizar(+id, dto, req.userCnpjEmpresa);
+  atualizar(@Param('id', ParseIntPipe) id: number, @Body() dto: ChecklistDto, @Req() req) {
+    return this.service.atualizar(id, dto, req.userCnpjEmpresa);
   }
 }

@@ -1,7 +1,7 @@
 import { EmpresaService } from './enterprise.service';
-import { Body, Controller, Get, Patch, Post, Req } from '@nestjs/common';
-import { EmpresaDto, UpdateEmpresaDTO } from '@/type/enterprise.dto';
-import { Permissao, SomenteDono } from '@/common/decorators/permissao.decorator'; // <- novo
+import { Body, Controller, Get, Patch, Req } from '@nestjs/common';
+import { UpdateEmpresaDTO } from '@/type/enterprise.dto';
+import { Permissao } from '@/common/decorators/permissao.decorator'; // <- novo
 import { PERMISSOES } from '@/common/permissoes/catalogo'; // <- novo
 
 @Controller('empresa')
@@ -12,12 +12,6 @@ export class EmpresaController {
   @Get('minha')
   buscarMinha(@Req() req) {
     return this.empresaService.buscarPorCnpj(req.userCnpjEmpresa);
-  }
-
-  @SomenteDono() // <- novo
-  @Post()
-  cadastar(@Body() empresa: EmpresaDto) {
-    return this.empresaService.cadastrar(empresa);
   }
 
   @Permissao(PERMISSOES.LOJA_EDITAR) // <- novo

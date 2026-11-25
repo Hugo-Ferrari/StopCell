@@ -1,43 +1,50 @@
-import { IsString, IsNotEmpty, MinLength, Matches } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength } from 'class-validator';
+import { IsCnpj } from '@/common/decorators/is-cnpj.decorator';
 
 export class EmpresaDto {
-  @Matches(/^[0-9A-Z]{12}\d{2}$/, {
-    message: 'O CNPJ deve ter 14 caracteres.',
-  })
+    @IsCnpj()
     @IsString()
     @IsNotEmpty()
     cnpj: string =''
 
     @IsString()
     @IsNotEmpty()
+    @MaxLength(100)
     nomeFantasia: string=''
 
     @IsString()
     @IsNotEmpty()
+    @MaxLength(100)
     razaoSocial: string=''
 
     @IsString()
     @IsNotEmpty()
+    @MaxLength(20)
     telefone: string=''
 
     @IsString()
     @IsNotEmpty()
+    @MaxLength(150)
     endereco: string=''
 }
 export class UpdateEmpresaDTO{
   @IsString()
   @IsNotEmpty()
+  @MaxLength(100)
   nomeFantasia: string = '';
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(100)
   razaoSocial: string = '';
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(20)
   telefone: string = '';
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(150)
   endereco: string = '';
 }
