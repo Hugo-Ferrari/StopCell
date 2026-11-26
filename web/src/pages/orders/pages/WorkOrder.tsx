@@ -10,7 +10,9 @@ import FiltroStatusDialog from "@/components/orders/list/FiltroStatusDialog";
 import FiltrosAtivos from "@/components/orders/list/FiltrosAtivos";
 import ResumoStatus from "@/components/orders/list/ResumoStatus";
 import { useListaOrdens } from "@/hooks/useListaOrdens";
+import { useUsuario } from "@/hooks/useUsuario";
 import { contarPorFiltro, filtrarOrdens, OPCOES_FILTRO, type FiltroOs } from "@/utils/filtroOs";
+import { PERMISSOES } from "@/utils/permissoes";
 
 const VALIDOS = new Set<string>(OPCOES_FILTRO.map((opcao) => opcao.valor));
 
@@ -23,6 +25,7 @@ function lerFiltros(texto: string | null): FiltroOs[] {
 
 function OrdemServico() {
   const { ordens, carregando, erro } = useListaOrdens();
+  const { pode } = useUsuario();
 
   // filtro e busca ficam na URL: abrir uma O.S. e voltar mantém a lista como estava,
   // e o financeiro consegue mandar pra cá já filtrado
@@ -60,14 +63,16 @@ function OrdemServico() {
 
   return (
     <div className="flex w-full flex-col gap-6 text-foreground">
-      <header className="flex justify-end">
-        <Link
-          to="/nova-ordem-servico"
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto"
-        >
-          <Plus size={18} strokeWidth={2.5} /> Nova O.S.
-        </Link>
-      </header>
+      {pode(PERMISSOES.ORDENS_EDITAR) && (
+        <header className="flex justify-end">
+          <Link
+            to="/nova-ordem-servico"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto"
+          >
+            <Plus size={18} strokeWidth={2.5} /> Nova O.S.
+          </Link>
+        </header>
+      )}
 
       <div className="flex flex-col gap-3">
         <div className="flex gap-2 md:gap-4">

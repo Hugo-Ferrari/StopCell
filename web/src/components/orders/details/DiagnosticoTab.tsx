@@ -12,6 +12,7 @@ interface DiagnosticoTabProps {
   numOs: number;
   relatoCliente?: string;
   diagnosticos: DiagnosticoInterface[];
+  podeEditar: boolean;
   onSalvo: () => Promise<void>;
 }
 
@@ -20,7 +21,7 @@ function formatarDataHora(data?: string) {
   return new Date(data).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
 }
 
-function DiagnosticoTab({ numOs, relatoCliente, diagnosticos, onSalvo }: DiagnosticoTabProps) {
+function DiagnosticoTab({ numOs, relatoCliente, diagnosticos, podeEditar, onSalvo }: DiagnosticoTabProps) {
   const [texto, setTexto] = useState("");
   const [salvando, setSalvando] = useState(false);
   const [mensagem, setMensagem] = useState<{ texto: string; tipo: "erro" | "sucesso" } | null>(null);
@@ -59,24 +60,30 @@ function DiagnosticoTab({ numOs, relatoCliente, diagnosticos, onSalvo }: Diagnos
         </section>
       )}
 
-      <section className="flex flex-col gap-3">
-        <SecaoTitulo>Diagnóstico técnico</SecaoTitulo>
-        <Textarea
-          value={texto}
-          onChange={(e) => setTexto(e.target.value)}
-          placeholder="O que foi encontrado no aparelho? Ex.: Face ID sem resposta, flex do sensor rompido."
-          className="min-h-36 bg-card"
-        />
-        <Alert mensagem={mensagem?.texto} tipo={mensagem?.tipo} />
-        <Button
-          onClick={handleSalvar}
-          disabled={salvando || !texto.trim()}
-          className="h-12 self-end rounded-xl px-8"
-        >
-          {salvando ? <Loader2 className="animate-spin" /> : <Save />}
-          Salvar diagnóstico
-        </Button>
-      </section>
+      {podeEditar && (
+        <section className="flex flex-col gap-3">
+          <SecaoTitulo>Diagnóstico técnico</SecaoTitulo>
+          <Textarea
+            value={texto}
+            onChange={(e) => setTexto(e.target.value)}
+            placeholder="O que foi encontrado no aparelho? Ex.: Face ID sem resposta, flex do sensor rompido."
+            className="min-h-36 bg-card"
+          />
+          <Alert mensagem={mensagem?.texto} tipo={mensagem?.tipo} />
+          <Button
+            onClick={handleSalvar}
+            disabled={salvando || !texto.trim()}
+            className="h-12 self-end rounded-xl px-8"
+          >
+            {salvando ? <Loader2 className="animate-spin" /> : <Save />}
+            Salvar diagnóstico
+          </Button>
+        </section>
+      )}
+
+      {!podeEditar && historico.length === 0 && (
+        <p className="text-sm text-muted-foreground">Nenhum diagnóstico técnico registrado nesta O.S.</p>
+      )}
 
       {historico.length > 0 && (
         <section className="flex flex-col gap-3">

@@ -22,6 +22,8 @@ import { calcularOrcamento } from "@/utils/orcamento";
 import { estaEncerrada } from "@/utils/statusOs";
 import { cn } from "@/lib/utils";
 import { useAvisos } from "@/hooks/useAvisos";
+import { useUsuario } from "@/hooks/useUsuario";
+import { PERMISSOES } from "@/utils/permissoes";
 
 type Aba = "diagnostico" | "reparo" | "pecas" | "checklist";
 
@@ -53,6 +55,7 @@ function DetalhesOrdemServico() {
   }, [location.pathname, location.state, navigate]);
   const [erroRemocao, setErroRemocao] = useState<string | null>(null);
   const { mostrar } = useAvisos();
+  const { pode } = useUsuario();
 
   async function handleRemoverItem(idItemOs: number) {
     setErroRemocao(null);
@@ -87,6 +90,7 @@ function DetalhesOrdemServico() {
   const orcamento = calcularOrcamento(ordem.itensOs);
   // finalizada ou cancelada: só leitura
   const encerrada = estaEncerrada(ordem.status);
+  const podeEditar = pode(PERMISSOES.ORDENS_EDITAR);
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in-0">
@@ -136,6 +140,7 @@ function DetalhesOrdemServico() {
               numOs={ordem.numOs}
               relatoCliente={ordem.diagnostico}
               diagnosticos={ordem.diagnosticos ?? []}
+              podeEditar={podeEditar}
               onSalvo={recarregar}
             />
           </TabsContent>
@@ -144,7 +149,7 @@ function DetalhesOrdemServico() {
             <MaoDeObraTab
               numOs={ordem.numOs}
               servicos={orcamento.servicos}
-              bloqueado={encerrada}
+              bloqueado={encerrada || !podeEditar}
               onAlterado={recarregar}
               onRemover={handleRemoverItem}
             />
@@ -154,14 +159,14 @@ function DetalhesOrdemServico() {
             <PecasTab
               numOs={ordem.numOs}
               pecas={orcamento.pecas}
-              bloqueado={encerrada}
+              bloqueado={encerrada || !podeEditar}
               onAlterado={recarregar}
               onRemover={handleRemoverItem}
             />
           </TabsContent>
 
           <TabsContent value="checklist">
-            <ChecklistTab numOs={ordem.numOs} />
+            <ChecklistTab numOs={ordem.numOs} podeEditar={podeEditar} />
           </TabsContent>
         </Tabs>
 
@@ -172,7 +177,9 @@ function DetalhesOrdemServico() {
             totalMaoDeObra={orcamento.totalMaoDeObra}
             total={orcamento.total}
           />
-          <AcoesStatus numOs={ordem.numOs} status={ordem.status} total={orcamento.total} onAlterado={recarregar} />
+          {(podeEditar || encerrada) && (
+            <AcoesStatus numOs={ordem.numOs} status={ordem.status} total={orcamento.total} onAlterado={recarregar} />
+          )}
           <AvisosCliente avisos={ordem.logNotificacoes ?? []} />
         </aside>
       </div>
