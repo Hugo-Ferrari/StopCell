@@ -3,6 +3,7 @@ import { IdCard, Loader2, Search } from "lucide-react";
 import FormInput from "@/components/common/FormInput";
 import { Button } from "@/components/ui/button";
 import { buscarClientePorCpf, type criarClienteDto } from "@/services/customerService";
+import { naoEncontrado } from "@/utils/apiError";
 import { formatarCpf, formatarTelefone } from "@/utils/masks";
 
 interface CustomerSearchProps {
@@ -36,8 +37,12 @@ export default function CustomerSearch({ mostrarToast, clienteSelecionado, setCl
       } else {
         mostrarToast("Cliente não encontrado.", "erro");
       }
-    } catch {
-      mostrarToast("Cliente não encontrado. Confira o CPF ou cadastre um novo.", "erro");
+    } catch (error) {
+      if (naoEncontrado(error)) {
+        mostrarToast("Cliente não encontrado. Confira o CPF ou cadastre um novo.", "erro");
+      } else {
+        mostrarToast("Não foi possível buscar o cliente agora. Verifique a conexão e tente de novo.", "erro");
+      }
     } finally {
       setBuscando(false);
     }

@@ -1,5 +1,9 @@
 import { isAxiosError } from "axios";
 
+export function naoEncontrado(error: unknown): boolean {
+  return isAxiosError(error) && error.response?.status === 404;
+}
+
 export function mensagemDeErro(error: unknown, padrao: string): string {
   if (!isAxiosError(error)) return padrao;
 

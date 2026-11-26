@@ -1,15 +1,11 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import { isAxiosError } from "axios";
 import { RotateCw, WifiOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { sairDoSistema } from "@/api/token";
 import { buscarUsuarioLogado, type UsuarioLogado } from "@/services/userService";
+import { naoEncontrado } from "@/utils/apiError";
 import type { Permissao } from "@/utils/permissoes";
 import { UsuarioContext } from "./usuarioContext";
-
-function usuarioNaoExiste(error: unknown) {
-  return isAxiosError(error) && error.response?.status === 404;
-}
 
 // Busca o /usuario/me uma vez quando entra no sistema e deixa disponível
 // pra qualquer tela (menu, rotas, botões) saber o que o usuário pode fazer.
@@ -23,7 +19,7 @@ export function UsuarioProvider({ children }: { children: ReactNode }) {
       setUsuario(await buscarUsuarioLogado());
       setFalhou(false);
     } catch (error) {
-      if (usuarioNaoExiste(error)) sairDoSistema("expirada");
+      if (naoEncontrado(error)) sairDoSistema("expirada");
     }
   }, []);
 
@@ -35,7 +31,7 @@ export function UsuarioProvider({ children }: { children: ReactNode }) {
       .then((dados) => montado && setUsuario(dados))
       // se for 401 o interceptor do axios já manda pro login
       .catch((error) => {
-        if (usuarioNaoExiste(error)) return sairDoSistema("expirada");
+        if (naoEncontrado(error)) return sairDoSistema("expirada");
         if (montado) setFalhou(true);
       })
       .finally(() => montado && setCarregando(false));
