@@ -188,7 +188,7 @@ export class AuthService {
     await this.prisma.$transaction([
       this.prisma.usuario.update({
         where: { idUsuario: usuario.idUsuario },
-        data: { senha: senhaHash },
+        data: { senha: senhaHash, senhaAlteradaEm: new Date() },
       }),
       this.prisma.tokenRecuperacaoSenha.update({
         where: { idToken: token.idToken },

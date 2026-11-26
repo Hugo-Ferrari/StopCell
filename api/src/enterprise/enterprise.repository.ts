@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { EmpresaDto, UpdateEmpresaDTO } from '@/type/enterprise.dto';
+import { UpdateEmpresaDTO } from '@/type/enterprise.dto';
 
 @Injectable()
 export class EmpresaRepository {
@@ -8,10 +8,6 @@ export class EmpresaRepository {
 
   findByCnpj(cnpj: string) {
     return this.prisma.empresa.findUnique({ where: { cnpj } });
-  }
-
-  create(dto: EmpresaDto) {
-    return this.prisma.empresa.create({ data: dto });
   }
 
   update(cnpj: string, dto: UpdateEmpresaDTO) {

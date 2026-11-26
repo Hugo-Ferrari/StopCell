@@ -3,8 +3,6 @@ import { Prisma } from '@prisma/client';
 import { PrismaExceptionFilter } from './prisma-exception.filter';
 import { ClientesService } from '@/customer/customer.service';
 import { ClientesRepository } from '@/customer/customer.repository';
-import { EmpresaService } from '@/enterprise/enterprise.service';
-import { EmpresaRepository } from '@/enterprise/enterprise.repository';
 
 function criarErroPrisma(code: string) {
   return new Prisma.PrismaClientKnownRequestError('erro prisma', {
@@ -174,23 +172,6 @@ describe('Tratamento de P2002 nos services de cliente e empresa', () => {
         },
         '12345678000198',
       ),
-    ).rejects.toThrow(ConflictException);
-  });
-
-  it('EmpresaService.cadastrar lança ConflictException (409) em P2002', async () => {
-    const repo = {
-      create: jest.fn().mockRejectedValue({ code: 'P2002' }),
-    } as unknown as EmpresaRepository;
-    const service = new EmpresaService(repo);
-
-    await expect(
-      service.cadastrar({
-        cnpj: '12345678000198',
-        nomeFantasia: 'Loja',
-        razaoSocial: 'Loja LTDA',
-        telefone: '11999999999',
-        endereco: 'Rua A',
-      }),
     ).rejects.toThrow(ConflictException);
   });
 });

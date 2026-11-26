@@ -11,6 +11,12 @@ import { IS_PUBLIC_KEY } from '@/common/decorators/public.decorator';
 import { PERMISSAO_KEY, SOMENTE_DONO_KEY } from '@/common/decorators/permissao.decorator';
 import { NIVEL_DONO, TODAS_PERMISSOES } from '@/common/permissoes/catalogo';
 
+function tokenAnteriorATrocaDeSenha(emitidoEm: unknown, senhaAlteradaEm: Date | null) {
+  if (!senhaAlteradaEm) return false;
+  if (typeof emitidoEm !== 'number') return true;
+  return emitidoEm < Math.floor(senhaAlteradaEm.getTime() / 1000);
+}
+
 // Roda depois do JwtAuthGuard, então o request.user já está preenchido.
 @Injectable()
 export class PermissoesGuard implements CanActivate {
@@ -39,12 +45,17 @@ export class PermissoesGuard implements CanActivate {
       select: {
         ativo: true,
         nivelAcesso: true,
+        senhaAlteradaEm: true,
         perfil: { select: { permissoes: true } },
       },
     });
 
     if (!usuario || !usuario.ativo) {
       throw new UnauthorizedException('Usuário desativado');
+    }
+
+    if (tokenAnteriorATrocaDeSenha(request.user?.iat, usuario.senhaAlteradaEm)) {
+      throw new UnauthorizedException('Sessão encerrada');
     }
 
     const ehDono = usuario.nivelAcesso === NIVEL_DONO;

@@ -14,6 +14,7 @@ export class FuncionarioDto {
   login!: string;
 
   @IsEmail({}, { message: 'E-mail inválido' })
+  @MaxLength(100)
   emailUsuario!: string;
 
   @IsString()

@@ -152,6 +152,7 @@ describe('AuthService - recuperação de senha', () => {
       const { data } = prisma.usuario.update.mock.calls[0][0];
       expect(data.senha).not.toBe(dto.novaSenha);
       expect(await bcrypt.compare(dto.novaSenha, data.senha)).toBe(true);
+      expect(data.senhaAlteradaEm).toBeInstanceOf(Date);
       expect(prisma.tokenRecuperacaoSenha.update).toHaveBeenCalledWith({
         where: { idToken: 't1' },
         data: { usado: true },

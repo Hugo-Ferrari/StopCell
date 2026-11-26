@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional, MaxLength } from 'class-validator';
 
 export class PecaDto {
     @IsNumber()
@@ -7,5 +7,6 @@ export class PecaDto {
 
     @IsString()
     @IsOptional()
+    @MaxLength(150)
     descricao?: string;
 }

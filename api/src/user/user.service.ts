@@ -77,13 +77,16 @@ export class UsuarioService {
       await this.validarPerfil(dto.idPerfil, cnpjEmpresa);
     }
 
+    const senhaNova = dto.senha ? await bcrypt.hash(dto.senha, 10) : undefined;
+
     try {
       return await this.repository.atualizar(idUsuario, {
         nome: dto.nome?.trim(),
         login: dto.login?.trim(),
         emailUsuario: dto.emailUsuario?.trim().toLowerCase(),
         // senha é opcional na edição: só troca se o dono digitar uma nova
-        senha: dto.senha ? await bcrypt.hash(dto.senha, 10) : undefined,
+        senha: senhaNova,
+        senhaAlteradaEm: senhaNova ? new Date() : undefined,
         idPerfil: dto.idPerfil,
         ativo: dto.ativo,
       });
