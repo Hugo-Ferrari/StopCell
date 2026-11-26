@@ -8,10 +8,11 @@ import { cn } from "@/lib/utils";
 
 interface ChecklistTabProps {
   numOs: number;
+  podeEditar: boolean;
 }
 
 // aqui é só o resumo. pra marcar ou mudar algum item o técnico vai pra tela do checklist
-function ChecklistTab({ numOs }: ChecklistTabProps) {
+function ChecklistTab({ numOs, podeEditar }: ChecklistTabProps) {
   const { itens, contagem, jaRegistrado, carregando } = useChecklistOs(numOs);
   const comProblema = itens.filter((item) => item.status === "NOK");
 
@@ -55,19 +56,23 @@ function ChecklistTab({ numOs }: ChecklistTabProps) {
         <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border px-6 py-10 text-center">
           <ClipboardCheck className="size-8 text-muted-foreground" />
           <p className="font-medium">O checklist de entrada ainda não foi preenchido</p>
-          <p className="max-w-sm text-sm text-muted-foreground">
-            Registre o estado do aparelho na chegada. Isso protege a loja se o cliente reclamar de algo depois.
-          </p>
+          {podeEditar && (
+            <p className="max-w-sm text-sm text-muted-foreground">
+              Registre o estado do aparelho na chegada. Isso protege a loja se o cliente reclamar de algo depois.
+            </p>
+          )}
         </div>
       )}
 
-      <Link
-        to={`/ordemServico/${numOs}/checklist`}
-        className={cn(buttonVariants({ variant: "outline" }), "h-12 self-end rounded-xl px-8")}
-      >
-        {jaRegistrado ? "Ver checklist completo" : "Preencher checklist"}
-        <ArrowRight />
-      </Link>
+      {podeEditar && (
+        <Link
+          to={`/ordemServico/${numOs}/checklist`}
+          className={cn(buttonVariants({ variant: "outline" }), "h-12 self-end rounded-xl px-8")}
+        >
+          {jaRegistrado ? "Ver checklist completo" : "Preencher checklist"}
+          <ArrowRight />
+        </Link>
+      )}
     </div>
   );
 }
