@@ -14,11 +14,20 @@ const CHAVE_DUPLICADA = 'P2002';
 export class AparelhoService {
   constructor(private readonly repository: AparelhoRepository) {}
 
+  // sem isso dava pra mandar o id de uma marca criada por outra loja
+  private async garantirOpcoesDaLoja(dto: AparelhoDto, cnpjEmpresa: string) {
+    const { categoria, marca } = await this.repository.opcoesVisiveis(dto.idCategoria, dto.idMarca, cnpjEmpresa);
+    if (!categoria) throw new BadRequestException('Categoria inválida para esta loja.');
+    if (!marca) throw new BadRequestException('Marca inválida para esta loja.');
+  }
+
   async cadastro(dto: AparelhoDto, cnpjEmpresa: string) {
     const cliente = await this.repository.findCliente(dto.cpfCliente, cnpjEmpresa);
     if (!cliente) {
       throw new BadRequestException('Cliente não pertence à empresa');
     }
+
+    await this.garantirOpcoesDaLoja(dto, cnpjEmpresa);
 
     // a checagem é só dentro da loja. se o celular já passou por outra loja,
     // aqui ele é cadastrado de novo normalmente
@@ -50,10 +59,11 @@ export class AparelhoService {
     return this.repository.listarPorCliente(cpf, cnpjEmpresa);
   }
 
-  async listarOpcoes() {
+  // selects do formulário: as categorias e marcas padrão mais as da loja
+  async listarOpcoes(cnpjEmpresa: string) {
     const [categorias, marcas] = await Promise.all([
-      this.repository.listarCategorias(),
-      this.repository.listarMarcas(),
+      this.repository.listarCategorias(cnpjEmpresa),
+      this.repository.listarMarcas(cnpjEmpresa),
     ]);
     return { categorias, marcas };
   }
@@ -63,6 +73,8 @@ export class AparelhoService {
     if (!aparelho) {
       throw new NotFoundException('Aparelho não encontrado');
     }
+
+    await this.garantirOpcoesDaLoja(dto, cnpjEmpresa);
 
     // o IMEI e o dono não mudam por aqui, só os dados do aparelho
     return this.repository.atualizar(imei, { ...dto, imei, cpfCliente: aparelho.cpfCliente }, cnpjEmpresa);

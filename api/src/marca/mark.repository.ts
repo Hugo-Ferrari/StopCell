@@ -1,39 +1,39 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { MarcaDto } from '@/type/mark.dto';
+
+
+function daLojaOuPadrao(cnpjEmpresa: string): Prisma.MarcaWhereInput {
+  return { OR: [{ cnpjEmpresa: null }, { cnpjEmpresa }] };
+}
 
 @Injectable()
 export class MarcaRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  cadastro(dto: MarcaDto) {
-    return this.prisma.marca.create({
-      data: dto,
-    });
+  cadastro(nmMarca: string, cnpjEmpresa: string) {
+    return this.prisma.marca.create({ data: { nmMarca, cnpjEmpresa } });
   }
 
-  findByMarcaNome(nome: string) {
-    return this.prisma.marca.findMany({
-      where: {
-        nmMarca: nome,
-      },
-    });
+  atualizar(idMarca: number, nmMarca: string) {
+    return this.prisma.marca.update({ where: { idMarca }, data: { nmMarca } });
   }
 
-  atualizar(id: number, dto: MarcaDto) {
-    return this.prisma.marca.update({
-      where: {
-        idMarca: id,
-      },
-      data: dto,
-    });
+  findByid(idMarca: number) {
+    return this.prisma.marca.findUnique({ where: { idMarca } });
   }
 
-  findByid(id: number) {
+
+  findVisivelPorNome(nome: string, cnpjEmpresa: string) {
     return this.prisma.marca.findFirst({
-      where: {
-        idMarca: id,
-      },
+      where: { ...daLojaOuPadrao(cnpjEmpresa), nmMarca: { equals: nome, mode: 'insensitive' } },
+    });
+  }
+
+  buscarPorNome(nome: string, cnpjEmpresa: string) {
+    return this.prisma.marca.findMany({
+      where: { ...daLojaOuPadrao(cnpjEmpresa), nmMarca: { contains: nome, mode: 'insensitive' } },
+      orderBy: { idMarca: 'asc' },
     });
   }
 }

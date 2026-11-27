@@ -1,25 +1,31 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { categoriaDto } from '@/type/category.dto';
+
+// o que a loja enxerga: as categorias padrão (sem loja) e as que ela mesma criou
+function daLojaOuPadrao(cnpjEmpresa: string): Prisma.CategoriaWhereInput {
+  return { OR: [{ cnpjEmpresa: null }, { cnpjEmpresa }] };
+}
 
 @Injectable()
 export class categoriaRepository {
   constructor(private readonly prisma: PrismaService) {}
-  // adicionar ligação entre categoria e empresa no PRISMA
-  cadastro(dto: categoriaDto) {
-    return this.prisma.categoria.create({ data: dto });
+
+  cadastro(nmCategoria: string, cnpjEmpresa: string) {
+    return this.prisma.categoria.create({ data: { nmCategoria, cnpjEmpresa } });
   }
 
-  findByid(id: number) {
-    return this.prisma.categoria.findFirst({ where: { idCategoria: id } });
+  atualizar(idCategoria: number, nmCategoria: string) {
+    return this.prisma.categoria.update({ where: { idCategoria }, data: { nmCategoria } });
   }
 
-  atualizar(id: number, dto: categoriaDto) {
-    return this.prisma.categoria.update({
-      where: {
-        idCategoria: id,
-      },
-      data: dto,
+  findByid(idCategoria: number) {
+    return this.prisma.categoria.findUnique({ where: { idCategoria } });
+  }
+
+  findVisivelPorNome(nome: string, cnpjEmpresa: string) {
+    return this.prisma.categoria.findFirst({
+      where: { ...daLojaOuPadrao(cnpjEmpresa), nmCategoria: { equals: nome, mode: 'insensitive' } },
     });
   }
 }
