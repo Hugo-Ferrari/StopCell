@@ -1,11 +1,13 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { Public } from '../common/decorators/public.decorator';
 import { AuthService } from './auth.service';
+import { AuthRateLimitGuard } from './auth-rate-limit.guard';
 import { CadastroDto } from '@/type/Cadastro.dto';
 import { LoginDto } from '@/type/Login.dto';
 import { EsqueciSenhaDto } from '@/type/EsqueciSenha.dto';
 import { RedefinirSenhaDto } from '@/type/RedefinirSenha.dto';
 
+@UseGuards(AuthRateLimitGuard)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
