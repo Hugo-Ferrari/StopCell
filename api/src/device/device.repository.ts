@@ -58,12 +58,31 @@ export class AparelhoRepository {
     });
   }
 
-  listarCategorias() {
-    return this.prisma.categoria.findMany({ orderBy: { idCategoria: 'asc' } });
+    // pros selects do formulário: as padrão do sistema e as que a loja criou
+  listarCategorias(cnpjEmpresa: string) {
+    return this.prisma.categoria.findMany({
+      where: { OR: [{ cnpjEmpresa: null }, { cnpjEmpresa }] },
+      orderBy: { idCategoria: 'asc' },
+    });
   }
 
-  listarMarcas() {
-    return this.prisma.marca.findMany({ orderBy: { idMarca: 'asc' } });
+  listarMarcas(cnpjEmpresa: string) {
+    return this.prisma.marca.findMany({
+      where: { OR: [{ cnpjEmpresa: null }, { cnpjEmpresa }] },
+      orderBy: { idMarca: 'asc' },
+    });
+  }
+
+  // confere se a marca e a categoria escolhidas são padrão ou da própria loja
+  async opcoesVisiveis(idCategoria: number, idMarca: number, cnpjEmpresa: string) {
+    const daLojaOuPadrao = { OR: [{ cnpjEmpresa: null }, { cnpjEmpresa }] };
+
+    const [categoria, marca] = await Promise.all([
+      this.prisma.categoria.findFirst({ where: { idCategoria, ...daLojaOuPadrao }, select: { idCategoria: true } }),
+      this.prisma.marca.findFirst({ where: { idMarca, ...daLojaOuPadrao }, select: { idMarca: true } }),
+    ]);
+
+    return { categoria: Boolean(categoria), marca: Boolean(marca) };
   }
 
   remover(imei: string, cnpjEmpresa: string) {

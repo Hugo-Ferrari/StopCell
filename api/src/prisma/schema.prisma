@@ -49,6 +49,8 @@ model Empresa {
   checklists    Checklist[]
   despesas      Despesa[]
   perfis        PerfilAcesso[]
+  marcas        Marca[]
+  categorias    Categoria[]
 
   @@map("empresa")
 }
@@ -72,20 +74,28 @@ model Cliente {
 }
 
 model Marca {
-  idMarca Int     @id @default(autoincrement()) @map("id_marca")
-  nmMarca String? @map("nm_marca") @db.VarChar(100)
+  idMarca     Int     @id @default(autoincrement()) @map("id_marca")
+  nmMarca     String? @map("nm_marca") @db.VarChar(100)
+  // null = marca padrão do sistema: todas as lojas veem e nenhuma edita
+  cnpjEmpresa String? @map("cnpj_empresa") @db.VarChar(14)
 
+  empresa   Empresa?   @relation(fields: [cnpjEmpresa], references: [cnpj], onDelete: Restrict, onUpdate: Cascade)
   aparelhos Aparelho[]
 
+  @@index([cnpjEmpresa])
   @@map("marca")
 }
 
 model Categoria {
   idCategoria Int     @id @default(autoincrement()) @map("id_categoria")
   nmCategoria String? @map("nm_categoria") @db.VarChar(100)
+  // null = categoria padrão do sistema: todas as lojas veem e nenhuma edita
+  cnpjEmpresa String? @map("cnpj_empresa") @db.VarChar(14)
 
+  empresa   Empresa?   @relation(fields: [cnpjEmpresa], references: [cnpj], onDelete: Restrict, onUpdate: Cascade)
   aparelhos Aparelho[]
 
+  @@index([cnpjEmpresa])
   @@map("categoria")
 }
 

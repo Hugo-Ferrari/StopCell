@@ -20,10 +20,10 @@ export class AparelhoController {
     return this.service.listar(req.userCnpjEmpresa);
   }
 
-  // categorias e marcas pros selects do formulário (antes ficavam fixas no front)
+   // categorias e marcas pros selects do formulário: as padrão e as da loja
   @Get('opcoes')
-  listarOpcoes() {
-    return this.service.listarOpcoes();
+  listarOpcoes(@Req() req: any) {
+    return this.service.listarOpcoes(req.userCnpjEmpresa);
   }
 
   // aparelhos que o cliente já trouxe, pra escolher na hora de abrir a O.S.

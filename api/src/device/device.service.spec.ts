@@ -13,7 +13,12 @@ describe('AparelhoService - cadastro', () => {
     tipoSenha: 'Numérica (PIN)',
   };
 
-  let repository: { findCliente: jest.Mock; findById: jest.Mock; cadastro: jest.Mock };
+    let repository: {
+    findCliente: jest.Mock;
+    findById: jest.Mock;
+    cadastro: jest.Mock;
+    opcoesVisiveis: jest.Mock;
+  };
   let service: AparelhoService;
 
   beforeEach(() => {
@@ -21,6 +26,7 @@ describe('AparelhoService - cadastro', () => {
       findCliente: jest.fn().mockResolvedValue({ cpf: dto.cpfCliente }),
       findById: jest.fn().mockResolvedValue(null),
       cadastro: jest.fn().mockResolvedValue({ ...dto, cnpjEmpresa: '11111111000111' }),
+      opcoesVisiveis: jest.fn().mockResolvedValue({ categoria: true, marca: true }),
     };
     service = new AparelhoService(repository as any);
   });
@@ -61,5 +67,12 @@ describe('AparelhoService - cadastro', () => {
     repository.findCliente.mockResolvedValue(null);
 
     await expect(service.cadastro(dto, '11111111000111')).rejects.toThrow('Cliente não pertence à empresa');
+  });
+
+    it('recusa marca criada por outra loja', async () => {
+    repository.opcoesVisiveis.mockResolvedValue({ categoria: true, marca: false });
+
+    await expect(service.cadastro(dto, '11111111000111')).rejects.toThrow('Marca inválida para esta loja.');
+    expect(repository.cadastro).not.toHaveBeenCalled();
   });
 });

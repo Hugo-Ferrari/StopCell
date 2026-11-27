@@ -1,23 +1,23 @@
-import { Body, Controller, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Param, ParseIntPipe, Post, Put, Req } from '@nestjs/common';
 import { CategoriaService } from './category.service';
 import { categoriaDto } from '@/type/category.dto';
-import { Permissao } from '@/common/decorators/permissao.decorator'; // <- novo
-import { PERMISSOES } from '@/common/permissoes/catalogo'; // <- novo
+import { Permissao } from '@/common/decorators/permissao.decorator';
+import { PERMISSOES } from '@/common/permissoes/catalogo';
 
 @Controller('categoria')
-// adicionar ligação entre categoria e empresa no PRISMA
 export class CategoriaController {
   constructor(private readonly service: CategoriaService) {}
 
-  @Permissao(PERMISSOES.ORDENS_EDITAR, PERMISSOES.ESTOQUE_EDITAR) // <- novo
+  @Permissao(PERMISSOES.ORDENS_EDITAR, PERMISSOES.ESTOQUE_EDITAR)
   @Post()
-  cadastrar(@Body() dto: categoriaDto) {
-    return this.service.cadastrar(dto);
+  cadastrar(@Body() dto: categoriaDto, @Req() req: any) {
+    return this.service.cadastrar(dto, req.userCnpjEmpresa);
   }
 
-  @Permissao(PERMISSOES.ORDENS_EDITAR, PERMISSOES.ESTOQUE_EDITAR) // <- novo
+  // só altera categoria criada pela própria loja; as padrão do sistema ficam travadas
+  @Permissao(PERMISSOES.ORDENS_EDITAR, PERMISSOES.ESTOQUE_EDITAR)
   @Put(':id')
-  atualizar(@Param('id', ParseIntPipe) id: number, @Body() dto: categoriaDto) {
-    return this.service.atualizar(id, dto);
+  atualizar(@Param('id', ParseIntPipe) id: number, @Body() dto: categoriaDto, @Req() req: any) {
+    return this.service.atualizar(id, dto, req.userCnpjEmpresa);
   }
 }
