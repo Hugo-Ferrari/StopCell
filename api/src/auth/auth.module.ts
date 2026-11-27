@@ -2,6 +2,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { AuthRateLimitGuard } from './auth-rate-limit.guard';
 import { EmpresaRepository } from '@/enterprise/enterprise.repository';
 import { UsuarioRepository } from '@/user/user.repository';
 import { MailModule } from '@/mail/mail.module';
@@ -20,6 +21,7 @@ import { MailModule } from '@/mail/mail.module';
   controllers: [AuthController],
   providers: [
     AuthService,
+    AuthRateLimitGuard,
     EmpresaRepository,
     UsuarioRepository,
   ],

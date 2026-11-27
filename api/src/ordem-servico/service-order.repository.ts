@@ -92,7 +92,7 @@ export class OrdemServicoRepository {
       where: { numOs, cnpjEmpresa },
       include: {
         cliente: true,
-        aparelho: true,
+        aparelho: { omit: { senhaAparelho: true } },
         usuario: { select: { idUsuario: true, nome: true } },
         diagnosticos: { orderBy: { dataHora: 'desc' } },
         itensOs: { orderBy: { idItemOs: 'asc' } },
