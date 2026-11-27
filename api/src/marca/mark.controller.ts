@@ -1,23 +1,17 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { MarcaService } from './mark.service';
 import { MarcaDto } from '@/type/mark.dto';
-import { Permissao } from '@/common/decorators/permissao.decorator'; // <- novo
-import { PERMISSOES } from '@/common/permissoes/catalogo'; // <- novo
+import { Permissao } from '@/common/decorators/permissao.decorator';
+import { PERMISSOES } from '@/common/permissoes/catalogo';
 
 @Controller('marca')
 export class MarcaController {
   constructor(private readonly service: MarcaService) {}
 
-  @Permissao(PERMISSOES.ORDENS_EDITAR, PERMISSOES.ESTOQUE_EDITAR) // <- novo
+  @Permissao(PERMISSOES.ORDENS_EDITAR, PERMISSOES.ESTOQUE_EDITAR)
   @Post()
   cadastrar(@Body() dto: MarcaDto) {
     return this.service.cadastrar(dto);
-  }
-
-  @Permissao(PERMISSOES.ORDENS_EDITAR, PERMISSOES.ESTOQUE_EDITAR) // <- novo
-  @Put(':id')
-  atualizar(@Param('id', ParseIntPipe) id: number, @Body() dto: MarcaDto) {
-    return this.service.atualizar(id, dto);
   }
 
   // sem etiqueta: qualquer usuário logado pode buscar marca
